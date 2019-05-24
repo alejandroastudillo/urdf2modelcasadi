@@ -42,3 +42,16 @@
 /build/cmake_install.cmake
 /build/libkinova3_dynamics.so
 /build/urdf2model_casadi
+/build/CMakeFiles/kinova3_dynamics.dir/src/model_pinocchio/kinova3.cpp.o
+/build/CMakeFiles/robot_dynamics.dir/CXX.includecache
+/build/CMakeFiles/robot_dynamics.dir/DependInfo.cmake
+/build/CMakeFiles/robot_dynamics.dir/build.make
+/build/CMakeFiles/robot_dynamics.dir/cmake_clean.cmake
+/build/CMakeFiles/robot_dynamics.dir/depend.internal
+/build/CMakeFiles/robot_dynamics.dir/depend.make
+/build/CMakeFiles/robot_dynamics.dir/flags.make
+/build/CMakeFiles/robot_dynamics.dir/link.txt
+/build/CMakeFiles/robot_dynamics.dir/progress.make
+/build/CMakeFiles/robot_dynamics.dir/src/model_pinocchio/kinova3.cpp.o
+/build/CMakeFiles/robot_dynamics.dir/src/model_pinocchio/pinocchio_interface.cpp.o
+/build/librobot_dynamics.so

@@ -1,0 +1,24 @@
+# Declare TPUT dictionary for readability: BLACK=$(tput setaf 0), RED=$(tput setaf 1), GREEN=$(tput setaf 2), YELLOW=$(tput setaf 3), LIME_YELLOW=$(tput setaf 190), POWDER_BLUE=$(tput setaf 153), BLUE=$(tput setaf 4), MAGENTA=$(tput setaf 5), CYAN=$(tput setaf 6), WHITE=$(tput setaf 7), BOLD=$(tput bold), NORMAL=$(tput sgr0), BLINK=$(tput blink), REVERSE=$(tput smso), UNDERLINE=$(tput smul)
+  declare -A TPUT=( ["CYAN"]=$(tput setaf 6) ["NORMAL"]=$(tput sgr0) ["BOLD"]=$(tput bold))
+  print_title () {
+      printf "\n%40s\n" "${TPUT[CYAN]}${TPUT[BOLD]} $1 ${TPUT[NORMAL]}"
+  }
+
+# Set variables used by CMake
+  export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/build/install_matlab"
+  export PINOCCHIO_INCLUDE="/opt/openrobots/include/"
+  export EIGEN_INCLUDE="/usr/include/eigen3"
+
+# If the CMakeCache.txt file exists, delete it.
+  if test -f "CMakeCache.txt"; then
+      print_title "########## Removing CMakeCache.txt ##########"
+      rm CMakeCache.txt
+  fi
+
+# Execute the cmake command, assigning the variable reference values (CASADI_DIR, PINOCCHIO_INC, EIGEN_INC).
+  print_title "########## Executing CMake ##########"
+  cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE
+
+# Execute the make command
+  print_title "########## Executing make ##########"
+  make -j3

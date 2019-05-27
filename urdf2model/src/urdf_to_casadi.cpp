@@ -6,12 +6,13 @@ using namespace casadi;
 int main()
 {
     std::string filename = "../urdf2model/robot_descriptions/kortex_description/urdf/JACO3_URDF_V10.urdf";
+    // std::string filename = "../urdf2model/robot_descriptions/iiwa_description/urdf/iiwa14.urdf";
     robot_init(filename);
 
     int n_dof = get_ndof();
     int n_q = get_nq();
 
-    std::cout << "ndof: " << n_dof << std::endl;
+    // std::cout << "ndof: " << n_dof << std::endl;
 
     // Variables
     SX q = SX::sym("q",n_dof,1);

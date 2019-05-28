@@ -6,13 +6,14 @@ using namespace casadi;
 int main()
 {
     // Select the URDF file to create the model
-        std::string filename = "../urdf2model/robot_descriptions/kortex_description/urdf/JACO3_URDF_V10.urdf";
+        std::string filename = "../urdf2model/robot_descriptions/kortex_description/urdf/JACO3_URDF_V10rev.urdf";
+        // std::string filename = "../urdf2model/robot_descriptions/kortex_description/urdf/JACO3_URDF_V10.urdf";
         // std::string filename = "../urdf2model/robot_descriptions/iiwa_description/urdf/iiwa14.urdf";
         // std::string filename = "../urdf2model/robot_descriptions/abb_common/urdf/irb120.urdf";
 
     robot_init(filename);
     execute_tests();
-    //print_model_data();
+    print_model_data();
 
     int n_dof = get_ndof();
     int n_q = get_nq();

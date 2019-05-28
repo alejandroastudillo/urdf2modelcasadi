@@ -2,51 +2,27 @@
 */
 #include "pinocchio_interface.h"
 
+#define PI boost::math::constants::pi<double>()
+
 pinocchio::Model model;
-// data for the NMPC controller
 pinocchio::Data data = pinocchio::Data(model);
 
 void robot_init(std::string filename)
 {
-    pinocchio::urdf::buildModel(filename,model);
-
+    // build the model using the urdf parser
+      pinocchio::urdf::buildModel(filename,model);
     // Set the gravity applied to the model
-    model.gravity.linear(pinocchio::Model::gravity981);     //model.gravity.setZero(), model.gravity.linear( Eigen::Vector3d(0,0,-9.8));
-
-    // init for NMPC
-    data = pinocchio::Data(model);
-
-    casadi::SX x = casadi::SX::sym("x");
-    casadi::SX y = casadi::SX::sym("y");
-    casadi::Function f("f", {x, y}, {2*x, x/y});
-    std::vector<casadi::DM> f_arg = {3,4};
-    std::cout << "f_kin: " << f(f_arg) << std::endl;
-
-    Eigen::VectorXd EE_pos = Eigen::VectorXd::Zero(3);
-
-
-    const double pi = boost::math::constants::pi<double>();
-    Eigen::VectorXd q_0(model.nq);
-    q_0 << 1, 0, pi/6, 1, 0, 4*pi/6, 1, 0, -2*pi/6, 1, -pi/2; // Eigen::VectorXd q_0(7); q_0 << 0, pi/6, 0, 4*pi/6, 0, -2*pi/6, -pi/2;
-    std::cout << "q_0 = " << q_0.transpose() << std::endl;
-
-    //Eigen::VectorXd q = pinocchio::neutral(model);  // pinocchio::randomConfiguration(model);
-    //std::cout << "q = " << q.transpose() << std::endl;
-
-    int EE_idx = model.getFrameId("EndEffector");
-
-    ForwardKinematics_pin(q_0);
-
-    std::cout << "\nEE position: " << data.oMf[EE_idx].translation().transpose() << std::endl;
-    std::cout << "\nEE rotation matrix: \n" << data.oMf[EE_idx+1].rotation() << std::endl;
-
-    // print_model_data();
-    std::cout << "IDX: "<< model.joints[7].idx_q() << std::endl;
+      model.gravity.linear(pinocchio::Model::gravity981);     //model.gravity.setZero(), model.gravity.linear( Eigen::Vector3d(0,0,-9.8));
+    // initialize the data structure for the model
+      data = pinocchio::Data(model);
 }
 
-void ForwardKinematics_pin(Eigen::VectorXd q){
-    pinocchio::forwardKinematics(model,data,q);
-    pinocchio::updateFramePlacements(model, data);
+void ForwardKinematics_pin(Eigen::VectorXd q)
+{
+    // apply forward kinematics wrt q. Updates data structure
+      pinocchio::forwardKinematics(model,data,q);
+    // update the position of each frame contained in the model.
+      pinocchio::updateFramePlacements(model, data);
 }
 
 void qdd_cal(double *q, double *qd, double *qdd, double *tau)
@@ -64,7 +40,8 @@ void qdd_cal(double *q, double *qd, double *qdd, double *tau)
 //    std::cout << "qdd = " << qdd_Eigen << std::endl;
 }
 
-void print_model_data(){
+void print_model_data()
+{
     std::cout << "Number of joints (including universe) = " << data.oMi.size() << std::endl; // model.njoints = data.oMi.size()
     std::cout << "Number of DoF: " << model.nv << std::endl;
     std::cout << "Number of bodies: " << model.nbodies << std::endl;
@@ -83,6 +60,32 @@ void print_model_data(){
     }
 
 }
+
+void execute_tests()
+{
+    // casadi::SX x = casadi::SX::sym("x");
+    // casadi::SX y = casadi::SX::sym("y");
+    // casadi::Function f("f", {x, y}, {2*x, x/y});
+    // std::vector<casadi::DM> f_arg = {3,4};
+    // std::cout << "f_kin: " << f(f_arg) << std::endl;
+
+    Eigen::VectorXd q(model.nq);
+    q << cos(0), sin(0), PI/6, cos(0), sin(0), 4*PI/6, 1, 0, -2*PI/6, cos(PI/2), sin(PI/2); //q << 1, 0, PI/6, 1, 0, 4*PI/6, 1, 0, -2*PI/6, 1, PI/2; // Eigen::VectorXd q_0(7); q_0 << 0, pi/6, 0, 4*pi/6, 0, -2*pi/6, -pi/2;
+    std::cout << "q = " << q.transpose() << std::endl;
+
+    // Eigen::VectorXd q = pinocchio::neutral(model);  // pinocchio::randomConfiguration(model);
+    // std::cout << "q = " << q.transpose() << std::endl;
+
+    int EE_idx = model.getFrameId("EndEffector"); // kinova: EndEffector, abb: joint6-tool0, kuka: iiwa_joint_ee
+
+    ForwardKinematics_pin(q);
+
+    std::cout << "\nEE position: " << data.oMf[EE_idx].translation().transpose() << std::endl;
+    std::cout << "\nEE rotation matrix: \n" << data.oMf[EE_idx+1].rotation() << std::endl;
+
+    std::cout << "IDX: "<< model.joints[7].idx_q() << std::endl;
+}
+
 
 int get_ndof() {return model.nv;}
 int get_nq() {return model.nq;}

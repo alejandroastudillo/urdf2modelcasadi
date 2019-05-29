@@ -22,8 +22,8 @@ void qdd_cal(double *q, double *qd, double *qdd, double *tau, int parIdx);
 
 void ForwardKinematics_pin(Eigen::VectorXd q);
 
-
 void print_model_data();
+
 void execute_tests();
 
 // getters

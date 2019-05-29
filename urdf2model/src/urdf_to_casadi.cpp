@@ -13,7 +13,10 @@ int main()
 
     robot_init(filename);
     execute_tests();
-    print_model_data();
+
+    #ifdef DEBUG
+      print_model_data();
+    #endif
 
     int n_dof = get_ndof();
     int n_q = get_nq();

@@ -16,7 +16,6 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
 /* TODO:
   - Handle (print error or warning) when the torque, position, or velocity limits are zero.
 */
-
 #include "pinocchio_interface.h"
 
 const double PI = boost::math::constants::pi<double>();
@@ -32,7 +31,7 @@ struct Robot_info_struct {
    Eigen::VectorXd  joint_pos_ub;
    Eigen::VectorXd  joint_pos_lb;
    Eigen::VectorXd  joint_vel_limit;
-   Eigen::Vector3d  gravity;
+   Eigen::VectorXd  gravity;          // Eigen::Vector3d
 };
 
 struct Robot_info_struct robot_info; // Declare robot_info of type Robot_info_struct
@@ -139,18 +138,17 @@ void execute_tests()
 
 void print_model_data()
 {
-    std::cout << std::left << std::setw(45) << "Model name = " << std::setw(45) << robot_info.name << std::endl;
-    std::cout << std::left << std::setw(45) << "Size of configuration vector = " << std::setw(45) << robot_info.n_q << std::endl;
-    std::cout << std::left << std::setw(45) << "Number of joints (including universe) = " << std::setw(45) << robot_info.n_joints << std::endl;
-    std::cout << std::left << std::setw(45) << "Number of DoF: " << std::setw(45) << robot_info.n_dof << std::endl;
-    std::cout << std::left << std::setw(45) << "Number of bodies: " << std::setw(45) << robot_info.n_bodies << std::endl;
-    std::cout << std::left << std::setw(45) << "Number of operational frames: " << std::setw(45) << robot_info.n_frames << std::endl;
-
-    std::cout << "Gravity: " << robot_info.gravity.transpose() << std::endl;
-    std::cout << "Joint torque upper bounds: " << robot_info.joint_torque_limit.transpose() << std::endl;
-    std::cout << "Joint configuration upper bounds: " << robot_info.joint_pos_ub.transpose() << std::endl;
-    std::cout << "Joint configuration lower bounds: " << robot_info.joint_pos_lb.transpose() << std::endl;
-    std::cout << "Joint velocity upped bounds: " << robot_info.joint_vel_limit.transpose() << std::endl;
+    print_indent("Model name = ", robot_info.name, 45);
+    print_indent("Size of configuration vector = ", robot_info.n_q, 45);
+    print_indent("Number of joints (including universe) = ", robot_info.n_joints, 45);
+    print_indent("Number of DoF: ", robot_info.n_dof, 45);
+    print_indent("Number of bodies: ", robot_info.n_bodies, 45);
+    print_indent("Number of operational frames: ", robot_info.n_frames, 45);
+    print_indent("Gravity: ", robot_info.gravity, 45);
+    print_indent("Joint torque upper bounds: ", robot_info.joint_torque_limit, 45);
+    print_indent("Joint configuration upper bounds: ", robot_info.joint_pos_ub, 45);
+    print_indent("Joint configuration lower bounds: ", robot_info.joint_pos_lb, 45);
+    print_indent("Joint velocity upped bounds: ", robot_info.joint_vel_limit, 45);
 
     for (int k=0 ; k<model.njoints ; ++k)
     {

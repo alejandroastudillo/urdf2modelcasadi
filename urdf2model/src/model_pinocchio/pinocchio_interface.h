@@ -2,6 +2,8 @@
 #ifndef PINOCCHIO_INTERFACE_H_INCLUDED
 #define PINOCCHIO_INTERFACE_H_INCLUDED
 
+#include "../utils/debug_functions.hpp"
+
 #include "pinocchio/multibody/model.hpp"
 #include "pinocchio/parsers/urdf.hpp"
 #include "pinocchio/algorithm/frames.hpp"

@@ -138,17 +138,17 @@ void execute_tests()
 
 void print_model_data()
 {
-    print_indent("Model name = ", robot_info.name, 45);
-    print_indent("Size of configuration vector = ", robot_info.n_q, 45);
-    print_indent("Number of joints (including universe) = ", robot_info.n_joints, 45);
-    print_indent("Number of DoF: ", robot_info.n_dof, 45);
-    print_indent("Number of bodies: ", robot_info.n_bodies, 45);
-    print_indent("Number of operational frames: ", robot_info.n_frames, 45);
-    print_indent("Gravity: ", robot_info.gravity, 45);
-    print_indent("Joint torque upper bounds: ", robot_info.joint_torque_limit, 45);
-    print_indent("Joint configuration upper bounds: ", robot_info.joint_pos_ub, 45);
-    print_indent("Joint configuration lower bounds: ", robot_info.joint_pos_lb, 45);
-    print_indent("Joint velocity upped bounds: ", robot_info.joint_vel_limit, 45);
+    print_indent("Model name = ",                             robot_info.name,                45);
+    print_indent("Size of configuration vector = ",           robot_info.n_q,                 45);
+    print_indent("Number of joints (including universe) = ",  robot_info.n_joints,            45);
+    print_indent("Number of DoF: ",                           robot_info.n_dof,               45);
+    print_indent("Number of bodies: ",                        robot_info.n_bodies,            45);
+    print_indent("Number of operational frames: ",            robot_info.n_frames,            45);
+    print_indent("Gravity: ",                                 robot_info.gravity,             45);
+    print_indent("Joint torque upper bounds: ",               robot_info.joint_torque_limit,  45);
+    print_indent("Joint configuration upper bounds: ",        robot_info.joint_pos_ub,        45);
+    print_indent("Joint configuration lower bounds: ",        robot_info.joint_pos_lb,        45);
+    print_indent("Joint velocity upped bounds: ",             robot_info.joint_vel_limit,     45);
 
     for (int k=0 ; k<model.njoints ; ++k)
     {

@@ -34,7 +34,8 @@ struct Robot_info_struct {
    Eigen::VectorXd  gravity;          // Eigen::Vector3d
 };
 
-struct Robot_info_struct robot_info; // Declare robot_info of type Robot_info_struct
+// Declare robot_info of type Robot_info_struct
+  Robot_info_struct robot_info;
 
 pinocchio::Model  model;                                      // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1ModelTpl.html
 pinocchio::Data   data = pinocchio::Data(model);              // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1DataTpl.html
@@ -98,67 +99,71 @@ void execute_tests()
     // std::vector<casadi::DM> f_arg = {3,4};
     // std::cout << "f_kin: " << f(f_arg) << std::endl;
 
+    std::cout << "\n----- Forward kinematics test: " << std::endl;
+
     // get the index of the frame corresponding to the end-effector
       int EE_idx = model.nframes-1; // EE_idx = model.getFrameId("EndEffector"); kinova: EndEffector, abb: joint6-tool0, kuka: iiwa_joint_ee
-      std::cout << "\n\tName of the end-effector frame = " << model.frames[EE_idx].name << std::endl << std::endl;
+      print_indent("Name of the end-effector frame = ", model.frames[EE_idx].name, 40);
+      // std::cout << "\n\tName of the end-effector frame = " << model.frames[EE_idx].name << std::endl << std::endl;
 
     // robot's home configuration
       Eigen::VectorXd q_home = pinocchio::neutral(model);  // pinocchio::randomConfiguration(model);
-      std::cout << "----- Home configuration --> q = " << q_home.transpose() << std::endl;
 
       ForwardKinematics_pin(q_home);
-      Eigen::Vector3d ee_position_0 = data.oMf[EE_idx].translation();
-      Eigen::Matrix3d ee_rotmatrix_0 = data.oMf[EE_idx].rotation();
-      Eigen::Vector3d ee_orientation_0 = ee_rotmatrix_0.eulerAngles(2, 1, 0);
+      Eigen::Vector3d ee_position_0     = data.oMf[EE_idx].translation();
+      Eigen::Matrix3d ee_rotmatrix_0    = data.oMf[EE_idx].rotation();
+      Eigen::Vector3d ee_orientation_0  = ee_rotmatrix_0.eulerAngles(2, 1, 0);
 
-      std::cout << "\tEE position: \t" << ee_position_0.transpose() << std::endl;
-      std::cout << "\n\tEE orientation: " << ee_orientation_0.transpose() << std::endl << std::endl;
+      std::cout << "Home configuration " << std::endl;
+      print_indent("     q = ",               q_home,           40);
+      print_indent("     EE position = ",     ee_position_0,    40);
+      print_indent("     EE orientation = ",  ee_orientation_0, 40);
 
     // custom joint configuration
       Eigen::VectorXd q(model.nq);
       q << 0, PI/6, 0, 4*PI/6, 0, -2*PI/6, -PI/2;//; //q << cos(0), sin(0), PI/6, cos(0), sin(0), 4*PI/6, cos(0), sin(0), -2*PI/6, cos(PI/2), sin(PI/2); // Eigen::VectorXd q_0(7); q_0 << 0, pi/6, 0, 4*pi/6, 0, -2*pi/6, -pi/2;
-      std::cout << "----- Custom joint configuration --> q = " << q.transpose() << std::endl;
 
       ForwardKinematics_pin(q);
-      Eigen::Vector3d ee_position = data.oMf[EE_idx].translation();
-      Eigen::Matrix3d ee_rotmatrix = data.oMf[EE_idx].rotation();
-      Eigen::Vector3d ee_orientation = ee_rotmatrix.eulerAngles(2, 1, 0);
+      Eigen::Vector3d ee_position       = data.oMf[EE_idx].translation();
+      Eigen::Matrix3d ee_rotmatrix      = data.oMf[EE_idx].rotation();
+      Eigen::Vector3d ee_orientation    = ee_rotmatrix.eulerAngles(2, 1, 0);
 
-      std::cout << "\tEE position: \t" << ee_position.transpose() << std::endl;
-      std::cout << "\n\tEE orientation: " << ee_orientation.transpose() << std::endl << std::endl;
+      std::cout << "Custom joint configuration " << std::endl;
+      print_indent("     q = ",               q,              40);
+      print_indent("     EE position = ",     ee_position,    40);
+      print_indent("     EE orientation = ",  ee_orientation, 40);
 
     // double q0[] = {cos(0), sin(0), PI/6, cos(0), sin(0), 4*PI/6, cos(0), sin(0), -2*PI/6, cos(PI/2), sin(PI/2)};
     // double qm[model.nq] = {0};
     // std::cout << "qm before = " << Eigen::Map<Eigen::VectorXd>(qm, model.nq).transpose() << std::endl;
-    // map_joint_angles(q0, qm);
-    // std::cout << "qm after = " << Eigen::Map<Eigen::VectorXd>(qm, model.nq).transpose() <<  std::endl;
     // std::cout << "IDX: "<< model.joints[7].idx_q() << std::endl;
 }
 
-
 void print_model_data()
 {
-    print_indent("Model name = ",                             robot_info.name,                45);
-    print_indent("Size of configuration vector = ",           robot_info.n_q,                 45);
-    print_indent("Number of joints (including universe) = ",  robot_info.n_joints,            45);
-    print_indent("Number of DoF: ",                           robot_info.n_dof,               45);
-    print_indent("Number of bodies: ",                        robot_info.n_bodies,            45);
-    print_indent("Number of operational frames: ",            robot_info.n_frames,            45);
-    print_indent("Gravity: ",                                 robot_info.gravity,             45);
-    print_indent("Joint torque upper bounds: ",               robot_info.joint_torque_limit,  45);
-    print_indent("Joint configuration upper bounds: ",        robot_info.joint_pos_ub,        45);
-    print_indent("Joint configuration lower bounds: ",        robot_info.joint_pos_lb,        45);
-    print_indent("Joint velocity upped bounds: ",             robot_info.joint_vel_limit,     45);
+    std::cout << "\n----- Robot model information: " << std::endl;
+    print_indent("Model name = ",                        robot_info.name,                40);
+    print_indent("Size of configuration vector = ",      robot_info.n_q,                 40);
+    print_indent("Number of joints (with universe) = ",  robot_info.n_joints,            40);
+    print_indent("Number of DoF = ",                      robot_info.n_dof,              40);
+    print_indent("Number of bodies = ",                   robot_info.n_bodies,           40);
+    print_indent("Number of operational frames = ",       robot_info.n_frames,           40);
+    print_indent("Gravity = ",                            robot_info.gravity,            40);
+    print_indent("Joint torque bounds = ",                robot_info.joint_torque_limit, 40);
+    print_indent("Joint configuration upper bounds = ",   robot_info.joint_pos_ub,       40);
+    print_indent("Joint configuration lower bounds = ",   robot_info.joint_pos_lb,       40);
+    print_indent("Joint velocity bounds = ",              robot_info.joint_vel_limit,    40);
 
+    std::cout << "\n----- Placement of each joint in the model: " << std::endl;
     for (int k=0 ; k<model.njoints ; ++k)
     {
-    std::cout << model.names[k] << "\t: "
-              << data.oMi[k].translation().transpose() << std::endl;
+        std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) <<  model.names[k] << std::setw(10) << data.oMi[k].translation().transpose() << std::endl;
     }
+
+    std::cout << "\n----- Placement of each frame in the model: " << std::endl;
     for (int k=0 ; k<model.nframes ; ++k)
     {
-        std::cout << k << "\t: "
-              << model.frames[k].name << "\t\t placement: " << data.oMf[k].translation().transpose() << std::endl;
+        std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << model.frames[k].name << std::setw(10) << data.oMf[k].translation().transpose() << std::endl;
     }
 }
 

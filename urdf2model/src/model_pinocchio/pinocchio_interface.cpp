@@ -16,9 +16,11 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
 /* TODO:
   - Handle (print error or warning) when the torque, position, or velocity limits are zero.
 */
+
 #include "pinocchio_interface.h"
 
-const double PI = boost::math::constants::pi<double>();
+// const double PI = boost::math::constants::pi<double>();
+const double PI = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862;
 
 struct Robot_info_struct {
    std::string      name;
@@ -37,8 +39,29 @@ struct Robot_info_struct {
 // Declare robot_info of type Robot_info_struct
   Robot_info_struct robot_info;
 
-pinocchio::Model  model;                                      // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1ModelTpl.html
-pinocchio::Data   data = pinocchio::Data(model);              // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1DataTpl.html
+// Typedef
+  typedef double                              Scalar;
+  typedef casadi::SX                          CasadiScalar;
+
+  typedef pinocchio::ModelTpl<Scalar>         Model;
+  typedef Model::Data                         Data;
+
+  typedef pinocchio::ModelTpl<CasadiScalar>   CasadiModel;
+  typedef CasadiModel::Data                   CasadiData;
+
+  typedef Model::ConfigVectorType             ConfigVector;
+  typedef Model::TangentVectorType            TangentVector;
+
+  typedef CasadiModel::ConfigVectorType       ConfigVectorCasadi;
+  typedef CasadiModel::TangentVectorType      TangentVectorCasadi;
+
+  typedef Eigen::Matrix<CasadiScalar , Eigen::Dynamic, Eigen::Dynamic>  EigenCasadiMatrix;
+  typedef Eigen::Matrix<CasadiScalar , Eigen::Dynamic, 1>               EigenCasadiVecXd;
+  typedef Eigen::Matrix<CasadiScalar , 3, 1>                            EigenCasadiVec3d;
+
+// Instantiate model and data objects
+  Model         model;                                        // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1ModelTpl.html
+  Data          data = pinocchio::Data(model);                // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1DataTpl.html
 
 
 void robot_init(std::string filename)
@@ -90,7 +113,6 @@ void qdd_cal(double *q, double *qd, double *qdd, double *tau)
 //    std::cout << "qdd = " << qdd_Eigen << std::endl;
 }
 
-
 void execute_tests()
 {
     // casadi::SX x = casadi::SX::sym("x");
@@ -121,7 +143,8 @@ void execute_tests()
 
     // custom joint configuration
       Eigen::VectorXd q(model.nq);
-      q << 0, PI/6, 0, 4*PI/6, 0, -2*PI/6, -PI/2;//; //q << cos(0), sin(0), PI/6, cos(0), sin(0), 4*PI/6, cos(0), sin(0), -2*PI/6, cos(PI/2), sin(PI/2); // Eigen::VectorXd q_0(7); q_0 << 0, pi/6, 0, 4*pi/6, 0, -2*pi/6, -pi/2;
+      // q << 0, PI/6, 0, 4*PI/6, 0, -2*PI/6, -PI/2;//;
+      q << cos(0), sin(0), PI/6, cos(0), sin(0), 4*PI/6, cos(0), sin(0), -2*PI/6, cos(-PI/2), sin(-PI/2); // Eigen::VectorXd q_0(7); q_0 << 0, pi/6, 0, 4*pi/6, 0, -2*pi/6, -pi/2;
 
       ForwardKinematics_pin(q);
       Eigen::Vector3d ee_position       = data.oMf[EE_idx].translation();
@@ -139,12 +162,71 @@ void execute_tests()
     // std::cout << "IDX: "<< model.joints[7].idx_q() << std::endl;
 }
 
+void execute_test_casadi()
+{
+    // Articulated-Body algorithm (forward dynamics) test with robot's home configuration
+      // Pinocchio
+        ConfigVector  q_home = pinocchio::neutral(model);  // pinocchio::randomConfiguration(model);
+        TangentVector v_home(Eigen::VectorXd::Zero(model.nv));
+        TangentVector tau_home(Eigen::VectorXd::Zero(model.nv));
+
+        pinocchio::aba(model,data,q_home,v_home,tau_home);
+
+      // Pinocchio + Casadi
+        CasadiModel casadi_model = model.cast<CasadiScalar>();
+        CasadiData casadi_data(casadi_model);
+
+        casadi::SX cs_q = casadi::SX::sym("q", model.nq);
+        ConfigVectorCasadi q_casadi(model.nq);
+        q_casadi = Eigen::Map<ConfigVectorCasadi>(static_cast< std::vector<CasadiScalar> >(cs_q).data(),model.nq,1);
+
+        casadi::SX cs_v = casadi::SX::sym("v", model.nv);
+        TangentVectorCasadi v_casadi(model.nv);
+        v_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(cs_v).data(),model.nv,1);
+
+        casadi::SX cs_tau = casadi::SX::sym("tau", model.nv);
+        TangentVectorCasadi tau_casadi(model.nv);
+        tau_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(cs_tau).data(),model.nv,1);
+
+        aba(casadi_model,casadi_data,q_casadi,v_casadi,tau_casadi);
+
+        casadi::SX cs_ddq(model.nv,1);
+        for(Eigen::DenseIndex k = 0; k < model.nv; ++k)
+        {
+            cs_ddq(k) = casadi_data.ddq[k];
+        }
+        casadi::Function eval_aba("eval_aba", casadi::SXVector {cs_q, cs_v, cs_tau}, casadi::SXVector {cs_ddq});
+
+        std::vector<double> q_vec((size_t)model.nq);
+        Eigen::Map<ConfigVector>(q_vec.data(),model.nq,1) = q_home;
+
+        std::vector<double> v_vec((size_t)model.nv);
+        Eigen::Map<TangentVector>(v_vec.data(),model.nv,1) = v_home;
+
+        std::vector<double> tau_vec((size_t)model.nv);
+        Eigen::Map<TangentVector>(tau_vec.data(),model.nv,1) = tau_home;
+
+        casadi::DM ddq_res = eval_aba(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
+
+        Data::TangentVectorType ddq_mat = Eigen::Map<Data::TangentVectorType>(static_cast< std::vector<double> >(ddq_res).data(), model.nv,1);
+
+      // Print results
+        std::cout << "\n----- Articulated-Body algorithm (forward dynamics) comparison: " << std::endl;
+        std::cout << "* Pinocchio" << std::endl;
+        print_indent("     ddq = ", data.ddq, 40);
+        std::cout << "* Pinocchio + Casadi" << std::endl;
+        print_indent("     ddq = ", ddq_mat, 40);
+
+
+
+}
+
 void print_model_data()
 {
     std::cout << "\n----- Robot model information: " << std::endl;
-    print_indent("Model name = ",                        robot_info.name,                40);
-    print_indent("Size of configuration vector = ",      robot_info.n_q,                 40);
-    print_indent("Number of joints (with universe) = ",  robot_info.n_joints,            40);
+    print_indent("Model name = ",                         robot_info.name,               40);
+    print_indent("Size of configuration vector = ",       robot_info.n_q,                40);
+    print_indent("Number of joints (with universe) = ",   robot_info.n_joints,           40);
     print_indent("Number of DoF = ",                      robot_info.n_dof,              40);
     print_indent("Number of bodies = ",                   robot_info.n_bodies,           40);
     print_indent("Number of operational frames = ",       robot_info.n_frames,           40);

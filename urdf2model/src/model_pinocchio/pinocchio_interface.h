@@ -2,17 +2,25 @@
 #ifndef PINOCCHIO_INTERFACE_H_INCLUDED
 #define PINOCCHIO_INTERFACE_H_INCLUDED
 
+#include "../casadi/casadi_eigen.hpp"
 #include "../utils/debug_functions.hpp"
 
 #include "pinocchio/multibody/model.hpp"
 #include "pinocchio/parsers/urdf.hpp"
 #include "pinocchio/algorithm/frames.hpp"
 
-#include "pinocchio/algorithm/aba.hpp"
-#include "pinocchio/algorithm/kinematics.hpp"
-#include "pinocchio/algorithm/joint-configuration.hpp"
 
 #include <casadi/casadi.hpp>
+
+#include "pinocchio/math/casadi.hpp"
+
+#include "pinocchio/algorithm/kinematics.hpp"
+#include "pinocchio/algorithm/jacobian.hpp"
+#include "pinocchio/algorithm/crba.hpp"
+#include "pinocchio/algorithm/rnea.hpp"
+#include "pinocchio/algorithm/aba.hpp"
+#include "pinocchio/algorithm/joint-configuration.hpp"
+
 
 #include <Eigen/Core>
 
@@ -27,6 +35,8 @@ void ForwardKinematics_pin(Eigen::VectorXd q);
 void print_model_data();
 
 void execute_tests();
+
+void execute_test_casadi();
 
 // getters
 int get_ndof();

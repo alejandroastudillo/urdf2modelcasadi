@@ -7,12 +7,14 @@ int main()
 {
     // Select the URDF file to create the model
         // std::string filename = "../urdf2model/robot_descriptions/kortex_description/urdf/JACO3_URDF_V10rev.urdf";
-        // std::string filename = "../urdf2model/robot_descriptions/kortex_description/urdf/JACO3_URDF_V10.urdf";
-        std::string filename = "../urdf2model/robot_descriptions/iiwa_description/urdf/iiwa14.urdf";
+        std::string filename = "../urdf2model/robot_descriptions/kortex_description/urdf/JACO3_URDF_V11.urdf";
+        // std::string filename = "../urdf2model/robot_descriptions/iiwa_description/urdf/iiwa14.urdf";
         // std::string filename = "../urdf2model/robot_descriptions/abb_common/urdf/irb120.urdf";
 
     robot_init(filename);
-    execute_tests();
+    // execute_tests();
+
+    execute_test_casadi();
 
     #ifdef DEBUG
       print_model_data();

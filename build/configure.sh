@@ -6,7 +6,7 @@
 
 # Set variables used by CMake
   export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/build/install_matlab"
-  export PINOCCHIO_INCLUDE="/opt/openrobots/include/"
+  export PINOCCHIO_INCLUDE="/usr/local/include/"
   export EIGEN_INCLUDE="/usr/include/eigen3"
 
 # If the CMakeCache.txt file exists, delete it.

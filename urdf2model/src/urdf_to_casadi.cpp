@@ -14,7 +14,9 @@ int main()
     robot_init(filename);
     // execute_tests();
 
-    execute_test_casadi();
+    test_casadi_aba();
+    test_casadi_rnea();
+    test_casadi_fk();
 
     #ifdef DEBUG
       print_model_data();

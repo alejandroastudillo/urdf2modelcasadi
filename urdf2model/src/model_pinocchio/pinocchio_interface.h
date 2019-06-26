@@ -28,15 +28,15 @@
 // init function
 void robot_init(std::string filename);
 // calculate qdd for f
-void qdd_cal(double *q, double *qd, double *qdd, double *tau, int parIdx);
-
-void ForwardKinematics_pin(Eigen::VectorXd q);
+void qdd_cal(double *q, double *qd, double *qdd, double *tau);
 
 void print_model_data();
 
 void execute_tests();
 
-void execute_test_casadi();
+void test_casadi_aba();
+void test_casadi_rnea();
+void test_casadi_fk();
 
 // getters
 int get_ndof();

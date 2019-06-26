@@ -170,15 +170,15 @@ void test_casadi_aba()
     // Pinocchio + Casadi
       CasadiScalar q_sx = casadi::SX::sym("q", model.nq);
       ConfigVectorCasadi q_casadi(model.nq);
-      q_casadi = Eigen::Map<ConfigVectorCasadi>(static_cast< std::vector<CasadiScalar> >(q_sx).data(),model.nq,1);
+      pinocchio::casadi::copy(q_sx,q_casadi); // q_casadi = Eigen::Map<ConfigVectorCasadi>(static_cast< std::vector<CasadiScalar> >(q_sx).data(),model.nq,1);
 
       CasadiScalar v_sx = casadi::SX::sym("v", model.nv);
       TangentVectorCasadi v_casadi(model.nv);
-      v_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(v_sx).data(),model.nv,1);
+      pinocchio::casadi::copy(v_sx,v_casadi); // v_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(v_sx).data(),model.nv,1);
 
       CasadiScalar tau_sx = casadi::SX::sym("tau", model.nv);
       TangentVectorCasadi tau_casadi(model.nv);
-      tau_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(tau_sx).data(),model.nv,1);
+      pinocchio::casadi::copy(tau_sx,tau_casadi); // tau_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(tau_sx).data(),model.nv,1);
 
       pinocchio::aba(casadi_model,casadi_data,q_casadi,v_casadi,tau_casadi);
 
@@ -208,6 +208,7 @@ void test_casadi_aba()
       print_indent("     ddq = ", data.ddq, 40);
       std::cout << "* Pinocchio + Casadi" << std::endl;
       print_indent("     ddq = ", ddq_mat, 40);
+
 }
 
 void test_casadi_rnea()
@@ -226,15 +227,16 @@ void test_casadi_rnea()
     // Pinocchio + Casadi
       CasadiScalar q_sx = casadi::SX::sym("q", model.nq);
       ConfigVectorCasadi q_casadi(model.nq);
-      q_casadi = Eigen::Map<ConfigVectorCasadi>(static_cast< std::vector<CasadiScalar> >(q_sx).data(),model.nq,1);
+      pinocchio::casadi::copy(q_sx,q_casadi); // q_casadi = Eigen::Map<ConfigVectorCasadi>(static_cast< std::vector<CasadiScalar> >(q_sx).data(),model.nq,1);
 
       CasadiScalar v_sx = casadi::SX::sym("v", model.nv);
       TangentVectorCasadi v_casadi(model.nv);
-      v_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(v_sx).data(),model.nv,1);
+      pinocchio::casadi::copy(v_sx,v_casadi); // v_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(v_sx).data(),model.nv,1);
+
 
       CasadiScalar a_sx = casadi::SX::sym("a", model.nv);
       TangentVectorCasadi a_casadi(model.nv);
-      a_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(a_sx).data(),model.nv,1);
+      pinocchio::casadi::copy(a_sx,a_casadi); // a_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(a_sx).data(),model.nv,1);
 
       pinocchio::rnea(casadi_model,casadi_data,q_casadi,v_casadi,a_casadi);
 
@@ -273,7 +275,8 @@ void test_casadi_fk()
   // FK test with robot's home configuration
     int EE_idx = model.nframes-1; // EE_idx = model.getFrameId("EndEffector"); kinova: EndEffector, abb: joint6-tool0, kuka: iiwa_joint_ee
     // Pinocchio
-      ConfigVector q_home = pinocchio::neutral(model);
+      ConfigVector q_home(model.nq); // ConfigVector q_home = pinocchio::neutral(model);
+      q_home << cos(0), sin(0), PI/6, cos(0), sin(0), 4*PI/6, cos(0), sin(0), -2*PI/6, cos(-PI/2), sin(-PI/2);
 
       pinocchio::forwardKinematics(model,data,q_home);  // apply forward kinematics wrt q. Updates data structure
       pinocchio::updateFramePlacements(model, data);    // update the position of each frame contained in the model.
@@ -283,20 +286,18 @@ void test_casadi_fk()
       Eigen::Matrix3d ee_rotmatrix_0    = data.oMf[EE_idx].rotation();
       Eigen::Vector3d ee_orientation_0  = ee_rotmatrix_0.eulerAngles(2, 1, 0);
 
-      Eigen::Vector3d act7_position     = data.oMi[model.njoints-1].translation();
-
     // Pinocchio + Casadi
       CasadiScalar q_sx = casadi::SX::sym("q", model.nq);
       ConfigVectorCasadi q_casadi(model.nq);
-      q_casadi = Eigen::Map<ConfigVectorCasadi>(static_cast< std::vector<CasadiScalar> >(q_sx).data(),model.nq,1);
+      pinocchio::casadi::copy(q_sx,q_casadi); // q_casadi = Eigen::Map<ConfigVectorCasadi>(static_cast< std::vector<CasadiScalar> >(q_sx).data(),model.nq,1);
 
       pinocchio::forwardKinematics(casadi_model,casadi_data,q_casadi);
-      // pinocchio::updateFramePlacements(casadi_model,casadi_data);
+      pinocchio::updateFramePlacements(casadi_model,casadi_data);
 
       CasadiScalar pos_sx(3,1);
       for(Eigen::Index k = 0; k < 3; ++k)
       {
-          pos_sx(k) = casadi_data.oMi[model.njoints-1].translation()[k];
+          pos_sx(k) = casadi_data.oMf[EE_idx].translation()[k];
       }
 
       casadi::Function eval_fk("eval_fk", casadi::SXVector {q_sx}, casadi::SXVector {pos_sx});
@@ -313,10 +314,10 @@ void test_casadi_fk()
       std::cout << "\n----- Forward kinematics test: " << std::endl;
       std::cout << "* Pinocchio" << std::endl;
       print_indent("     q = ",                       q_home,         40);
-      print_indent("     Actuator 7 position = ",     act7_position,  40);
+      print_indent("     EE position = ",     ee_position_0,  40);
       std::cout << "* Pinocchio + Casadi" << std::endl;
       print_indent("     q = ",               q_home,           40);
-      print_indent("     Actuator 7 position = ",     pos_mat,    40);
+      print_indent("     EE position = ",     pos_mat,    40);
 
 }
 

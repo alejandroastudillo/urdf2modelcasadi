@@ -1,0 +1,39 @@
+managed to launch irb120 model w/ launch file here.
+
+HOWEVER, arm is severed btwn links 3 and 4 in Gazebo model!!
+
+need to fix this. 
+
+also, rosrun abb_pub_base abb_pub_base to force the robot-arm base to a fixed pose on the ground plane.
+(included this node in the launch file) 
+
+robot launches OK in Gazebo, then the links fall apart!  (more links are dying)
+
+changed to URDF and meshes found here:
+
+https://github.com/ros-industrial/abb_experimental
+(put previous version in urdf_old and meshes_old)
+
+edited the urdf (renamed urdf.xacro)
+and changed directory references to abb_common/...
+edited launch file
+
+spawn model w/ launch file; 
+looks beautiful in rviz (orange now)
+But NOTHING in gazebo!
+
+-----added inertias to newer urdf;
+tried spawning manually:
+
+wyatt@Wall-E:~/ros_workspace/cwru-ros-pkg-hydro/catkin/src/cwru_376_student/abb_common/urdf$ rosrun gazebo_ros spawn_model -urdf -file irb120.urdf -model abbyArm
+spawn_model script started
+[INFO] [WallTime: 1425308042.642991] [0.000000] Loading model xml from file
+[INFO] [WallTime: 1425308042.643735] [0.000000] Waiting for service /gazebo/spawn_urdf_model
+[INFO] [WallTime: 1425308042.648132] [0.000000] Calling service /gazebo/spawn_urdf_model
+[INFO] [WallTime: 1425308043.013354] [212.900000] Spawn status: SpawnModel: Successfully spawned model
+
+Gazebo says there is a model "abbyArm", but it is only a "default" (no links)
+
+tried this with urdf_old:  abbyArm in Gazebo DOES show 6 links and 6 joints (but still no visualization)
+(formerly, at least, did see broken robot arm---now, nothing)
+Also, rviz model is totally screwed--links embedded in each other

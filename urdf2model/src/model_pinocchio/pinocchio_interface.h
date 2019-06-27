@@ -2,18 +2,14 @@
 #ifndef PINOCCHIO_INTERFACE_H_INCLUDED
 #define PINOCCHIO_INTERFACE_H_INCLUDED
 
-#include "../casadi/casadi_eigen.hpp"
 #include "../utils/debug_functions.hpp"
+
+#include <casadi/casadi.hpp>
+#include "pinocchio/math/casadi.hpp"
 
 #include "pinocchio/multibody/model.hpp"
 #include "pinocchio/parsers/urdf.hpp"
 #include "pinocchio/algorithm/frames.hpp"
-
-
-#include <casadi/casadi.hpp>
-
-#include "pinocchio/math/casadi.hpp"
-
 #include "pinocchio/algorithm/kinematics.hpp"
 #include "pinocchio/algorithm/jacobian.hpp"
 #include "pinocchio/algorithm/crba.hpp"
@@ -32,8 +28,6 @@ void robot_init(std::string filename);
 void qdd_cal(double *q, double *qd, double *qdd, double *tau);
 
 void print_model_data();
-
-void execute_tests();
 
 void test_casadi_aba();
 void test_casadi_rnea();

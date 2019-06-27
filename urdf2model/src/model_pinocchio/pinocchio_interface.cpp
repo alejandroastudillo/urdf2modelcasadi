@@ -90,70 +90,6 @@ void robot_init(std::string filename)
       robot_info.joint_vel_limit    = model.velocityLimit;
 }
 
-void qdd_cal(double *q, double *qd, double *qdd, double *tau)
-{
-    Eigen::VectorXd q_Eigen   = Eigen::Map<Eigen::VectorXd>(q, model.nv);
-    Eigen::VectorXd qd_Eigen  = Eigen::Map<Eigen::VectorXd>(qd,model.nv);
-    Eigen::VectorXd qdd_Eigen = Eigen::VectorXd::Zero(model.nv);
-    Eigen::VectorXd tau_Eigen = Eigen::Map<Eigen::VectorXd>(tau,model.nv);
-
-    qdd_Eigen = pinocchio::aba(model,data,q_Eigen,qd_Eigen,tau_Eigen);
-
-    // to double
-    Eigen::Map<Eigen::VectorXd>(qdd,model.nv) = qdd_Eigen;
-
-
-}
-
-void execute_tests()
-{
-    // casadi::SX x = casadi::SX::sym("x");
-    // casadi::SX y = casadi::SX::sym("y");
-    // casadi::Function f("f", {x, y}, {2*x, x/y});
-    // std::vector<casadi::DM> f_arg = {3,4};
-    // std::cout << "f_kin: " << f(f_arg) << std::endl;
-
-    std::cout << "\n----- Forward kinematics test: " << std::endl;
-
-    // get the index of the frame corresponding to the end-effector
-      int EE_idx = model.nframes-1; // EE_idx = model.getFrameId("EndEffector"); kinova: EndEffector, abb: joint6-tool0, kuka: iiwa_joint_ee
-      print_indent("Name of the end-effector frame = ", model.frames[EE_idx].name, 40);
-      // std::cout << "\n\tName of the end-effector frame = " << model.frames[EE_idx].name << std::endl << std::endl;
-
-    // robot's home configuration
-      Eigen::VectorXd q_home = pinocchio::neutral(model);  // pinocchio::randomConfiguration(model);
-
-      pinocchio::framesForwardKinematics(model,data,q_home);
-      Eigen::Vector3d ee_position_0     = data.oMf[EE_idx].translation();
-      Eigen::Matrix3d ee_rotmatrix_0    = data.oMf[EE_idx].rotation();
-      Eigen::Vector3d ee_orientation_0  = ee_rotmatrix_0.eulerAngles(2, 1, 0);
-
-      std::cout << "Home configuration " << std::endl;
-      print_indent("     q = ",               q_home,           40);
-      print_indent("     EE position = ",     ee_position_0,    40);
-      print_indent("     EE orientation = ",  ee_orientation_0, 40);
-
-    // custom joint configuration
-      Eigen::VectorXd q(model.nq);
-      // q << 0, PI/6, 0, 4*PI/6, 0, -2*PI/6, -PI/2;//;
-      q << cos(0), sin(0), PI/6, cos(0), sin(0), 4*PI/6, cos(0), sin(0), -2*PI/6, cos(-PI/2), sin(-PI/2); // Eigen::VectorXd q_0(7); q_0 << 0, pi/6, 0, 4*pi/6, 0, -2*pi/6, -pi/2;
-
-      pinocchio::framesForwardKinematics(model,data,q);
-      Eigen::Vector3d ee_position       = data.oMf[EE_idx].translation();
-      Eigen::Matrix3d ee_rotmatrix      = data.oMf[EE_idx].rotation();
-      Eigen::Vector3d ee_orientation    = ee_rotmatrix.eulerAngles(2, 1, 0);
-
-      std::cout << "Custom joint configuration " << std::endl;
-      print_indent("     q = ",               q,              40);
-      print_indent("     EE position = ",     ee_position,    40);
-      print_indent("     EE orientation = ",  ee_orientation, 40);
-
-    // double q0[] = {cos(0), sin(0), PI/6, cos(0), sin(0), 4*PI/6, cos(0), sin(0), -2*PI/6, cos(PI/2), sin(PI/2)};
-    // double qm[model.nq] = {0};
-    // std::cout << "qm before = " << Eigen::Map<Eigen::VectorXd>(qm, model.nq).transpose() << std::endl;
-    // std::cout << "IDX: "<< model.joints[7].idx_q() << std::endl;
-}
-
 void test_casadi_aba()
 {
   CasadiModel casadi_model = model.cast<CasadiScalar>();
@@ -270,16 +206,18 @@ void test_casadi_rnea()
 void test_casadi_fk()
 {
   CasadiModel casadi_model = model.cast<CasadiScalar>();
-  CasadiData casadi_data(casadi_model);
+  CasadiData  casadi_data(casadi_model);
 
   // FK test with robot's home configuration
     int EE_idx = model.nframes-1; // EE_idx = model.getFrameId("EndEffector"); kinova: EndEffector, abb: joint6-tool0, kuka: iiwa_joint_ee
+    print_indent("Name of the end-effector frame = ", model.frames[EE_idx].name, 40);
     // Pinocchio
-      ConfigVector q_home(model.nq); // ConfigVector q_home = pinocchio::neutral(model);
-      q_home << cos(0), sin(0), PI/6, cos(0), sin(0), 4*PI/6, cos(0), sin(0), -2*PI/6, cos(-PI/2), sin(-PI/2);
+      ConfigVector  q_home(model.nq); // Eigen::VectorXd q_home = pinocchio::neutral(model);
+      q_home        << cos(0), sin(0), PI/6, cos(0), sin(0), 4*PI/6, cos(0), sin(0), -2*PI/6, cos(-PI/2), sin(-PI/2); // q << 0, PI/6, 0, 4*PI/6, 0, -2*PI/6, -PI/2; // Eigen::VectorXd q_0(7); q_0 << 0, pi/6, 0, 4*pi/6, 0, -2*pi/6, -pi/2;
 
-      pinocchio::forwardKinematics(model,data,q_home);  // apply forward kinematics wrt q. Updates data structure
-      pinocchio::updateFramePlacements(model, data);    // update the position of each frame contained in the model.
+
+      pinocchio::forwardKinematics(     model,  data,   q_home);  // apply forward kinematics wrt q. Updates data structure
+      pinocchio::updateFramePlacements( model,  data);            // updates the pose of every frame contained in the model.
       // pinocchio::framesForwardKinematics(model,data,q_home);
 
       Eigen::Vector3d ee_position_0     = data.oMf[EE_idx].translation();
@@ -287,37 +225,57 @@ void test_casadi_fk()
       Eigen::Vector3d ee_orientation_0  = ee_rotmatrix_0.eulerAngles(2, 1, 0);
 
     // Pinocchio + Casadi
-      CasadiScalar q_sx = casadi::SX::sym("q", model.nq);
-      ConfigVectorCasadi q_casadi(model.nq);
-      pinocchio::casadi::copy(q_sx,q_casadi); // q_casadi = Eigen::Map<ConfigVectorCasadi>(static_cast< std::vector<CasadiScalar> >(q_sx).data(),model.nq,1);
+      CasadiScalar        q_sx = casadi::SX::sym( "q", model.nq );
+      ConfigVectorCasadi  q_casadi( model.nq );
+      pinocchio::casadi::copy( q_sx, q_casadi ); // q_casadi = Eigen::Map<ConfigVectorCasadi>(static_cast< std::vector<CasadiScalar> >(q_sx).data(),model.nq,1);
 
-      pinocchio::forwardKinematics(casadi_model,casadi_data,q_casadi);
-      pinocchio::updateFramePlacements(casadi_model,casadi_data);
+      pinocchio::forwardKinematics(     casadi_model,   casadi_data,    q_casadi);
+      pinocchio::updateFramePlacements( casadi_model,   casadi_data);
 
+      // Copy the expression contained in an Eigen::Matrix into a casadi::SX
       CasadiScalar pos_sx(3,1);
-      for(Eigen::Index k = 0; k < 3; ++k)
-      {
-          pos_sx(k) = casadi_data.oMf[EE_idx].translation()[k];
-      }
+      // for(Eigen::Index k = 0; k < 3; ++k)
+      // {
+      //     pos_sx(k) = casadi_data.oMf[EE_idx].translation()[k];
+      // }
+      pinocchio::casadi::copy( casadi_data.oMf[EE_idx].translation(), pos_sx );
 
-      casadi::Function eval_fk("eval_fk", casadi::SXVector {q_sx}, casadi::SXVector {pos_sx});
+      casadi::Function    eval_fk( "eval_fk", casadi::SXVector {q_sx}, casadi::SXVector {pos_sx} );
 
       std::vector<double> q_vec((size_t)model.nq);
-      Eigen::Map<ConfigVector>(q_vec.data(),model.nq,1) = q_home;
+      Eigen::Map<ConfigVector>( q_vec.data(), model.nq, 1 ) = q_home;
 
       casadi::DM pos_res = eval_fk(casadi::DMVector {q_vec})[0];
 
       Data::TangentVectorType pos_mat = Eigen::Map<Data::TangentVectorType>(static_cast< std::vector<double> >(pos_res).data(), 3,1);
-
+      // Eigen::VectorXd pos_mat = Eigen::Map<Eigen::VectorXd>(static_cast< std::vector<double> >(pos_res).data(), 3,1);
 
     // Print results
       std::cout << "\n----- Forward kinematics test: " << std::endl;
       std::cout << "* Pinocchio" << std::endl;
-      print_indent("     q = ",                       q_home,         40);
-      print_indent("     EE position = ",     ee_position_0,  40);
+      print_indent("     q = ",               q_home,           40);
+      print_indent("     EE position = ",     ee_position_0,    40);
+      print_indent("     EE orientation = ",  ee_orientation_0, 40);
       std::cout << "* Pinocchio + Casadi" << std::endl;
       print_indent("     q = ",               q_home,           40);
-      print_indent("     EE position = ",     pos_mat,    40);
+      print_indent("     EE position = ",     pos_mat,          40);
+
+
+      // Copy Casadi to EIGEN
+      // casadi::SX cs_mat = casadi::SX::sym("A", 3, 4);
+      // Eigen::Matrix<casadi::SX, 3, 4> eig_mat;
+      //
+      // pinocchio::casadi::copy(cs_mat, eig_mat);
+      // std::cout << eig_mat << std::endl;
+
+      // Copy EIGEN to Casadi
+      // Eigen::Matrix<casadi::SX, 3, 4> eig_mat2;
+      // pinocchio::casadi::sym(eig_mat2, "A");
+      //
+      // casadi::SX cs_mat2;
+      //
+      // pinocchio::casadi::copy(eig_mat2, cs_mat2);
+      // std::cout << cs_mat2 << std::endl;
 
 }
 
@@ -348,6 +306,23 @@ void print_model_data()
         std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << model.frames[k].name << std::setw(10) << data.oMf[k].translation().transpose() << std::endl;
     }
 }
+
+
+void qdd_cal(double *q, double *qd, double *qdd, double *tau)
+{
+    Eigen::VectorXd q_Eigen   = Eigen::Map<Eigen::VectorXd>(q, model.nv);
+    Eigen::VectorXd qd_Eigen  = Eigen::Map<Eigen::VectorXd>(qd,model.nv);
+    Eigen::VectorXd qdd_Eigen = Eigen::VectorXd::Zero(model.nv);
+    Eigen::VectorXd tau_Eigen = Eigen::Map<Eigen::VectorXd>(tau,model.nv);
+
+    qdd_Eigen = pinocchio::aba(model,data,q_Eigen,qd_Eigen,tau_Eigen);
+
+    // to double
+    Eigen::Map<Eigen::VectorXd>(qdd,model.nv) = qdd_Eigen;
+
+
+}
+
 
 int get_ndof() {return model.nv;}
 int get_nq() {return model.nq;}

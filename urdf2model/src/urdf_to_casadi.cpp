@@ -22,6 +22,8 @@ int main()
       print_model_data();
     #endif
 
+
+
     int n_dof = get_ndof();
 
     // std::cout << "ndof: " << n_dof << std::endl;

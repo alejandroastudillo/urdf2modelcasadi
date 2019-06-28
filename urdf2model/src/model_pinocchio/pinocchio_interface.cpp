@@ -19,6 +19,8 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
 
 #include "pinocchio_interface.h"
 
+#include "../utils/debug_functions.hpp"
+
 // const double PI = boost::math::constants::pi<double>();
 const double PI = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862;
 
@@ -98,8 +100,8 @@ void test_casadi_aba()
   // Articulated-Body algorithm (forward dynamics) test with robot's home configuration
     // Pinocchio
       ConfigVector  q_home = pinocchio::neutral(model);  // pinocchio::randomConfiguration(model);
-      TangentVector v_home(Eigen::VectorXd::Zero(model.nv));
-      TangentVector tau_home(Eigen::VectorXd::Zero(model.nv));
+      TangentVector v_home(Eigen::VectorXd::Zero(model.nv)); // v_home(Eigen::VectorXd::Random(model.nv));
+      TangentVector tau_home(Eigen::VectorXd::Zero(model.nv)); // tau_home(Eigen::VectorXd::Random(model.nv));
 
       pinocchio::aba(model,data,q_home,v_home,tau_home);
 
@@ -119,10 +121,11 @@ void test_casadi_aba()
       pinocchio::aba(casadi_model,casadi_data,q_casadi,v_casadi,tau_casadi);
 
       CasadiScalar ddq_sx(model.nv,1);
-      for(Eigen::DenseIndex k = 0; k < model.nv; ++k)
-      {
-          ddq_sx(k) = casadi_data.ddq[k];
-      }
+      // for(Eigen::DenseIndex k = 0; k < model.nv; ++k)
+      // {
+      //     ddq_sx(k) = casadi_data.ddq[k];
+      // }
+      pinocchio::casadi::copy( casadi_data.ddq, ddq_sx );
       casadi::Function eval_aba("eval_aba", casadi::SXVector {q_sx, v_sx, tau_sx}, casadi::SXVector {ddq_sx});
 
       std::vector<double> q_vec((size_t)model.nq);
@@ -141,9 +144,9 @@ void test_casadi_aba()
     // Print results
       std::cout << "\n----- Articulated-Body algorithm (forward dynamics) test: " << std::endl;
       std::cout << "* Pinocchio" << std::endl;
-      print_indent("     ddq = ", data.ddq, 40);
+      print_indent("     ddq = ", data.ddq, 38);
       std::cout << "* Pinocchio + Casadi" << std::endl;
-      print_indent("     ddq = ", ddq_mat, 40);
+      print_indent("     ddq = ", ddq_mat, 38);
 
 }
 
@@ -177,10 +180,11 @@ void test_casadi_rnea()
       pinocchio::rnea(casadi_model,casadi_data,q_casadi,v_casadi,a_casadi);
 
       casadi::SX tau_sx(model.nv,1);
-      for(Eigen::Index k = 0; k < model.nv; ++k)
-      {
-        tau_sx(k) = casadi_data.tau[k];
-      }
+      // for(Eigen::Index k = 0; k < model.nv; ++k)
+      // {
+      //   tau_sx(k) = casadi_data.tau[k];
+      // }
+      pinocchio::casadi::copy( casadi_data.tau, tau_sx );
       casadi::Function eval_rnea("eval_rnea", casadi::SXVector {q_sx, v_sx, a_sx}, casadi::SXVector {tau_sx});
 
       std::vector<double> q_vec((size_t)model.nq);
@@ -197,9 +201,9 @@ void test_casadi_rnea()
     // Print results
       std::cout << "\n----- Recursive Newton-Euler algorithm (inverse dynamics) test: " << std::endl;
       std::cout << "* Pinocchio " << std::endl;
-      print_indent("     tau = ", data.tau, 40);
+      print_indent("     tau = ", data.tau, 38);
       std::cout << "* Pinocchio + Casadi" << std::endl;
-      print_indent("     tau = ", tau_mat, 40);
+      print_indent("     tau = ", tau_mat, 38);
 
 }
 
@@ -210,11 +214,10 @@ void test_casadi_fk()
 
   // FK test with robot's home configuration
     int EE_idx = model.nframes-1; // EE_idx = model.getFrameId("EndEffector"); kinova: EndEffector, abb: joint6-tool0, kuka: iiwa_joint_ee
-    print_indent("Name of the end-effector frame = ", model.frames[EE_idx].name, 40);
+    print_indent("\nName of the end-effector frame = ", model.frames[EE_idx].name, 39);
     // Pinocchio
-      ConfigVector  q_home(model.nq); // Eigen::VectorXd q_home = pinocchio::neutral(model);
-      q_home        << cos(0), sin(0), PI/6, cos(0), sin(0), 4*PI/6, cos(0), sin(0), -2*PI/6, cos(-PI/2), sin(-PI/2); // q << 0, PI/6, 0, 4*PI/6, 0, -2*PI/6, -PI/2; // Eigen::VectorXd q_0(7); q_0 << 0, pi/6, 0, 4*pi/6, 0, -2*pi/6, -pi/2;
-
+      ConfigVector  q_home = pinocchio::randomConfiguration(model, -PI*Eigen::VectorXd::Ones(model.nq), PI*Eigen::VectorXd::Ones(model.nq)); // q_home(model.nq); // Eigen::VectorXd q_home = pinocchio::neutral(model);
+      // q_home        << cos(0), sin(0), PI/6, cos(0), sin(0), 4*PI/6, cos(0), sin(0), -2*PI/6, cos(-PI/2), sin(-PI/2); // q << 0, PI/6, 0, 4*PI/6, 0, -2*PI/6, -PI/2; // Eigen::VectorXd q_0(7); q_0 << 0, pi/6, 0, 4*pi/6, 0, -2*pi/6, -pi/2;
 
       pinocchio::forwardKinematics(     model,  data,   q_home);  // apply forward kinematics wrt q. Updates data structure
       pinocchio::updateFramePlacements( model,  data);            // updates the pose of every frame contained in the model.
@@ -253,12 +256,12 @@ void test_casadi_fk()
     // Print results
       std::cout << "\n----- Forward kinematics test: " << std::endl;
       std::cout << "* Pinocchio" << std::endl;
-      print_indent("     q = ",               q_home,           40);
-      print_indent("     EE position = ",     ee_position_0,    40);
-      print_indent("     EE orientation = ",  ee_orientation_0, 40);
+      print_indent("     q = ",               q_home,           38);
+      print_indent("     EE position = ",     ee_position_0,    38);
+      print_indent("     EE orientation = ",  ee_orientation_0, 38);
       std::cout << "* Pinocchio + Casadi" << std::endl;
-      print_indent("     q = ",               q_home,           40);
-      print_indent("     EE position = ",     pos_mat,          40);
+      print_indent("     q = ",               q_home,           38);
+      print_indent("     EE position = ",     pos_mat,          38);
 
 
       // Copy Casadi to EIGEN
@@ -282,17 +285,17 @@ void test_casadi_fk()
 void print_model_data()
 {
     std::cout << "\n----- Robot model information: " << std::endl;
-    print_indent("Model name = ",                         robot_info.name,               40);
-    print_indent("Size of configuration vector = ",       robot_info.n_q,                40);
-    print_indent("Number of joints (with universe) = ",   robot_info.n_joints,           40);
-    print_indent("Number of DoF = ",                      robot_info.n_dof,              40);
-    print_indent("Number of bodies = ",                   robot_info.n_bodies,           40);
-    print_indent("Number of operational frames = ",       robot_info.n_frames,           40);
-    print_indent("Gravity = ",                            robot_info.gravity,            40);
-    print_indent("Joint torque bounds = ",                robot_info.joint_torque_limit, 40);
-    print_indent("Joint configuration upper bounds = ",   robot_info.joint_pos_ub,       40);
-    print_indent("Joint configuration lower bounds = ",   robot_info.joint_pos_lb,       40);
-    print_indent("Joint velocity bounds = ",              robot_info.joint_vel_limit,    40);
+    print_indent("Model name = ",                         robot_info.name,               38);
+    print_indent("Size of configuration vector = ",       robot_info.n_q,                38);
+    print_indent("Number of joints (with universe) = ",   robot_info.n_joints,           38);
+    print_indent("Number of DoF = ",                      robot_info.n_dof,              38);
+    print_indent("Number of bodies = ",                   robot_info.n_bodies,           38);
+    print_indent("Number of operational frames = ",       robot_info.n_frames,           38);
+    print_indent("Gravity = ",                            robot_info.gravity,            38);
+    print_indent("Joint torque bounds = ",                robot_info.joint_torque_limit, 38);
+    print_indent("Joint configuration upper bounds = ",   robot_info.joint_pos_ub,       38);
+    print_indent("Joint configuration lower bounds = ",   robot_info.joint_pos_lb,       38);
+    print_indent("Joint velocity bounds = ",              robot_info.joint_vel_limit,    38);
 
     std::cout << "\n----- Placement of each joint in the model: " << std::endl;
     for (int k=0 ; k<model.njoints ; ++k)

@@ -2,8 +2,6 @@
 #ifndef PINOCCHIO_INTERFACE_H_INCLUDED
 #define PINOCCHIO_INTERFACE_H_INCLUDED
 
-#include "../utils/debug_functions.hpp"
-
 #include <casadi/casadi.hpp>
 #include "pinocchio/math/casadi.hpp"
 
@@ -11,16 +9,15 @@
 #include "pinocchio/parsers/urdf.hpp"
 #include "pinocchio/algorithm/frames.hpp"
 #include "pinocchio/algorithm/kinematics.hpp"
-#include "pinocchio/algorithm/jacobian.hpp"
-#include "pinocchio/algorithm/crba.hpp"
 #include "pinocchio/algorithm/rnea.hpp"
-#include "pinocchio/algorithm/rnea-derivatives.hpp"
 #include "pinocchio/algorithm/aba.hpp"
-#include "pinocchio/algorithm/aba-derivatives.hpp"
 #include "pinocchio/algorithm/joint-configuration.hpp"
+// #include "pinocchio/algorithm/jacobian.hpp"
+// #include "pinocchio/algorithm/crba.hpp"
+// #include "pinocchio/algorithm/rnea-derivatives.hpp"
+// #include "pinocchio/algorithm/aba-derivatives.hpp"
 
-
-#include <Eigen/Core>
+// #include <Eigen/Core>
 
 // init function
 void robot_init(std::string filename);

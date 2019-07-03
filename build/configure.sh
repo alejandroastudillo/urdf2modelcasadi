@@ -6,7 +6,7 @@
 
 # Set variables used by CMake
   export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/build/install_matlab"
-  export PINOCCHIO_INCLUDE="/usr/local/include/"
+  export PINOCCHIO_INCLUDE="/opt/openrobots/include/"
   export EIGEN_INCLUDE="/usr/include/eigen3"
 
 # If the CMakeCache.txt file exists, delete it.
@@ -28,7 +28,7 @@
   make -j3
 
 # Execute unit tests
-  print_title "########## Executing unit tests ##########"
-  export BOOST_TEST_LOG_LEVEL="message"
-  # ctest -V
+   print_title "########## Executing unit tests ##########"
+  # export BOOST_TEST_LOG_LEVEL="message"
+  # # ctest -V
   make test ARGS="-V -j2"

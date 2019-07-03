@@ -32,4 +32,11 @@ int main(int argc, char ** argv)
     SX qd = SX::sym("qd",n_dof,1);
     SX qdd = SX::zeros(n_dof,1);
     SX tau = SX::sym("tau",n_dof,1);
+
+
+    // CasadiModel cas_model;
+    // CasadiData cas_data(cas_model);
+    // generate_model(cas_model, cas_data, "../urdf2model/robot_descriptions/abb_common/urdf/irb120.urdf");
+    //
+    // std::cout << "name: " << cas_model.name << std::endl;
 }

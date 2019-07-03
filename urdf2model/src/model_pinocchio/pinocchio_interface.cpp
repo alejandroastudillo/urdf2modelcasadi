@@ -24,38 +24,9 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
 // const double PI = boost::math::constants::pi<double>();
 const double PI = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862;
 
-struct Robot_info_struct {
-   std::string      name;
-   int              n_q;
-   int              n_joints;
-   int              n_dof;
-   int              n_bodies;
-   int              n_frames;
-   Eigen::VectorXd  joint_torque_limit;
-   Eigen::VectorXd  joint_pos_ub;
-   Eigen::VectorXd  joint_pos_lb;
-   Eigen::VectorXd  joint_vel_limit;
-   Eigen::VectorXd  gravity;          // Eigen::Vector3d
-};
 
 // Declare robot_info of type Robot_info_struct
   Robot_info_struct robot_info;
-
-// Typedef
-  typedef double                              Scalar;
-  typedef casadi::SX                          CasadiScalar;
-
-  typedef pinocchio::ModelTpl<Scalar>         Model;
-  typedef Model::Data                         Data;
-
-  typedef pinocchio::ModelTpl<CasadiScalar>   CasadiModel;
-  typedef CasadiModel::Data                   CasadiData;
-
-  typedef Model::ConfigVectorType             ConfigVector;
-  typedef Model::TangentVectorType            TangentVector;
-
-  typedef CasadiModel::ConfigVectorType       ConfigVectorCasadi;
-  typedef CasadiModel::TangentVectorType      TangentVectorCasadi;
 
   typedef Eigen::Matrix<CasadiScalar , Eigen::Dynamic, Eigen::Dynamic>  EigenCasadiMatrix;
   typedef Eigen::Matrix<CasadiScalar , Eigen::Dynamic, 1>               EigenCasadiVecXd;
@@ -65,6 +36,23 @@ struct Robot_info_struct {
   Model         model;                                        // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1ModelTpl.html
   Data          data = pinocchio::Data(model);                // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1DataTpl.html
 
+// std::tuple<double, char, std::string> get_student(int id)
+// {
+//     return std::make_tuple(3.8, 'A', "Lisa Simpson");
+// }
+
+// void generate_model(CasadiModel &cas_model, CasadiData &cas_data, std::string file_name)
+// {
+//     Model         pin_model;
+//     pinocchio::urdf::buildModel(file_name,pin_model);
+//     model.gravity.linear(pinocchio::Model::gravity981);
+//     Data          pin_data = pinocchio::Data(pin_model);                // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1DataTpl.html
+//
+//     cas_model = model.cast<CasadiScalar>();
+//     cas_data = CasadiData(cas_model);
+//
+//     std::cout << "name: " << cas_model.name << std::endl;
+// }
 
 void robot_init(std::string filename)
 {

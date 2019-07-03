@@ -3,6 +3,7 @@ find_package (Boost COMPONENTS system filesystem unit_test_framework REQUIRED)
 include_directories (${ROB_DYN_INTERFACE_DIR}
                      ${CASADI_DIR}/include
                      ${EIGEN_INC}
+                     ${PINOCCHIO_INC}
                      ${Boost_INCLUDE_DIRS}
                      )
 

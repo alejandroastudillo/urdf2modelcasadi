@@ -22,6 +22,56 @@ std::string filename =  "../../urdf2model/robot_descriptions/kortex_description/
   typedef CasadiModel::ConfigVectorType       ConfigVectorCasadi;
   typedef CasadiModel::TangentVectorType      TangentVectorCasadi;
 
+BOOST_AUTO_TEST_CASE(FK_pinocchio_casadi)
+{
+// Instantiate model and data objects
+    Model         model;                                        // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1ModelTpl.html
+    Data          data = pinocchio::Data(model);                // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1DataTpl.html
+
+    pinocchio::urdf::buildModel(filename,model);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
+  // Set the gravity applied to the model
+    model.gravity.linear(pinocchio::Model::gravity981);     // options: model.gravity.setZero(), model.gravity.linear( Eigen::Vector3d(0,0,-9.81));
+  // initialize the data structure for the model
+    data = pinocchio::Data(model);
+
+    CasadiModel casadi_model = model.cast<CasadiScalar>();
+    CasadiData  casadi_data(casadi_model);
+
+  // FK test with robot's home configuration
+    int EE_idx = model.nframes-1; // EE_idx = model.getFrameId("EndEffector"); kinova: EndEffector, abb: joint6-tool0, kuka: iiwa_joint_ee
+
+  // Pinocchio
+    ConfigVector  q_home = pinocchio::randomConfiguration(model, -3.14159*Eigen::VectorXd::Ones(model.nq), 3.14159*Eigen::VectorXd::Ones(model.nq)); // q_home(model.nq); // Eigen::VectorXd q_home = pinocchio::neutral(model);
+    // q_home        << cos(0), sin(0), PI/6, cos(0), sin(0), 4*PI/6, cos(0), sin(0), -2*PI/6, cos(-PI/2), sin(-PI/2); // q << 0, PI/6, 0, 4*PI/6, 0, -2*PI/6, -PI/2; // Eigen::VectorXd q_0(7); q_0 << 0, pi/6, 0, 4*pi/6, 0, -2*pi/6, -pi/2;
+
+    pinocchio::forwardKinematics(     model,  data,   q_home);  // apply forward kinematics wrt q. Updates data structure
+    pinocchio::updateFramePlacements( model,  data);            // updates the pose of every frame contained in the model.
+
+
+  // Pinocchio + Casadi
+    CasadiScalar        q_sx = casadi::SX::sym( "q", model.nq );
+    ConfigVectorCasadi  q_casadi( model.nq );
+    pinocchio::casadi::copy( q_sx, q_casadi ); // q_casadi = Eigen::Map<ConfigVectorCasadi>(static_cast< std::vector<CasadiScalar> >(q_sx).data(),model.nq,1);
+
+    pinocchio::forwardKinematics(     casadi_model,   casadi_data,    q_casadi);
+    pinocchio::updateFramePlacements( casadi_model,   casadi_data);
+
+    // Copy the expression contained in an Eigen::Matrix into a casadi::SX
+    CasadiScalar pos_sx(3,1);
+    pinocchio::casadi::copy( casadi_data.oMf[EE_idx].translation(), pos_sx );
+
+    casadi::Function    eval_fk( "eval_fk", casadi::SXVector {q_sx}, casadi::SXVector {pos_sx} );
+
+    std::vector<double> q_vec((size_t)model.nq);
+    Eigen::Map<ConfigVector>( q_vec.data(), model.nq, 1 ) = q_home;
+
+    casadi::DM pos_res = eval_fk(casadi::DMVector {q_vec})[0];
+
+    Data::TangentVectorType pos_mat = Eigen::Map<Data::TangentVectorType>(static_cast< std::vector<double> >(pos_res).data(), 3,1);
+
+    BOOST_CHECK(pos_mat.isApprox(data.oMf[EE_idx].translation()));
+}
+
 BOOST_AUTO_TEST_CASE(ABA_pinocchio_casadi)
 {
 // Instantiate model and data objects

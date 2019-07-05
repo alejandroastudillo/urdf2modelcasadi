@@ -5,6 +5,8 @@
 #include <casadi/casadi.hpp>
 #include "pinocchio/math/casadi.hpp"
 
+// #include <Eigen/Dense>
+
 #include "pinocchio/multibody/model.hpp"
 #include "pinocchio/parsers/urdf.hpp"
 // #include "pinocchio/algorithm/frames.hpp"
@@ -58,6 +60,8 @@ struct Serial_Robot {
 };
 
 Serial_Robot generate_model(std::string filename);
+
+Eigen::VectorXd randomConfiguration(Serial_Robot rob_model);
 
 void print_model_data(Serial_Robot robot_info);
 

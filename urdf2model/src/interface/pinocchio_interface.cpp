@@ -67,6 +67,30 @@ Serial_Robot generate_model(std::string filename)
     return rob_model;
 }
 
+Eigen::VectorXd randomConfiguration(Serial_Robot rob_model)
+{
+  // TODO: Assert that lb and ub are different than 0
+  // TODO: Add option so that you can call the method with your own ub and lb vectors (which shouln'd be outside the real robot bounds)
+
+  srand(time(NULL)); // Needed so that a random value is always different
+
+  Eigen::VectorXd randnConfig = Eigen::VectorXd::Random(rob_model.n_q, 1);
+
+  for(Eigen::DenseIndex k = 0; k < rob_model.n_q; ++k)
+  {
+    if (randnConfig(k) < 0)
+    {
+      randnConfig(k) = -1*rob_model.joint_pos_lb(k)*randnConfig(k);
+    }
+    else
+    {
+      randnConfig(k) = rob_model.joint_pos_ub(k)*randnConfig(k);
+    }
+  }
+
+  return randnConfig;
+}
+
 
       // ConfigVector  q_home = pinocchio::randomConfiguration(model, -3.14159*Eigen::VectorXd::Ones(model.nq), 3.14159*Eigen::VectorXd::Ones(model.nq));
 

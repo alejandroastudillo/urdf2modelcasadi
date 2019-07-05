@@ -39,7 +39,9 @@ int main(int argc, char ** argv)
     print_model_data(robot_model);
     // #endif
 
-    std::cout << "neutral: " << robot_model.neutral_configuration.transpose() << std::endl;
+    // std::cout << "neutral: " << robot_model.neutral_configuration.transpose() << std::endl;
+
+    std::cout << "random configuration: " << randomConfiguration(robot_model).transpose() << std::endl;
 
     //
     // Serial_Robot robot_model_2;

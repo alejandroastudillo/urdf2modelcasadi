@@ -1,15 +1,15 @@
 #include <casadi/casadi.hpp>
-#include "../src/model_pinocchio/pinocchio_interface.hpp"
+#include "../src/interface/pinocchio_interface.hpp"
 
 using namespace casadi;
 
 int main(int argc, char ** argv)
 {
-    std::string urdf_filename = (argc<=1) ? "../urdf2model/robot_descriptions/kortex_description/urdf/JACO3_URDF_V11.urdf" : argv[1];
-      // ../urdf2model/robot_descriptions/kortex_description/urdf/JACO3_URDF_V10rev.urdf
-      // ../urdf2model/robot_descriptions/kortex_description/urdf/JACO3_URDF_V11.urdf
-      // ../urdf2model/robot_descriptions/iiwa_description/urdf/iiwa14.urdf
-      // ../urdf2model/robot_descriptions/abb_common/urdf/irb120.urdf
+    std::string urdf_filename = (argc<=1) ? "../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf" : argv[1];
+      // ../urdf2model/models/kortex_description/urdf/JACO3_URDF_V10rev.urdf
+      // ../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf
+      // ../urdf2model/models/iiwa_description/urdf/iiwa14.urdf
+      // ../urdf2model/models/abb_common/urdf/irb120.urdf
 
     Serial_Robot robot_model;
     robot_model = generate_model(urdf_filename);
@@ -39,11 +39,13 @@ int main(int argc, char ** argv)
     print_model_data(robot_model);
     // #endif
 
+    std::cout << "neutral: " << robot_model.neutral_configuration.transpose() << std::endl;
 
-    Serial_Robot robot_model_2;
-    robot_model_2 = generate_model("../urdf2model/robot_descriptions/iiwa_description/urdf/iiwa14.urdf");
-
-    print_model_data(robot_model_2);
+    //
+    // Serial_Robot robot_model_2;
+    // robot_model_2 = generate_model("../urdf2model/models/iiwa_description/urdf/iiwa14.urdf");
+    //
+    // print_model_data(robot_model_2);
 
     // robot_init(filename);
     // // execute_tests();

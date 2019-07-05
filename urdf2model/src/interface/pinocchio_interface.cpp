@@ -8,6 +8,10 @@ https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/name
 ### Information about types of variables
 Eigen::VectorXd = Eigen::Matrix<double, Eigen::Dynamic, 1> = pinocchio::ModelTpl<double>::VectorXs
 Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vector3
+
+  typedef Eigen::Matrix<CasadiScalar , Eigen::Dynamic, Eigen::Dynamic>  EigenCasadiMatrix;
+  typedef Eigen::Matrix<CasadiScalar , Eigen::Dynamic, 1>               EigenCasadiVecXd;
+  typedef Eigen::Matrix<CasadiScalar , 3, 1>                            EigenCasadiVec3d;
 */
 
 /* TODO:
@@ -21,162 +25,83 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
 // const double PI = boost::math::constants::pi<double>();
 const double PI = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862;
 
-
 // Declare robot_info of type Serial_Robot
-  Serial_Robot robot_info;
-
-  typedef Eigen::Matrix<CasadiScalar , Eigen::Dynamic, Eigen::Dynamic>  EigenCasadiMatrix;
-  typedef Eigen::Matrix<CasadiScalar , Eigen::Dynamic, 1>               EigenCasadiVecXd;
-  typedef Eigen::Matrix<CasadiScalar , 3, 1>                            EigenCasadiVec3d;
+// Serial_Robot robot_info;
 
 
 Serial_Robot generate_model(std::string filename)
 {
-    Serial_Robot robot_model;
+      Serial_Robot  rob_model;
 
   // Pinocchio model
       Model         model;
     // Build the model using the URDF parser
-      bool verbose = false;                                   // verbose can be omitted from the buildModel execution: <pinocchio::urdf::buildModel(filename,model)>
+      bool          verbose = false;                                   // verbose can be omitted from the buildModel execution: <pinocchio::urdf::buildModel(filename,model)>
       pinocchio::urdf::buildModel(filename,model,verbose);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
     // Set the gravity applied to the model
       model.gravity.linear(pinocchio::Model::gravity981);
     // Initialize the data structure for the model
       Data          data = pinocchio::Data(model);
 
-    // fill the data structure with some basic information about the robot
-      robot_model.name               = model.name;
-      robot_model.n_joints           = model.njoints;  // data.oMi.size()
-      robot_model.n_q                = model.nq;
-      robot_model.n_dof              = model.nv;
-      robot_model.n_bodies           = model.nbodies;
-      robot_model.n_frames           = model.nframes;
-      robot_model.gravity            = model.gravity.linear_impl();
-      robot_model.joint_torque_limit = model.effortLimit;
-      robot_model.joint_pos_ub       = model.upperPositionLimit;
-      robot_model.joint_pos_lb       = model.lowerPositionLimit;
-      robot_model.joint_vel_limit    = model.velocityLimit;
-      robot_model.joint_names        = model.names;
+    // populate the data structure with some basic information about the robot
+      rob_model.name                  = model.name;
+      rob_model.n_joints              = model.njoints;  // data.oMi.size()
+      rob_model.n_q                   = model.nq;
+      rob_model.n_dof                 = model.nv;
+      rob_model.n_bodies              = model.nbodies;
+      rob_model.n_frames              = model.nframes;
+      rob_model.gravity               = model.gravity.linear_impl();
+      rob_model.joint_torque_limit    = model.effortLimit;
+      rob_model.joint_pos_ub          = model.upperPositionLimit;
+      rob_model.joint_pos_lb          = model.lowerPositionLimit;
+      rob_model.joint_vel_limit       = model.velocityLimit;
+      rob_model.joint_names           = model.names;
+      rob_model.neutral_configuration = pinocchio::neutral(model);
 
     // Casadi model
       CasadiModel casadi_model = model.cast<CasadiScalar>();
-      CasadiData casadi_data(casadi_model);
+      CasadiData casadi_data( casadi_model );
 
-      robot_model.aba = get_forward_dynamics(casadi_model, casadi_data);
-      robot_model.rnea = get_inverse_dynamics(casadi_model, casadi_data);
-      robot_model.fk_pos = get_forward_kinematics_position(casadi_model, casadi_data);
+    // Get functions and populate data structure
+      rob_model.aba     = get_forward_dynamics( casadi_model, casadi_data );
+      rob_model.rnea    = get_inverse_dynamics( casadi_model, casadi_data );
+      rob_model.fk_pos  = get_forward_kinematics_position( casadi_model, casadi_data );
 
-    return robot_model;
+    return rob_model;
 }
 
 
-void print_model_data(Serial_Robot robot_info)
+      // ConfigVector  q_home = pinocchio::randomConfiguration(model, -3.14159*Eigen::VectorXd::Ones(model.nq), 3.14159*Eigen::VectorXd::Ones(model.nq));
+
+void print_model_data(Serial_Robot rob_info)
 {
     std::cout << "\n----- Robot model information: " << std::endl;
-    print_indent("Model name = ",                         robot_info.name,               38);
-    print_indent("Size of configuration vector = ",       robot_info.n_q,                38);
-    print_indent("Number of joints (with universe) = ",   robot_info.n_joints,           38);
-    print_indent("Number of DoF = ",                      robot_info.n_dof,              38);
-    print_indent("Number of bodies = ",                   robot_info.n_bodies,           38);
-    print_indent("Number of operational frames = ",       robot_info.n_frames,           38);
-    print_indent("Gravity = ",                            robot_info.gravity,            38);
-    print_indent("Joint torque bounds = ",                robot_info.joint_torque_limit, 38);
-    print_indent("Joint configuration upper bounds = ",   robot_info.joint_pos_ub,       38);
-    print_indent("Joint configuration lower bounds = ",   robot_info.joint_pos_lb,       38);
-    print_indent("Joint velocity bounds = ",              robot_info.joint_vel_limit,    38);
+    print_indent("Model name = ",                         rob_info.name,               38);
+    print_indent("Size of configuration vector = ",       rob_info.n_q,                38);
+    print_indent("Number of joints (with universe) = ",   rob_info.n_joints,           38);
+    print_indent("Number of DoF = ",                      rob_info.n_dof,              38);
+    print_indent("Number of bodies = ",                   rob_info.n_bodies,           38);
+    print_indent("Number of operational frames = ",       rob_info.n_frames,           38);
+    print_indent("Gravity = ",                            rob_info.gravity,            38);
+    print_indent("Joint torque bounds = ",                rob_info.joint_torque_limit, 38);
+    print_indent("Joint configuration upper bounds = ",   rob_info.joint_pos_ub,       38);
+    print_indent("Joint configuration lower bounds = ",   rob_info.joint_pos_lb,       38);
+    print_indent("Joint velocity bounds = ",              rob_info.joint_vel_limit,    38);
 
     // std::cout << "\n----- Placement of each joint in the model: " << std::endl;
     // std::cout << "\n-----Name of each joint in the model: " << std::endl;
-    // for (int k=0 ; k<robot_info.n_joints ; ++k)
+    // for (int k=0 ; k<rob_info.n_joints ; ++k)
     // {
-    //     std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << robot_info.joint_names[k] << std::setw(10) << std::endl; // << data.oMi[k].translation().transpose()
+    //     std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << rob_info.joint_names[k] << std::setw(10) << std::endl; // << data.oMi[k].translation().transpose()
     // }
 
     //
     // std::cout << "\n----- Placement of each frame in the model: " << std::endl;
-    // for (int k=0 ; k<robot_info.n_frames ; ++k)
+    // for (int k=0 ; k<rob_info.n_frames ; ++k)
     // {
     //     std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << model.frames[k].name << std::setw(10) << data.oMf[k].translation().transpose() << std::endl;
     // }
 }
-
-// casadi::Function get_forward_dynamics(CasadiModel &cas_model, CasadiData &cas_data)
-// {
-//   // Set variables
-//   CasadiScalar q_sx = casadi::SX::sym("q", cas_model.nq);
-//   ConfigVectorCasadi q_casadi(cas_model.nq);
-//   pinocchio::casadi::copy(q_sx,q_casadi); // q_casadi = Eigen::Map<ConfigVectorCasadi>(static_cast< std::vector<CasadiScalar> >(q_sx).data(),model.nq,1);
-//
-//   CasadiScalar v_sx = casadi::SX::sym("v", cas_model.nv);
-//   TangentVectorCasadi v_casadi(cas_model.nv);
-//   pinocchio::casadi::copy(v_sx,v_casadi); // v_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(v_sx).data(),model.nv,1);
-//
-//   CasadiScalar tau_sx = casadi::SX::sym("tau", cas_model.nv);
-//   TangentVectorCasadi tau_casadi(cas_model.nv);
-//   pinocchio::casadi::copy(tau_sx,tau_casadi); // tau_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(tau_sx).data(),model.nv,1);
-//
-//   // Call the Articulated-body algorithm
-//   pinocchio::aba(cas_model,cas_data,q_casadi,v_casadi,tau_casadi);
-//
-//   // Get the result from ABA into an SX
-//   CasadiScalar ddq_sx(cas_model.nv,1);
-//   pinocchio::casadi::copy( cas_data.ddq, ddq_sx );
-//
-//   // Create the ABA function
-//   casadi::Function aba("aba", casadi::SXVector {q_sx, v_sx, tau_sx}, casadi::SXVector {ddq_sx});
-//
-//   return aba;
-// }
-//
-// casadi::Function get_inverse_dynamics(CasadiModel &cas_model, CasadiData &cas_data)
-// {
-//   // Set variables
-//   CasadiScalar q_sx = casadi::SX::sym("q", cas_model.nq);
-//   ConfigVectorCasadi q_casadi(cas_model.nq);
-//   pinocchio::casadi::copy(q_sx,q_casadi);
-//
-//   CasadiScalar v_sx = casadi::SX::sym("v", cas_model.nv);
-//   TangentVectorCasadi v_casadi(cas_model.nv);
-//   pinocchio::casadi::copy(v_sx,v_casadi);
-//
-//   CasadiScalar a_sx = casadi::SX::sym("a", cas_model.nv);
-//   TangentVectorCasadi a_casadi(cas_model.nv);
-//   pinocchio::casadi::copy(a_sx,a_casadi);
-//
-//   // Call the Recursive Newton-Euler algorithm
-//   pinocchio::rnea(cas_model,cas_data,q_casadi,v_casadi,a_casadi);
-//
-//   // Get the result from ABA into an SX
-//   casadi::SX tau_sx(cas_model.nv,1);
-//   pinocchio::casadi::copy( cas_data.tau, tau_sx );
-//
-//   // Create the RNEA function
-//   casadi::Function rnea("rnea", casadi::SXVector {q_sx, v_sx, a_sx}, casadi::SXVector {tau_sx});
-//
-//   return rnea;
-// }
-
-// casadi::Function get_forward_kinematics_position(CasadiModel &cas_model, CasadiData &cas_data)
-// {
-//   int EE_idx = cas_model.nframes-1;
-//   // Set variables
-//   CasadiScalar q_sx = casadi::SX::sym("q", cas_model.nq);
-//   ConfigVectorCasadi q_casadi(cas_model.nq);
-//   pinocchio::casadi::copy( q_sx, q_casadi );
-//
-//   // Call the forward kinematics function
-//   pinocchio::forwardKinematics(     cas_model,   cas_data,    q_casadi);
-//   pinocchio::updateFramePlacements( cas_model,   cas_data);
-//
-//   // Get the result from FK
-//   CasadiScalar pos_sx(3,1);
-//   pinocchio::casadi::copy( cas_data.oMf[EE_idx].translation(), pos_sx );
-//
-//   // Create the Forward Kinematics function
-//   casadi::Function fk( "fk", casadi::SXVector {q_sx}, casadi::SXVector {pos_sx} );
-//
-//   return fk;
-// }
 
 
 // void robot_init(std::string filename)

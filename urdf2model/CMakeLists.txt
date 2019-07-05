@@ -11,7 +11,7 @@
 
 # Set source directories
   set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
-  set(ROB_DYN_INTERFACE_DIR ${SRC_DIR}/model_pinocchio)
+  set(ROB_DYN_INTERFACE_DIR ${SRC_DIR}/interface)
 
 # Add subdirectories
   add_subdirectory (src)

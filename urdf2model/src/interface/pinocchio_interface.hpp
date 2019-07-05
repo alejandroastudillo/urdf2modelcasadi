@@ -7,11 +7,11 @@
 
 #include "pinocchio/multibody/model.hpp"
 #include "pinocchio/parsers/urdf.hpp"
-#include "pinocchio/algorithm/frames.hpp"
-#include "pinocchio/algorithm/kinematics.hpp"
-#include "pinocchio/algorithm/rnea.hpp"
-#include "pinocchio/algorithm/aba.hpp"
-#include "pinocchio/algorithm/joint-configuration.hpp"
+// #include "pinocchio/algorithm/frames.hpp"
+// #include "pinocchio/algorithm/kinematics.hpp"
+// #include "pinocchio/algorithm/rnea.hpp"
+// #include "pinocchio/algorithm/aba.hpp"
+// #include "pinocchio/algorithm/joint-configuration.hpp"
 // #include "pinocchio/algorithm/jacobian.hpp"
 // #include "pinocchio/algorithm/crba.hpp"
 // #include "pinocchio/algorithm/rnea-derivatives.hpp"
@@ -51,6 +51,7 @@ struct Serial_Robot {
    Eigen::VectorXd          joint_pos_ub;
    Eigen::VectorXd          joint_pos_lb;
    Eigen::VectorXd          joint_vel_limit;
+   Eigen::VectorXd          neutral_configuration;
    casadi::Function         aba;
    casadi::Function         rnea;
    casadi::Function         fk_pos;
@@ -59,11 +60,5 @@ struct Serial_Robot {
 Serial_Robot generate_model(std::string filename);
 
 void print_model_data(Serial_Robot robot_info);
-
-// casadi::Function get_forward_dynamics(CasadiModel &cas_model, CasadiData &cas_data);
-
-// casadi::Function get_inverse_dynamics(CasadiModel &cas_model, CasadiData &cas_data);
-
-// casadi::Function get_forward_kinematics_position(CasadiModel &cas_model, CasadiData &cas_data);
 
 #endif // PINOCCHIO_INTERFACE_H_INCLUDED

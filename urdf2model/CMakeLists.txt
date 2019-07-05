@@ -7,7 +7,7 @@
   option(BUILD_UNIT_TESTS "Build the unit tests" OFF)
 
 # Set the GCC flags
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -fPIC -std=c++11 -DPINOCCHIO_URDFDOM_TYPEDEF_SHARED_PTR -DPINOCCHIO_WITH_URDFDOM") # -DDEBUG
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -fPIC -std=c++11 -DPINOCCHIO_URDFDOM_TYPEDEF_SHARED_PTR -DPINOCCHIO_WITH_URDFDOM -DDEBUG") # -DDEBUG
 
 # Set source directories
   set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
@@ -15,6 +15,8 @@
 
 # Add subdirectories
   add_subdirectory (src)
+
+  add_subdirectory (examples)
 
   if(BUILD_UNIT_TESTS)
     enable_testing ()

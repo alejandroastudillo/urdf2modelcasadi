@@ -1,9 +1,5 @@
 
 
-# Adds an executable target to be built from the source files listed after it
-add_executable( ${PROJECT_NAME}
-                urdf_to_casadi.cpp
-              )
 
 # link directories (as the -L flag in gcc)
 find_library(CASADI_LIB casadi HINTS ${CASADI_DIR}/lib)
@@ -16,21 +12,16 @@ include_directories(${EIGEN_INC})
 include_directories(${CASADI_DIR}/include)
 
 # link external libraries (as the -l flag in gcc)
-add_library(robot_dynamics
+add_library(model_interface
             SHARED
             ${ROB_DYN_INTERFACE_DIR}/pinocchio_interface.cpp)
 
 # target link libraries
-target_link_libraries(robot_dynamics
+target_link_libraries(model_interface
 
                       stdc++
                       boost_system
                       urdfdom_model
                       ${CASADI_LIB}
                       # casadi
-                    )
-
-target_link_libraries(${PROJECT_NAME}
-
-                      robot_dynamics
                     )

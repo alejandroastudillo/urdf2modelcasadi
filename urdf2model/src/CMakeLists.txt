@@ -20,9 +20,6 @@ add_library(robot_dynamics
             SHARED
             ${ROB_DYN_INTERFACE_DIR}/pinocchio_interface.cpp)
 
-# find boost for unit tests
-# find_package(Boost COMPONENTS system filesystem unit_test_framework REQUIRED)
-
 # target link libraries
 target_link_libraries(robot_dynamics
 
@@ -34,9 +31,6 @@ target_link_libraries(robot_dynamics
                     )
 
 target_link_libraries(${PROJECT_NAME}
-                      # stdc++
-                      # boost_system
-                      # urdfdom_model
-                      # ${CASADI_LIB}
+
                       robot_dynamics
                     )

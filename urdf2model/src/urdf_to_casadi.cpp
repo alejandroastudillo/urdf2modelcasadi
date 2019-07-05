@@ -39,4 +39,28 @@ int main(int argc, char ** argv)
     // generate_model(cas_model, cas_data, "../urdf2model/robot_descriptions/abb_common/urdf/irb120.urdf");
     //
     // std::cout << "name: " << cas_model.name << std::endl;
+
+    Robot_info_struct robot_model;
+    robot_model = generate_model("../urdf2model/robot_descriptions/abb_common/urdf/irb120.urdf");
+    std::cout << "robot_model name: " << robot_model.name << std::endl;
+
+    std::cout << "robot_model ABA: " << robot_model.aba << std::endl;
+
+    std::vector<double> q_vec = {1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0};
+    std::vector<double> v_vec = {0, 0, 0, 0, 0, 0, 0};
+    std::vector<double> a_vec = {0, 0, 0, 0, 0, 0, 0};
+    std::vector<double> tau_vec = {0, 0, 0, 0, 0, 0, 0};
+
+    casadi::DM ddq_res = robot_model.aba(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
+
+    std::cout << "ddq: " << ddq_res << std::endl;
+
+    casadi::DM tau_res = robot_model.rnea(casadi::DMVector {q_vec, v_vec, a_vec})[0];
+
+    std::cout << "tau: " << tau_res << std::endl;
+
+    casadi::DM pos_res = robot_model.fk_pos(casadi::DMVector {q_vec})[0];
+
+    std::cout << "EE_pos: " << pos_res << std::endl;
+
 }

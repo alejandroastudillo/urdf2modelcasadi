@@ -36,23 +36,121 @@ const double PI = 3.141592653589793238462643383279502884197169399375105820974944
   Model         model;                                        // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1ModelTpl.html
   Data          data = pinocchio::Data(model);                // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1DataTpl.html
 
-// std::tuple<double, char, std::string> get_student(int id)
-// {
-//     return std::make_tuple(3.8, 'A', "Lisa Simpson");
-// }
+Robot_info_struct generate_model(std::string filename)
+{
+    Robot_info_struct robot_model;
 
-// void generate_model(CasadiModel &cas_model, CasadiData &cas_data, std::string file_name)
-// {
-//     Model         pin_model;
-//     pinocchio::urdf::buildModel(file_name,pin_model);
-//     model.gravity.linear(pinocchio::Model::gravity981);
-//     Data          pin_data = pinocchio::Data(pin_model);                // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1DataTpl.html
-//
-//     cas_model = model.cast<CasadiScalar>();
-//     cas_data = CasadiData(cas_model);
-//
-//     std::cout << "name: " << cas_model.name << std::endl;
-// }
+    // Pinocchio model
+      Model         pin_model;
+    // Build the model using the URDF parser
+      bool verbose = false;                                   // verbose can be omitted from the buildModel execution: <pinocchio::urdf::buildModel(filename,model)>
+      pinocchio::urdf::buildModel(filename,model,verbose);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
+    // Set the gravity applied to the model
+      model.gravity.linear(pinocchio::Model::gravity981);
+    // Initialize the data structure for the model
+      Data          pin_data = pinocchio::Data(pin_model);
+
+    // fill the data structure with some basic information about the robot
+      robot_model.name               = model.name;
+      robot_model.n_joints           = model.njoints;  // data.oMi.size()
+      robot_model.n_q                = model.nq;
+      robot_model.n_dof              = model.nv;
+      robot_model.n_bodies           = model.nbodies;
+      robot_model.n_frames           = model.nframes;
+      robot_model.gravity            = model.gravity.linear_impl();
+      robot_model.joint_torque_limit = model.effortLimit;
+      robot_model.joint_pos_ub       = model.upperPositionLimit;
+      robot_model.joint_pos_lb       = model.lowerPositionLimit;
+      robot_model.joint_vel_limit    = model.velocityLimit;
+
+    // Casadi model
+      CasadiModel casadi_model = model.cast<CasadiScalar>();
+      CasadiData casadi_data(casadi_model);
+
+      robot_model.aba = get_forward_dynamics(casadi_model, casadi_data);
+      robot_model.rnea = get_inverse_dynamics(casadi_model, casadi_data);
+      robot_model.fk_pos = get_forward_kinematics_position(casadi_model, casadi_data);
+
+    return robot_model;
+}
+
+casadi::Function get_forward_dynamics(CasadiModel &cas_model, CasadiData &cas_data)
+{
+  // Set variables
+  CasadiScalar q_sx = casadi::SX::sym("q", cas_model.nq);
+  ConfigVectorCasadi q_casadi(cas_model.nq);
+  pinocchio::casadi::copy(q_sx,q_casadi); // q_casadi = Eigen::Map<ConfigVectorCasadi>(static_cast< std::vector<CasadiScalar> >(q_sx).data(),model.nq,1);
+
+  CasadiScalar v_sx = casadi::SX::sym("v", cas_model.nv);
+  TangentVectorCasadi v_casadi(cas_model.nv);
+  pinocchio::casadi::copy(v_sx,v_casadi); // v_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(v_sx).data(),model.nv,1);
+
+  CasadiScalar tau_sx = casadi::SX::sym("tau", cas_model.nv);
+  TangentVectorCasadi tau_casadi(cas_model.nv);
+  pinocchio::casadi::copy(tau_sx,tau_casadi); // tau_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(tau_sx).data(),model.nv,1);
+
+  // Call the Articulated-body algorithm
+  pinocchio::aba(cas_model,cas_data,q_casadi,v_casadi,tau_casadi);
+
+  // Get the result from ABA into an SX
+  CasadiScalar ddq_sx(cas_model.nv,1);
+  pinocchio::casadi::copy( cas_data.ddq, ddq_sx );
+
+  // Create the ABA function
+  casadi::Function aba("aba", casadi::SXVector {q_sx, v_sx, tau_sx}, casadi::SXVector {ddq_sx});
+
+  return aba;
+}
+
+casadi::Function get_inverse_dynamics(CasadiModel &cas_model, CasadiData &cas_data)
+{
+  // Set variables
+  CasadiScalar q_sx = casadi::SX::sym("q", cas_model.nq);
+  ConfigVectorCasadi q_casadi(cas_model.nq);
+  pinocchio::casadi::copy(q_sx,q_casadi);
+
+  CasadiScalar v_sx = casadi::SX::sym("v", cas_model.nv);
+  TangentVectorCasadi v_casadi(cas_model.nv);
+  pinocchio::casadi::copy(v_sx,v_casadi);
+
+  CasadiScalar a_sx = casadi::SX::sym("a", cas_model.nv);
+  TangentVectorCasadi a_casadi(cas_model.nv);
+  pinocchio::casadi::copy(a_sx,a_casadi);
+
+  // Call the Recursive Newton-Euler algorithm
+  pinocchio::rnea(cas_model,cas_data,q_casadi,v_casadi,a_casadi);
+
+  // Get the result from ABA into an SX
+  casadi::SX tau_sx(cas_model.nv,1);
+  pinocchio::casadi::copy( cas_data.tau, tau_sx );
+
+  // Create the RNEA function
+  casadi::Function rnea("rnea", casadi::SXVector {q_sx, v_sx, a_sx}, casadi::SXVector {tau_sx});
+
+  return rnea;
+}
+
+casadi::Function get_forward_kinematics_position(CasadiModel &cas_model, CasadiData &cas_data)
+{
+  int EE_idx = model.nframes-1;
+  // Set variables
+  CasadiScalar q_sx = casadi::SX::sym("q", cas_model.nq);
+  ConfigVectorCasadi q_casadi(cas_model.nq);
+  pinocchio::casadi::copy( q_sx, q_casadi );
+
+  // Call the forward kinematics function
+  pinocchio::forwardKinematics(     cas_model,   cas_data,    q_casadi);
+  pinocchio::updateFramePlacements( cas_model,   cas_data);
+
+  // Get the result from FK
+  CasadiScalar pos_sx(3,1);
+  pinocchio::casadi::copy( cas_data.oMf[EE_idx].translation(), pos_sx );
+
+  // Create the Forward Kinematics function
+  casadi::Function fk( "fk", casadi::SXVector {q_sx}, casadi::SXVector {pos_sx} );
+
+  return fk;
+}
 
 void robot_init(std::string filename)
 {
@@ -131,6 +229,7 @@ void test_casadi_aba()
 
     // Print results
       std::cout << "\n----- Articulated-Body algorithm (forward dynamics) test: " << std::endl;
+      print_indent("     q = ", q_home, 38);
       std::cout << "* Pinocchio" << std::endl;
       print_indent("     ddq = ", data.ddq, 38);
       std::cout << "* Pinocchio + Casadi" << std::endl;
@@ -297,23 +396,6 @@ void print_model_data()
         std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << model.frames[k].name << std::setw(10) << data.oMf[k].translation().transpose() << std::endl;
     }
 }
-
-
-void qdd_cal(double *q, double *qd, double *qdd, double *tau)
-{
-    Eigen::VectorXd q_Eigen   = Eigen::Map<Eigen::VectorXd>(q, model.nv);
-    Eigen::VectorXd qd_Eigen  = Eigen::Map<Eigen::VectorXd>(qd,model.nv);
-    Eigen::VectorXd qdd_Eigen = Eigen::VectorXd::Zero(model.nv);
-    Eigen::VectorXd tau_Eigen = Eigen::Map<Eigen::VectorXd>(tau,model.nv);
-
-    qdd_Eigen = pinocchio::aba(model,data,q_Eigen,qd_Eigen,tau_Eigen);
-
-    // to double
-    Eigen::Map<Eigen::VectorXd>(qdd,model.nv) = qdd_Eigen;
-
-
-}
-
 
 int get_ndof() {return model.nv;}
 int get_nq() {return model.nq;}

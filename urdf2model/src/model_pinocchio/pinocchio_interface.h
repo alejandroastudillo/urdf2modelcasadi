@@ -2,8 +2,6 @@
 #ifndef PINOCCHIO_INTERFACE_H_INCLUDED
 #define PINOCCHIO_INTERFACE_H_INCLUDED
 
-#include <tuple>
-
 #include <casadi/casadi.hpp>
 #include "pinocchio/math/casadi.hpp"
 
@@ -48,15 +46,20 @@ struct Robot_info_struct {
    Eigen::VectorXd  joint_pos_lb;
    Eigen::VectorXd  joint_vel_limit;
    Eigen::VectorXd  gravity;          // Eigen::Vector3d
+   casadi::Function aba;
+   casadi::Function rnea;
+   casadi::Function fk_pos;
 };
 
 
 // init function
 void robot_init(std::string filename);
-// calculate qdd for f
-void qdd_cal(double *q, double *qd, double *qdd, double *tau);
 
 // void generate_model(CasadiModel &cas_model, CasadiData &cas_data, std::string filename);
+Robot_info_struct generate_model(std::string filename);
+casadi::Function get_forward_dynamics(CasadiModel &cas_model, CasadiData &cas_data);
+casadi::Function get_inverse_dynamics(CasadiModel &cas_model, CasadiData &cas_data);
+casadi::Function get_forward_kinematics_position(CasadiModel &cas_model, CasadiData &cas_data);
 
 void print_model_data();
 

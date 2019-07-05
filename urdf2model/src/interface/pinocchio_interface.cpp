@@ -25,9 +25,6 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
 // const double PI = boost::math::constants::pi<double>();
 const double PI = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862;
 
-// Declare robot_info of type Serial_Robot
-// Serial_Robot robot_info;
-
 
 Serial_Robot generate_model(std::string filename)
 {

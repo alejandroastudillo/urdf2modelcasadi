@@ -17,6 +17,10 @@
 // #include "pinocchio/algorithm/rnea-derivatives.hpp"
 // #include "pinocchio/algorithm/aba-derivatives.hpp"
 
+#include "../functions/forward_dynamics.hpp"
+#include "../functions/inverse_dynamics.hpp"
+#include "../functions/forward_kinematics.hpp"
+
 // Typedef
   typedef double                              Scalar;
   typedef casadi::SX                          CasadiScalar;
@@ -35,32 +39,31 @@
 
 
 struct Serial_Robot {
-   std::string      name;
-   int              n_q;
-   int              n_joints;
-   int              n_dof;
-   int              n_bodies;
-   int              n_frames;
+   std::string              name;
+   int                      n_q;
+   int                      n_joints;
+   int                      n_dof;
+   int                      n_bodies;
+   int                      n_frames;
    std::vector<std::string> joint_names;
-   Eigen::VectorXd  gravity;          // Eigen::Vector3d
-   Eigen::VectorXd  joint_torque_limit;
-   Eigen::VectorXd  joint_pos_ub;
-   Eigen::VectorXd  joint_pos_lb;
-   Eigen::VectorXd  joint_vel_limit;
-   casadi::Function aba;
-   casadi::Function rnea;
-   casadi::Function fk_pos;
+   Eigen::VectorXd          gravity;          // Eigen::Vector3d
+   Eigen::VectorXd          joint_torque_limit;
+   Eigen::VectorXd          joint_pos_ub;
+   Eigen::VectorXd          joint_pos_lb;
+   Eigen::VectorXd          joint_vel_limit;
+   casadi::Function         aba;
+   casadi::Function         rnea;
+   casadi::Function         fk_pos;
 };
 
 Serial_Robot generate_model(std::string filename);
 
-casadi::Function get_forward_dynamics(CasadiModel &cas_model, CasadiData &cas_data);
-
-casadi::Function get_inverse_dynamics(CasadiModel &cas_model, CasadiData &cas_data);
-
-casadi::Function get_forward_kinematics_position(CasadiModel &cas_model, CasadiData &cas_data);
-
 void print_model_data(Serial_Robot robot_info);
 
+// casadi::Function get_forward_dynamics(CasadiModel &cas_model, CasadiData &cas_data);
+
+// casadi::Function get_inverse_dynamics(CasadiModel &cas_model, CasadiData &cas_data);
+
+// casadi::Function get_forward_kinematics_position(CasadiModel &cas_model, CasadiData &cas_data);
 
 #endif // PINOCCHIO_INTERFACE_H_INCLUDED

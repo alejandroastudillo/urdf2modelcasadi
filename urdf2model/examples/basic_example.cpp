@@ -1,5 +1,5 @@
 #include <casadi/casadi.hpp>
-#include "../src/model_pinocchio/pinocchio_interface.h"
+#include "../src/model_pinocchio/pinocchio_interface.hpp"
 
 using namespace casadi;
 

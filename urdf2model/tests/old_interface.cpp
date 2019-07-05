@@ -2,7 +2,7 @@
 #define BOOST_TEST_MODULE ABA_TESTS
 #include <boost/test/unit_test.hpp>
 
-#include "../src/model_pinocchio/pinocchio_interface.h"
+#include "../src/model_pinocchio/pinocchio_interface.hpp"
 
 std::string filename =  "../../urdf2model/robot_descriptions/kortex_description/urdf/JACO3_URDF_V11.urdf";
 

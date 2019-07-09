@@ -17,10 +17,20 @@ int main(int argc, char ** argv)
 
     std::cout << "robot_model ABA: " << robot_model.aba << std::endl;
 
-    std::vector<double> q_vec = {1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0};
-    std::vector<double> v_vec = {0, 0, 0, 0, 0, 0, 0};
-    std::vector<double> a_vec = {0, 0, 0, 0, 0, 0, 0};
-    std::vector<double> tau_vec = {0, 0, 0, 0, 0, 0, 0};
+    std::vector<double> q_vec((size_t)robot_model.n_q);
+    Eigen::Map<ConfigVector>( q_vec.data(), robot_model.n_q, 1 ) = robot_model.neutral_configuration; // Populate q_vec with the robot's neutral configuration
+    // std::vector<double> q_vec = {1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0};
+    std::vector<double> v_vec((size_t)robot_model.n_dof);
+    Eigen::Map<TangentVector>(v_vec.data(),robot_model.n_dof,1) = Eigen::VectorXd::Zero(robot_model.n_dof);
+    // std::vector<double> v_vec = {0, 0, 0, 0, 0, 0, 0};
+    std::vector<double> a_vec((size_t)robot_model.n_dof);
+    Eigen::Map<TangentVector>(a_vec.data(),robot_model.n_dof,1) = Eigen::VectorXd::Zero(robot_model.n_dof);
+    // std::vector<double> a_vec = {0, 0, 0, 0, 0, 0, 0};
+    std::vector<double> tau_vec((size_t)robot_model.n_dof);
+    Eigen::Map<TangentVector>(tau_vec.data(),robot_model.n_dof,1) = Eigen::VectorXd::Zero(robot_model.n_dof);
+    // std::vector<double> tau_vec = {0, 0, 0, 0, 0, 0, 0};
+
+
 
     casadi::DM ddq_res = robot_model.aba(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
 
@@ -41,7 +51,11 @@ int main(int argc, char ** argv)
 
     // std::cout << "neutral: " << robot_model.neutral_configuration.transpose() << std::endl;
 
-    std::cout << "random configuration: " << randomConfiguration(robot_model).transpose() << std::endl;
+    std::cout << "home configuration: " << robot_model.neutral_configuration.transpose() << std::endl << std::endl;
+
+    std::cout << "random configuration: " << randomConfiguration(robot_model).transpose() << std::endl << std::endl;
+
+    std::cout << "random configuration extended: " << randomConfiguration(robot_model, -3.14159*Eigen::VectorXd::Ones(robot_model.n_q), 3.14159*Eigen::VectorXd::Ones(robot_model.n_q)).transpose() << std::endl;
 
     //
     // Serial_Robot robot_model_2;

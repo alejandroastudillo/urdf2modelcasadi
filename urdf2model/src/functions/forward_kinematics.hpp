@@ -4,7 +4,6 @@
 #include "pinocchio/multibody/model.hpp"
 #include "pinocchio/algorithm/frames.hpp"
 #include "pinocchio/algorithm/kinematics.hpp"
-#include "pinocchio/algorithm/joint-configuration.hpp"
 
 // Typedef
   typedef casadi::SX                          CasadiScalar;

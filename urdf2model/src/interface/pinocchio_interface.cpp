@@ -77,22 +77,20 @@ Serial_Robot generate_model(std::string filename)
 Eigen::VectorXd randomConfiguration(Serial_Robot rob_model)
 {
   Eigen::VectorXd lb = rob_model.joint_pos_lb;
-  Eigen::VectorXd ub = rob_model.joint_pos_ub;
+  Eigen::VectorXd ub = rob_model.joint_pos_ub; // In this function, lb and ub size = n_q
 
   Eigen::VectorXd randConfig;
 
-  srand(time(NULL)); // Needed so that a random value is always different
   // std::mt19937 mt_rand(time(0));
   std::random_device rd;  //Will be used to obtain a seed for the random number engine
   std::mt19937 mt_rand(rd()); //Standard mersenne_twister_engine seeded with rd()
   std::uniform_real_distribution<> rnd_dis(-1.0, 1.0);
-  // std::cout << rnd_dis(mt_rand) << std::endl;
 
   // Check for continuous joints
   if (rob_model.n_q > rob_model.n_dof) // If the length of the configuration-vector is > than the DoF, some joints are continuous and represented by [cos(q_j) sin(q_j)]
   {
     // Create a random vector of size = n_dof. (This is filled with numbers between -1 and 1).
-    Eigen::VectorXd randAngles = Eigen::VectorXd::Random(rob_model.n_dof, 1);
+    Eigen::VectorXd randAngles = Eigen::VectorXd::Zero(rob_model.n_dof, 1);
     // Create a configuration vector of size n_q, filled with zeros.
     randConfig = Eigen::VectorXd::Zero(rob_model.n_q);
     // Creates an index for the configuration vector
@@ -103,9 +101,8 @@ Eigen::VectorXd randomConfiguration(Serial_Robot rob_model)
       // Check if joint k is a revolute unbounded (continuous) joint (This joint types come from Pinocchio)
       if (rob_model.joint_types[k].compare("JointModelRUBZ") == 0 || rob_model.joint_types[k].compare("JointModelRUBY") == 0 || rob_model.joint_types[k].compare("JointModelRUBX") == 0)
       {
-        // Adjust the range of the random angle from [-1, 1] to [-PI, PI] (Here you can have bounds < or > than PI because it is a continuous joint.
-        randAngles[k] = PI*randAngles[k];
-        // randAngles[k] = ((float)rand())/RAND_MAX * 2*PI - PI;
+        // Use mt19937 to set a random number in [-1, 1], then multiply it by PI to have [-PI, PI] (Here you can have bounds < or > than PI because it is a continuous joint.
+        randAngles[k] = PI*rnd_dis(mt_rand);
         // Fill the corresponding values in the configuration vector.
         randConfig[j] = cos(randAngles[k]);
         randConfig[j+1] = sin(randAngles[k]);
@@ -113,9 +110,12 @@ Eigen::VectorXd randomConfiguration(Serial_Robot rob_model)
         j = j+2;
       } else // If joint k is not a continuous joint
       {
-        // Fill the randAngles vector with random numbers between lb and ub
-        randAngles[k] = ((float)rand())/RAND_MAX * (ub[j]-lb[j]) + lb[j];
-        // Directly fill the corresponding value in the configuration vector
+        // Use mt19937 to set a random number between -1 and 1.
+        randAngles[k] = rnd_dis(mt_rand);
+        // Adjust the range of the random values from [-1, 1] to [ub, lb].
+        if (randAngles[k] < 0) { randAngles[k] = -1*lb[j]*randAngles[k]; }
+        else { randAngles[k] = ub[j]*randAngles[k]; }
+        // Fill the corresponding value in the configuration vector
         randConfig[j] = randAngles[k];
         // Update the configuration vector index.
         j++;
@@ -125,10 +125,12 @@ Eigen::VectorXd randomConfiguration(Serial_Robot rob_model)
   } else // There is no continuous joint in this robot
   {
     // Create a random configuration vector of size = n_q. (This is filled with numbers between -1 and 1).
-    randConfig = Eigen::VectorXd::Random(rob_model.n_q, 1);
+    randConfig = Eigen::VectorXd::Zero(rob_model.n_q, 1);
 
     for (Eigen::DenseIndex k = 0; k < rob_model.n_q; ++k)
     {
+      // Use mt19937 to set a random number between -1 and 1.
+      randConfig[k] = rnd_dis(mt_rand);
       // Adjust the range of the random values from [-1, 1] to [ub, lb].
       if (randConfig[k] < 0) { randConfig[k] = -1*lb[k]*randConfig[k]; }
       else { randConfig[k] = ub[k]*randConfig[k]; }
@@ -148,13 +150,15 @@ Eigen::VectorXd randomConfiguration(Serial_Robot rob_model, Eigen::VectorXd lowe
 
   Eigen::VectorXd randConfig;
 
-  srand(time(NULL)); // Needed so that a random value is always different
+  std::random_device rd;  //Will be used to obtain a seed for the random number engine
+  std::mt19937 mt_rand(rd()); //Standard mersenne_twister_engine seeded with rd()
+  std::uniform_real_distribution<> rnd_dis(-1.0, 1.0);
 
   // Check for continuous joints
   if (rob_model.n_q > rob_model.n_dof) // If the length of the configuration-vector is > than the DoF, some joints are continuous and represented by [cos(q_j) sin(q_j)]
   {
     // Create a vector of size = n_dof. (This will be filled with random numbers between lb and ub).
-    Eigen::VectorXd randAngles = Eigen::VectorXd::Random(rob_model.n_dof, 1);
+    Eigen::VectorXd randAngles = Eigen::VectorXd::Zero(rob_model.n_dof, 1);
     // Create a configuration vector of size n_q, filled with zeros.
     randConfig = Eigen::VectorXd::Zero(rob_model.n_q);
     // Creates an index for the configuration vector
@@ -162,8 +166,11 @@ Eigen::VectorXd randomConfiguration(Serial_Robot rob_model, Eigen::VectorXd lowe
     // Iterates for all the components of the random angles vector.
     for (Eigen::DenseIndex k = 0; k < rob_model.n_dof; ++k)
     {
-      // Fill the randAngles vector with random numbers between lb and ub
-      randAngles[k] = ((float)rand())/RAND_MAX * (ub[k]-lb[k]) + lb[k];
+      // Use mt19937 to set a random number between -1 and 1.
+      randAngles[k] = rnd_dis(mt_rand);
+      // Adjust the range of the random values from [-1, 1] to [ub, lb].
+      if (randAngles[k] < 0) { randAngles[k] = -1*lb[k]*randAngles[k]; }
+      else { randAngles[k] = ub[k]*randAngles[k]; }
       // Check if joint k is a revolute unbounded (continuous) joint (This joint types come from Pinocchio)
       if (rob_model.joint_types[k].compare("JointModelRUBZ") == 0 || rob_model.joint_types[k].compare("JointModelRUBY") == 0 || rob_model.joint_types[k].compare("JointModelRUBX") == 0)
       {
@@ -182,15 +189,17 @@ Eigen::VectorXd randomConfiguration(Serial_Robot rob_model, Eigen::VectorXd lowe
     }
   } else // If there is no continuous joint in this robot
   {
-    // Create a random configuration vector of size = n_q. (This is filled with numbers between -1 and 1).
-    randConfig = Eigen::VectorXd::Random(rob_model.n_q, 1);
+    // Create a configuration vector of size = n_q.
+    randConfig = Eigen::VectorXd::Zero(rob_model.n_q, 1);
 
     for (Eigen::DenseIndex k = 0; k < rob_model.n_q; ++k)
     {
-      // Fill the randConfig vector with random numbers between lb and ub
-      randConfig[k] = ((float)rand())/RAND_MAX * (ub[k]-lb[k]) + lb[k];
+      // Use mt19937 to set a random number between -1 and 1.
+      randConfig[k] = rnd_dis(mt_rand);
+      // Adjust the range of the random values from [-1, 1] to [ub, lb].
+      if (randConfig[k] < 0) { randConfig[k] = -1*lb[k]*randConfig[k]; }
+      else { randConfig[k] = ub[k]*randConfig[k]; }
     }
-    // The random function is called multiple times (instead of using the random Eigen vector so that we are sure the value is always different).
   }
   return randConfig;
 }
@@ -226,32 +235,6 @@ void print_model_data(Serial_Robot rob_info)
 }
 
 
-// void robot_init(std::string filename)
-// {
-//     // build the model using the urdf parser
-//       bool verbose = false;                                   // verbose can be omitted from the buildModel execution: <pinocchio::urdf::buildModel(filename,model)>
-//       pinocchio::urdf::buildModel(filename,model,verbose);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
-//
-//     // Set the gravity applied to the model
-//       model.gravity.linear(pinocchio::Model::gravity981);     // options: model.gravity.setZero(), model.gravity.linear( Eigen::Vector3d(0,0,-9.81));
-//
-//     // initialize the data structure for the model
-//       data = pinocchio::Data(model);
-//
-//     // fill a data structure with some basic information about the robot
-//       robot_info.name               = model.name; // robot_info.name.assign(model.name);
-//       robot_info.n_joints           = model.njoints;  // data.oMi.size()
-//       robot_info.n_q                = model.nq;
-//       robot_info.n_dof              = model.nv;
-//       robot_info.n_bodies           = model.nbodies;
-//       robot_info.n_frames           = model.nframes;
-//       robot_info.gravity            = model.gravity.linear_impl();
-//       robot_info.joint_torque_limit = model.effortLimit;
-//       robot_info.joint_pos_ub       = model.upperPositionLimit;
-//       robot_info.joint_pos_lb       = model.lowerPositionLimit;
-//       robot_info.joint_vel_limit    = model.velocityLimit;
-// }
-//
 // void test_casadi_aba()
 // {
 //   CasadiModel casadi_model = model.cast<CasadiScalar>();

@@ -45,17 +45,17 @@ int main(int argc, char ** argv)
 
     std::cout << "Neutral configuration: " << robot_model.neutral_configuration.transpose() << std::endl;
     std::cout << "Random configuration: " << randomConfiguration(robot_model).transpose() << std::endl;
-    std::cout << "Random configuration with custom bounds: " << randomConfiguration(robot_model, -3.14159*Eigen::VectorXd::Ones(robot_model.n_dof), 3.14159*Eigen::VectorXd::Ones(robot_model.n_dof)).transpose() << std::endl;
+    std::cout << "Random configuration with custom bounds: " << randomConfiguration(robot_model, -0.94159*Eigen::VectorXd::Ones(robot_model.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model.n_dof)).transpose() << std::endl;
 
 
     Serial_Robot robot_model_2;
-    robot_model_2 = generate_model("../urdf2model/models/kortex_description/urdf/JACO3_URDF_V10.urdf");
+    robot_model_2 = generate_model("../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf");
 
     print_model_data(robot_model_2);
 
     std::cout << "Neutral configuration: " << robot_model_2.neutral_configuration.transpose() << std::endl;
     std::cout << "Random configuration: " << randomConfiguration(robot_model_2).transpose() << std::endl;
-    std::cout << "Random configuration with custom bounds: " << randomConfiguration(robot_model_2, -3.14159*Eigen::VectorXd::Ones(robot_model_2.n_dof), 3.14159*Eigen::VectorXd::Ones(robot_model_2.n_dof)).transpose() << std::endl;
+    std::cout << "Random configuration with custom bounds: " << randomConfiguration(robot_model_2, -0.94159*Eigen::VectorXd::Ones(robot_model_2.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model_2.n_dof)).transpose() << std::endl;
 
 
     Serial_Robot robot_model_3;
@@ -65,7 +65,7 @@ int main(int argc, char ** argv)
 
     std::cout << "Neutral configuration: " << robot_model_3.neutral_configuration.transpose() << std::endl;
     std::cout << "Random configuration: " << randomConfiguration(robot_model_3).transpose() << std::endl;
-    std::cout << "Random configuration with custom bounds: " << randomConfiguration(robot_model_3, -3.14159*Eigen::VectorXd::Ones(robot_model_3.n_dof), 3.14159*Eigen::VectorXd::Ones(robot_model_3.n_dof)).transpose() << std::endl;
+    std::cout << "Random configuration with custom bounds: " << randomConfiguration(robot_model_3, -0.94159*Eigen::VectorXd::Ones(robot_model_3.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model_3.n_dof)).transpose() << std::endl;
 
     Serial_Robot robot_model_4;
     robot_model_4 = generate_model("../urdf2model/models/iiwa_description/urdf/iiwa14.urdf");
@@ -74,18 +74,7 @@ int main(int argc, char ** argv)
 
     std::cout << "Neutral configuration: " << robot_model_4.neutral_configuration.transpose() << std::endl;
     std::cout << "Random configuration: " << randomConfiguration(robot_model_4).transpose() << std::endl;
-    std::cout << "Random configuration with custom bounds: " << randomConfiguration(robot_model_4, -3.14159*Eigen::VectorXd::Ones(robot_model_4.n_dof), 3.14159*Eigen::VectorXd::Ones(robot_model_4.n_dof)).transpose() << std::endl;
+    std::cout << "Random configuration with custom bounds: " << randomConfiguration(robot_model_4, -0.94159*Eigen::VectorXd::Ones(robot_model_4.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model_4.n_dof)).transpose() << std::endl;
 
-
-    // robot_init(filename);
-    // // execute_tests();
-    //
-    // test_casadi_aba();
-    // test_casadi_rnea();
-    // test_casadi_fk();
-    //
-    // #ifdef DEBUG
-    //   print_model_data();
-    // #endif
 
 }

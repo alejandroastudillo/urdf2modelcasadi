@@ -6,4 +6,4 @@
 * CASADI
 * Pinocchio (with Casadi interface)
 * Boost for unit-testing and some asserts
-* C++11
+* C++11 (for randomConfiguration)

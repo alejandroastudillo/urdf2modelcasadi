@@ -18,6 +18,8 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
   - Handle (print error or warning) when the torque, position, or velocity limits are zero.
 */
 
+#include <ctime>
+
 #include "pinocchio_interface.hpp"
 
 #include "../utils/debug_functions.hpp"
@@ -73,8 +75,6 @@ Serial_Robot generate_model(std::string filename)
 
 Eigen::VectorXd randomConfiguration(Serial_Robot rob_model)
 {
-  // TODO: Assert that lb and ub are different than 0
-
   Eigen::VectorXd lb = rob_model.joint_pos_lb;
   Eigen::VectorXd ub = rob_model.joint_pos_ub;
 
@@ -134,17 +134,58 @@ Eigen::VectorXd randomConfiguration(Serial_Robot rob_model)
 
 Eigen::VectorXd randomConfiguration(Serial_Robot rob_model, Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds)
 {
+  custom_assert(lower_bounds.size() == rob_model.n_dof || upper_bounds.size() == rob_model.n_dof, "Error in " + std::string(__FUNCTION__) + "(): Lower and upper bound vectors must be of length equal to n_dof.");
+
   Eigen::VectorXd lb = lower_bounds;
   Eigen::VectorXd ub = upper_bounds;
 
+  Eigen::VectorXd randConfig;
+
   srand(time(NULL)); // Needed so that a random value is always different
 
-  Eigen::VectorXd randConfig = Eigen::VectorXd::Random(rob_model.n_q, 1);
-
-  for (Eigen::DenseIndex k = 0; k < rob_model.n_q; ++k)
+  // Check for continuous joints
+  if (rob_model.n_q > rob_model.n_dof) // If the length of the configuration-vector is > than the DoF, some joints are continuous and represented by [cos(q_j) sin(q_j)]
   {
-    if (randConfig[k] < 0) { randConfig[k] = -1*lb[k]*randConfig[k]; }
-    else { randConfig[k] = ub[k]*randConfig[k]; }
+    // Create a random vector of size = n_dof. (This is filled with numbers between -1 and 1).
+    Eigen::VectorXd randAngles = Eigen::VectorXd::Random(rob_model.n_dof, 1);
+    // Create a configuration vector of size n_q, filled with zeros.
+    randConfig = Eigen::VectorXd::Zero(rob_model.n_q);
+    // Creates an index for the configuration vector
+    int j = 0;
+    // Iterates for all the components of the random angles vector.
+    for (Eigen::DenseIndex k = 0; k < rob_model.n_dof; ++k)
+    {
+      // Adjust the range of the random angle from [-1, 1] to [ub, lb].
+      if (randAngles[k] < 0) { randAngles[k] = -1*lb[k]*randAngles[k]; }
+      else { randAngles[k] = ub[k]*randAngles[k]; }
+      // Check if joint k is a revolute unbounded (continuous) joint (This joint types come from Pinocchio)
+      if (rob_model.joint_types[k].compare("JointModelRUBZ") == 0 || rob_model.joint_types[k].compare("JointModelRUBY") == 0 || rob_model.joint_types[k].compare("JointModelRUBX") == 0)
+      {
+        // Fill the corresponding values in the configuration vector.
+        randConfig[j] = cos(randAngles[k]);
+        randConfig[j+1] = sin(randAngles[k]);
+        // Update the configuration vector index.
+        j = j+2;
+      } else // If joint k is not a continuous joint
+      {
+        // Directly fill the corresponding value in the configuration vector
+        randConfig[j] = randAngles[k];
+        // Update the configuration vector index.
+        j++;
+      }
+    }
+
+  } else // There is no continuous joint in this robot
+  {
+    // Create a random configuration vector of size = n_q. (This is filled with numbers between -1 and 1).
+    randConfig = Eigen::VectorXd::Random(rob_model.n_q, 1);
+
+    for (Eigen::DenseIndex k = 0; k < rob_model.n_q; ++k)
+    {
+      // Adjust the range of the random values from [-1, 1] to [ub, lb].
+      if (randConfig[k] < 0) { randConfig[k] = -1*lb[k]*randConfig[k]; }
+      else { randConfig[k] = ub[k]*randConfig[k]; }
+    }
   }
 
   return randConfig;

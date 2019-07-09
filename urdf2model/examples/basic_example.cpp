@@ -55,7 +55,9 @@ int main(int argc, char ** argv)
 
     std::cout << "random configuration: " << randomConfiguration(robot_model).transpose() << std::endl << std::endl;
 
-    std::cout << "random configuration extended: " << randomConfiguration(robot_model, -3.14159*Eigen::VectorXd::Ones(robot_model.n_q), 3.14159*Eigen::VectorXd::Ones(robot_model.n_q)).transpose() << std::endl;
+    // std::cout << "random configuration extended: " << randomConfiguration(robot_model, -3.14159*Eigen::VectorXd::Ones(robot_model.n_q), 3.14159*Eigen::VectorXd::Ones(robot_model.n_q)).transpose() << std::endl;
+
+    std::cout << "random configuration extended: " << randomConfiguration(robot_model, -3.14159*Eigen::VectorXd::Ones(robot_model.n_dof), 3.14159*Eigen::VectorXd::Ones(robot_model.n_dof)).transpose() << std::endl;
 
     //
     // Serial_Robot robot_model_2;

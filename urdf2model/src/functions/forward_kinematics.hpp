@@ -1,3 +1,6 @@
+#ifndef FUN_FORWARD_KINEMATICS_H_INCLUDED
+#define FUN_FORWARD_KINEMATICS_H_INCLUDED
+
 #include <casadi/casadi.hpp>
 #include "pinocchio/math/casadi.hpp"
 
@@ -14,4 +17,9 @@
   typedef CasadiModel::ConfigVectorType       ConfigVectorCasadi;
   typedef CasadiModel::TangentVectorType      TangentVectorCasadi;
 
-casadi::Function get_forward_kinematics_position(CasadiModel &cas_model, CasadiData &cas_data);
+namespace mecali
+{
+  casadi::Function get_forward_kinematics_position(CasadiModel &cas_model, CasadiData &cas_data);
+}
+
+#endif // FUN_FORWARD_KINEMATICS_H_INCLUDED

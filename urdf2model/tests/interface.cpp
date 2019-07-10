@@ -4,6 +4,8 @@
 
 #include "../src/interface/pinocchio_interface.hpp"
 
+using namespace mecali;
+
 std::string filename =  "../../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf";
 
 // Typedef

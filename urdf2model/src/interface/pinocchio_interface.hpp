@@ -21,48 +21,53 @@
 #include "../functions/inverse_dynamics.hpp"
 #include "../functions/forward_kinematics.hpp"
 
-// Typedef
-  typedef double                              Scalar;
-  typedef casadi::SX                          CasadiScalar;
+namespace mecali
+{
 
-  typedef pinocchio::ModelTpl<Scalar>         Model;
-  typedef Model::Data                         Data;
+  // Typedef
+    typedef double                              Scalar;
+    typedef casadi::SX                          CasadiScalar;
 
-  typedef pinocchio::ModelTpl<CasadiScalar>   CasadiModel;
-  typedef CasadiModel::Data                   CasadiData;
+    typedef pinocchio::ModelTpl<Scalar>         Model;
+    typedef Model::Data                         Data;
 
-  typedef Model::ConfigVectorType             ConfigVector;
-  typedef Model::TangentVectorType            TangentVector;
+    typedef pinocchio::ModelTpl<CasadiScalar>   CasadiModel;
+    typedef CasadiModel::Data                   CasadiData;
 
-  typedef CasadiModel::ConfigVectorType       ConfigVectorCasadi;
-  typedef CasadiModel::TangentVectorType      TangentVectorCasadi;
+    typedef Model::ConfigVectorType             ConfigVector;
+    typedef Model::TangentVectorType            TangentVector;
+
+    typedef CasadiModel::ConfigVectorType       ConfigVectorCasadi;
+    typedef CasadiModel::TangentVectorType      TangentVectorCasadi;
 
 
-struct Serial_Robot {
-   std::string              name;
-   int                      n_q;
-   int                      n_joints;
-   int                      n_dof;
-   int                      n_bodies;
-   int                      n_frames;
-   std::vector<std::string> joint_names;
-   Eigen::VectorXd          gravity;          // Eigen::Vector3d
-   Eigen::VectorXd          joint_torque_limit;
-   Eigen::VectorXd          joint_pos_ub;
-   Eigen::VectorXd          joint_pos_lb;
-   Eigen::VectorXd          joint_vel_limit;
-   Eigen::VectorXd          neutral_configuration;
-   std::vector<std::string> joint_types;
-   casadi::Function         aba;
-   casadi::Function         rnea;
-   casadi::Function         fk_pos;
-};
+  struct Serial_Robot {
+     std::string              name;
+     int                      n_q;
+     int                      n_joints;
+     int                      n_dof;
+     int                      n_bodies;
+     int                      n_frames;
+     std::vector<std::string> joint_names;
+     Eigen::VectorXd          gravity;          // Eigen::Vector3d
+     Eigen::VectorXd          joint_torque_limit;
+     Eigen::VectorXd          joint_pos_ub;
+     Eigen::VectorXd          joint_pos_lb;
+     Eigen::VectorXd          joint_vel_limit;
+     Eigen::VectorXd          neutral_configuration;
+     std::vector<std::string> joint_types;
+     casadi::Function         aba;
+     casadi::Function         rnea;
+     casadi::Function         fk_pos;
+  };
 
-Serial_Robot generate_model(std::string filename);
+  Serial_Robot generate_model(std::string filename);
 
-Eigen::VectorXd randomConfiguration(Serial_Robot rob_model);
-Eigen::VectorXd randomConfiguration(Serial_Robot rob_model, Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds);
+  Eigen::VectorXd randomConfiguration(Serial_Robot rob_model);
+  Eigen::VectorXd randomConfiguration(Serial_Robot rob_model, Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds);
 
-void print_model_data(Serial_Robot robot_info);
+  void print_model_data(Serial_Robot robot_info);
+
+}
 
 #endif // PINOCCHIO_INTERFACE_H_INCLUDED

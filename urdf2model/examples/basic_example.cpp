@@ -1,5 +1,6 @@
 #include <casadi/casadi.hpp>
 #include "../src/interface/pinocchio_interface.hpp"
+#include "../src/utils/debug_functions.hpp"
 
 using namespace casadi;
 
@@ -42,10 +43,10 @@ int main(int argc, char ** argv)
     // #ifdef DEBUG
     print_model_data(robot_model);
     // #endif
+    print_indent("Neutral configuration = ",   robot_model.neutral_configuration,       38);
+    print_indent("Random configuration = ",   randomConfiguration(robot_model),       38);
+    print_indent("Random config. w/ custom bounds = ",   randomConfiguration(robot_model, -0.94159*Eigen::VectorXd::Ones(robot_model.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model.n_dof)),       38);
 
-    std::cout << "Neutral configuration: " << robot_model.neutral_configuration.transpose() << std::endl;
-    std::cout << "Random configuration: " << randomConfiguration(robot_model).transpose() << std::endl;
-    std::cout << "Random configuration with custom bounds: " << randomConfiguration(robot_model, -0.94159*Eigen::VectorXd::Ones(robot_model.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model.n_dof)).transpose() << std::endl;
 
 
     // Serial_Robot robot_model_2;

@@ -18,6 +18,7 @@ add_library(  model_interface
               ${SRC_DIR}/functions/forward_dynamics.cpp
               ${SRC_DIR}/functions/inverse_dynamics.cpp
               ${SRC_DIR}/functions/forward_kinematics.cpp
+              ${SRC_DIR}/functions/code_generation.cpp
            )
 
 # target link libraries

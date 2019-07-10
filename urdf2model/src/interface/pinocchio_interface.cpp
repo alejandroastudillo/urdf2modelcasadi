@@ -16,7 +16,9 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
 
 /* TODO:
   - Handle (print error or warning) when the torque, position, or velocity limits are zero.
-  - Create cpp-hpp which will handle the code-generation of functions (in C, Python, and MATLAB)
+  - Create cpp-hpp which will handle the code-generation of functions (in C, Python, and MATLAB) created src/functions/code_generation.*pp
+  - Change struct Serial_Robot to a new class which can have private and public attributes and methods.
+  - In randomConfiguration, assert that each ub[k] >= lb[k] (kind of implemented already) Check if there is a better way
 */
 
 #include "pinocchio_interface.hpp"
@@ -74,7 +76,7 @@ namespace mecali
       return rob_model;
   }
 
-  Eigen::VectorXd randomConfiguration(Serial_Robot rob_model)
+  Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model)
   {
     Eigen::VectorXd lb = rob_model.joint_pos_lb;
     Eigen::VectorXd ub = rob_model.joint_pos_ub; // In this function, lb and ub size = n_q
@@ -139,11 +141,15 @@ namespace mecali
 
     return randConfig;
   }
-
-  Eigen::VectorXd randomConfiguration(Serial_Robot rob_model, Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds)
+  Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model, Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds)
   {
     // Assert that both the lower_bounds and upper_bounds vectors are of length equal to n_dof.
-    custom_assert(lower_bounds.size() == rob_model.n_dof || upper_bounds.size() == rob_model.n_dof, "Error in " + std::string(__FUNCTION__) + "(): Lower and upper bound vectors must be of length equal to n_dof.");
+    custom_assert(lower_bounds.size() == rob_model.n_dof && upper_bounds.size() == rob_model.n_dof, "Error in " + std::string(__FUNCTION__) + "(): Lower and upper bound vectors must be of length equal to n_dof.");
+
+    for (int i = 0; i < rob_model.n_dof; ++i)
+    {
+      custom_assert(lower_bounds[i] <= upper_bounds[i], "Error in " + std::string(__FUNCTION__) + "(): Lower bound [" + std::to_string(i) + "] must be lower than upper bound [" + std::to_string(i) + "]");
+    }
 
     Eigen::VectorXd lb = lower_bounds;
     Eigen::VectorXd ub = upper_bounds;
@@ -202,6 +208,21 @@ namespace mecali
       }
     }
     return randConfig;
+  }
+  Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model, std::vector<double> lower_bounds_v, std::vector<double> upper_bounds_v)
+  {
+    // Assert that both the lower_bounds and upper_bounds vectors are of length equal to n_dof.
+    custom_assert(lower_bounds_v.size() == rob_model.n_dof && upper_bounds_v.size() == rob_model.n_dof, "Error in " + std::string(__FUNCTION__) + "(): Lower and upper bound vectors must be of length equal to n_dof.");
+
+    // double* ptr_lb = &lower_bounds_v[0];
+    // double* ptr_ub = &upper_bounds_v[0];
+
+    Eigen::Map<Eigen::VectorXd> lb(&lower_bounds_v[0], rob_model.n_dof);
+    Eigen::Map<Eigen::VectorXd> ub(&upper_bounds_v[0], rob_model.n_dof);
+
+    // std::cout << "lb: " << lb.transpose() << "\t ub: " << ub.transpose() << std::endl;
+
+    return randomConfiguration(rob_model, lb, ub);
   }
 
   void print_model_data(Serial_Robot rob_info)

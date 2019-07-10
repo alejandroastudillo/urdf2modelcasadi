@@ -20,6 +20,7 @@
 #include "../functions/forward_dynamics.hpp"
 #include "../functions/inverse_dynamics.hpp"
 #include "../functions/forward_kinematics.hpp"
+#include "../functions/code_generation.hpp"
 
 namespace mecali
 {
@@ -63,8 +64,9 @@ namespace mecali
 
   Serial_Robot generate_model(std::string filename);
 
-  Eigen::VectorXd randomConfiguration(Serial_Robot rob_model);
-  Eigen::VectorXd randomConfiguration(Serial_Robot rob_model, Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds);
+  Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model);
+  Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model, Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds);
+  Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model, std::vector<double> lower_bounds_v, std::vector<double> upper_bounds_v);
 
   void print_model_data(Serial_Robot robot_info);
 

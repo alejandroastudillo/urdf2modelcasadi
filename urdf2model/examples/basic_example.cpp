@@ -58,11 +58,15 @@ int main(int argc, char ** argv)
       print_indent("Neutral configuration = ",            robot_model_abb.neutral_configuration, 38);
       print_indent("Random configuration = ",             randomConfiguration(robot_model_abb),  38);
       print_indent("Random config. w/ custom bounds = ",  randomConfiguration(robot_model_abb, -0.94159*Eigen::VectorXd::Ones(robot_model_abb.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model_abb.n_dof)),       38);
+      print_indent("Random config. w/ vector bounds = ",  randomConfiguration(robot_model_abb, std::vector<double>{-2, -2.2, 3.3, -2.4, -2.5, -2.6}, std::vector<double>{2.1, 2.2, 2.3, 2.4, 2.5, 2.6}), 38);
 
       casadi::Function irb120_forward_dynamics = robot_model_abb.aba;
       std::cout << "irb120 forward dynamics function: " << irb120_forward_dynamics << std::endl;
       // irb120_forward_dynamics.generate("abb_fd.c");
-
-      
+      Dictionary opts;
+      opts["c"]=false;
+      // opts["python"]=false;
+      // opts["matlab"]=true;
+      generate_code(irb120_forward_dynamics,"abb_fd_ext",opts);
 
 }

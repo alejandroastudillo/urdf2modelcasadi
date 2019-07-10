@@ -61,5 +61,8 @@ int main(int argc, char ** argv)
 
       casadi::Function irb120_forward_dynamics = robot_model_abb.aba;
       std::cout << "irb120 forward dynamics function: " << irb120_forward_dynamics << std::endl;
+      // irb120_forward_dynamics.generate("abb_fd.c");
+
+      
 
 }

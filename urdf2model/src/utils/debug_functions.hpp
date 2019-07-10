@@ -2,12 +2,15 @@
 TODO: Check that vec_size is at least 2, or handle vec_size = 1
 */
 
+#ifndef DEBUG_FUNCTIONS_H_INCLUDED
+#define DEBUG_FUNCTIONS_H_INCLUDED
+
+#include <stdexcept>
 #include <string>
 #include <iostream>
 #include <iomanip>
-#include <Eigen/Core>
+// #include <Eigen/Core>
 
-#include <stdexcept>
 
 template <typename T>
 void print_indent(std::string var_name, T var_value,               int indent)
@@ -48,3 +51,6 @@ void custom_assert(bool expr, std::string msg)
     throw std::invalid_argument(msg);
   }
 }
+
+
+#endif // DEBUG_FUNCTIONS_H_INCLUDED

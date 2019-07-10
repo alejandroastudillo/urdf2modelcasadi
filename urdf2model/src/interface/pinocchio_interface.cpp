@@ -16,6 +16,7 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
 
 /* TODO:
   - Handle (print error or warning) when the torque, position, or velocity limits are zero.
+  - Create cpp-hpp which will handle the code-generation of functions (in C, Python, and MATLAB)
 */
 
 #include "pinocchio_interface.hpp"

@@ -17,10 +17,10 @@
 // #include "pinocchio/algorithm/rnea-derivatives.hpp"
 // #include "pinocchio/algorithm/aba-derivatives.hpp"
 
-#include "../functions/forward_dynamics.hpp"
-#include "../functions/inverse_dynamics.hpp"
-#include "../functions/forward_kinematics.hpp"
-#include "../functions/code_generation.hpp"
+#include <src/functions/forward_dynamics.hpp>
+#include <src/functions/inverse_dynamics.hpp>
+#include <src/functions/forward_kinematics.hpp>
+#include <src/functions/code_generation.hpp>
 
 namespace mecali
 {

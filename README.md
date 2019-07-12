@@ -10,6 +10,10 @@ sudo apt-get install cmake
 ```
 sudo apt-get install libboost-all-dev
 ```
+* URDFDOM for URDF parser
+```
+sudo apt-get install liburdfdom-dev
+```
 * CASADI >= 3.4.4
 * Pinocchio (with Casadi interface - needs pkg-config support) from branch 'devel' - commit 607bab825ae37749034f2da11d16e3b883670f0b
 ```
@@ -22,3 +26,6 @@ git checkout 607bab825ae37749034f2da11d16e3b883670f0b
 ...
 ```
 * C++11 (for randomConfiguration)
+
+### TODO-list
+* [ ] Add Recorder as submodule and generate MATLAB code for functions (aba, rnea, ...)

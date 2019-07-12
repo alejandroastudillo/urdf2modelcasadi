@@ -17,6 +17,9 @@
   set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
   set(ROB_DYN_INTERFACE_DIR ${SRC_DIR}/interface)
 
+# Include root folder to the project's include path
+  include_directories(${CMAKE_SOURCE_DIR})
+
 # Add subdirectories
   add_subdirectory (src)
 

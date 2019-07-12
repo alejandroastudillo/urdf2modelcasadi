@@ -1,12 +1,21 @@
 
-#define BOOST_TEST_MODULE ABA_TESTS
+#define BOOST_TEST_MODULE INTERFACE_TESTS
 #include <boost/test/unit_test.hpp>
 
-#include "../src/interface/pinocchio_interface.hpp"
+#include <src/interface/pinocchio_interface.hpp>
 
-using namespace mecali;
+using namespace mecali; // TODO: Remove this using namespace. It is better to explicitely put the namespace before each attribute like: mecali::Serial_Robot
 
-std::string filename =  "../../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf";
+#define MAKE_STR(x) _MAKE_STR(x)
+#define _MAKE_STR(x) #x
+
+#ifdef MODELS_DIR
+    #define Rob_models_dir MAKE_STR(MODELS_DIR)
+#else
+    #define Rob_models_dir "../../urdf2model/models"
+#endif
+
+std::string filename = Rob_models_dir"/kortex_description/urdf/JACO3_URDF_V11.urdf";
 
 // Typedef
   typedef double                              Scalar;

@@ -14,7 +14,7 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
   typedef Eigen::Matrix<CasadiScalar , 3, 1>                            EigenCasadiVec3d;
 */
 
-/* TODO:
+/* TODO: Multiple:
   - Handle (print error or warning) when the torque, position, or velocity limits are zero.
   - Create cpp-hpp which will handle the code-generation of functions (in C, Python, and MATLAB) created src/functions/code_generation.*pp
   - Change struct Serial_Robot to a new class which can have private and public attributes and methods.
@@ -23,7 +23,7 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
 
 #include "pinocchio_interface.hpp"
 
-#include "../utils/debug_functions.hpp"
+#include <src/utils/debug_functions.hpp>
 
 namespace mecali
 {

@@ -11,6 +11,7 @@ find_library(CASADI_LIB casadi HINTS ${CASADI_DIR}/lib)
 
 add_definitions (-DBOOST_TEST_DYN_LINK)
 
+
 add_executable (Basic_tests basictests.cpp)
 target_link_libraries (Basic_tests
                        # ${CASADI_LIB}
@@ -32,6 +33,7 @@ target_link_libraries (Interface_tests
                       ${Boost_SYSTEM_LIBRARY}
                       ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
                       )
+target_compile_definitions(Interface_tests PRIVATE MODELS_DIR=${CMAKE_SOURCE_DIR}/models) # can also be set like: add_definitions (-DMODELS_DIR=${CMAKE_SOURCE_DIR}/models) for all executables at once
 
 add_executable (Old_interface_tests old_interface.cpp)
 target_link_libraries (Old_interface_tests

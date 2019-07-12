@@ -4,14 +4,21 @@
   project(urdf2model_casadi)
 
 # options
-  option(BUILD_UNIT_TESTS "Build the unit tests" OFF)
+  option(DEBUG_MODE "Build unit tests" OFF)
+  option(BUILD_UNIT_TESTS "Build unit tests" OFF)
 
 # Set the GCC flags
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -fPIC -std=c++11 -DPINOCCHIO_URDFDOM_TYPEDEF_SHARED_PTR -DPINOCCHIO_WITH_URDFDOM -DDEBUG") # -DDEBUG
-
+  if(DEBUG_MODE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -fPIC -std=c++11 -DPINOCCHIO_URDFDOM_TYPEDEF_SHARED_PTR -DPINOCCHIO_WITH_URDFDOM -DDEBUG")
+  else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -fPIC -std=c++11 -DPINOCCHIO_URDFDOM_TYPEDEF_SHARED_PTR -DPINOCCHIO_WITH_URDFDOM")
+  endif(DEBUG_MODE)
 # Set source directories
   set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
-  set(ROB_DYN_INTERFACE_DIR ${SRC_DIR}/model_pinocchio)
+  set(ROB_DYN_INTERFACE_DIR ${SRC_DIR}/interface)
+
+# Include root folder to the project's include path
+  include_directories(${CMAKE_SOURCE_DIR})
 
 # Add subdirectories
   add_subdirectory (src)

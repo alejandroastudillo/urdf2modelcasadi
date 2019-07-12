@@ -21,7 +21,7 @@
 # Execute the cmake command, assigning the variable reference values (CASADI_DIR, PINOCCHIO_INC, EIGEN_INC).
   print_title "########## Executing CMake ##########"
   # cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE
-  cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE -DBUILD_UNIT_TESTS=ON
+  cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE -DBUILD_UNIT_TESTS=ON -DDEBUG_MODE=OFF
 
 # Execute the make command
   print_title "########## Executing make ##########"
@@ -31,4 +31,4 @@
    print_title "########## Executing unit tests ##########"
   # export BOOST_TEST_LOG_LEVEL="message"
   # # ctest -V
-  make test ARGS="-V -j3"
+  make test ARGS="-j3" # -V

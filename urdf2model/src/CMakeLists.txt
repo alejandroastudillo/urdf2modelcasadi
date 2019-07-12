@@ -12,9 +12,14 @@ include_directories(${EIGEN_INC})
 include_directories(${CASADI_DIR}/include)
 
 # link external libraries (as the -l flag in gcc)
-add_library(model_interface
-            SHARED
-            ${ROB_DYN_INTERFACE_DIR}/pinocchio_interface.cpp)
+add_library(  model_interface
+              SHARED
+              ${ROB_DYN_INTERFACE_DIR}/pinocchio_interface.cpp
+              ${SRC_DIR}/functions/forward_dynamics.cpp
+              ${SRC_DIR}/functions/inverse_dynamics.cpp
+              ${SRC_DIR}/functions/forward_kinematics.cpp
+              ${SRC_DIR}/functions/code_generation.cpp
+           )
 
 # target link libraries
 target_link_libraries(model_interface

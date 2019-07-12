@@ -14,11 +14,10 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
   typedef Eigen::Matrix<CasadiScalar , 3, 1>                            EigenCasadiVec3d;
 */
 
-/* TODO: Multiple:
-  - Handle (print error or warning) when the torque, position, or velocity limits are zero.
-  - Create cpp-hpp which will handle the code-generation of functions (in C, Python, and MATLAB) created src/functions/code_generation.*pp
-  - Change struct Serial_Robot to a new class which can have private and public attributes and methods.
-  - In randomConfiguration, assert that each ub[k] >= lb[k] (kind of implemented already) Check if there is a better way
+/* TODO Handle (print error or warning) when the torque, position, or velocity limits are zero.
+   IDEA Create cpp-hpp which will handle the code-generation of functions (in C, Python, and MATLAB) created src/functions/code_generation.*pp
+   IDEA Change struct Serial_Robot to a new class which can have private and public attributes and methods.
+   TODO In randomConfiguration, assert that each ub[k] >= lb[k] (kind of implemented already) Check if there is a better way
 */
 
 #include "pinocchio_interface.hpp"
@@ -143,6 +142,8 @@ namespace mecali
   }
   Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model, Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds)
   {
+    // QUESTION Should these lower and upper bounds be compared with rob_model.joint_pos_lb and rob_model.joint_pos_ub?
+
     // Assert that both the lower_bounds and upper_bounds vectors are of length equal to n_dof.
     custom_assert(lower_bounds.size() == rob_model.n_dof && upper_bounds.size() == rob_model.n_dof, "Error in " + std::string(__FUNCTION__) + "(): Lower and upper bound vectors must be of length equal to n_dof.");
 
@@ -211,6 +212,8 @@ namespace mecali
   }
   Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model, std::vector<double> lower_bounds_v, std::vector<double> upper_bounds_v)
   {
+    // QUESTION Should these lower and upper bounds be compared with rob_model.joint_pos_lb and rob_model.joint_pos_ub?
+
     // Assert that both the lower_bounds and upper_bounds vectors are of length equal to n_dof.
     custom_assert(lower_bounds_v.size() == rob_model.n_dof && upper_bounds_v.size() == rob_model.n_dof, "Error in " + std::string(__FUNCTION__) + "(): Lower and upper bound vectors must be of length equal to n_dof.");
 

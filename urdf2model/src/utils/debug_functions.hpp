@@ -1,7 +1,3 @@
-/*
-TODO: Check that vec_size is at least 2, or handle vec_size = 1
-*/
-
 #ifndef DEBUG_FUNCTIONS_H_INCLUDED
 #define DEBUG_FUNCTIONS_H_INCLUDED
 

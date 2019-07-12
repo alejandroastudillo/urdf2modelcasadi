@@ -2,7 +2,10 @@
 #include <src/interface/pinocchio_interface.hpp>
 #include <src/utils/debug_functions.hpp>
 
-using namespace mecali; // grep -inr "namespace mecali" ../
+// TODO: Remove the "using namespace ...". It is better to explicitely put the namespace before each attribute like: mecali::Serial_Robot
+// NOTE: With the following code, you can look for any file containint "text" in ../ : grep -inr "text" ../
+
+using namespace mecali;
 
 int main(int argc, char ** argv)
 {
@@ -15,8 +18,8 @@ int main(int argc, char ** argv)
 
       Serial_Robot robot_model;
       robot_model = generate_model(urdf_filename);
-      std::cout << "robot_model name: " << robot_model.name << std::endl;
 
+      std::cout << "robot_model name: " << robot_model.name << std::endl;
       std::cout << "robot_model ABA: " << robot_model.aba << std::endl;
 
       std::vector<double> q_vec((size_t)robot_model.n_q);
@@ -62,11 +65,13 @@ int main(int argc, char ** argv)
 
       casadi::Function irb120_forward_dynamics = robot_model_abb.aba;
       std::cout << "irb120 forward dynamics function: " << irb120_forward_dynamics << std::endl;
+
       // irb120_forward_dynamics.generate("abb_fd.c");
       Dictionary opts;
       opts["c"]=false;
       // opts["python"]=false;
       // opts["matlab"]=true;
       generate_code(irb120_forward_dynamics,"abb_fd_ext",opts);
+
 
 }

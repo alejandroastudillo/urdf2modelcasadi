@@ -30,20 +30,22 @@ namespace mecali
     {
       if (opts["python"])
       {
-          #ifdef DEBUG
-            std::cout << "\t Python ... \t" << name << ".py" << std::endl;
-          #endif
-          func.generate(name+".py");
+          // #ifdef DEBUG
+          //   std::cout << "\t Python ... \t" << name << ".py" << std::endl;
+          // #endif
+          // func.generate(name+".py");
+          std::cout << "\n\t ########### PYTHON CODE-GENERATION NOT YET SUPPORTED ###########" << std::endl;
       }
     }
     if (opts.find("matlab") != opts.end())  // If there exists a key "matlab" inside opts
     {
       if (opts["matlab"])
       {
-          #ifdef DEBUG
-            std::cout << "\t MATLAB ... \t" << name << ".m" << std::endl;
-          #endif
-          func.generate(name+".m");
+          // #ifdef DEBUG
+          //   std::cout << "\t MATLAB ... \t" << name << ".m" << std::endl;
+          // #endif
+          // func.generate(name+".m");
+          std::cout << "\n\t ########### MATLAB CODE-GENERATION NOT YET SUPPORTED ###########" << std::endl;
       }
     }
 

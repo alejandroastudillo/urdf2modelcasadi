@@ -66,12 +66,14 @@ int main(int argc, char ** argv)
       casadi::Function irb120_forward_dynamics = robot_model_abb.aba;
       std::cout << "irb120 forward dynamics function: " << irb120_forward_dynamics << std::endl;
 
+      // TODO Change generate_code to include only C-code and Function.save/load stuff.
       // irb120_forward_dynamics.generate("abb_fd.c");
       Dictionary opts;
-      opts["c"]=false;
-      // opts["python"]=false;
+      opts["c"]=true;
+      opts["save"]=true;
       // opts["matlab"]=true;
       generate_code(irb120_forward_dynamics,"abb_fd_ext",opts);
 
+      std::cout << "irb120 forward dynamics function loaded: " << casadi::Function::load("abb_fd_ext.casadi") << std::endl;
 
 }

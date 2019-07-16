@@ -21,7 +21,7 @@
 # Execute the cmake command, assigning the variable reference values (CASADI_DIR, PINOCCHIO_INC, EIGEN_INC).
   print_title "########## Executing CMake ##########"
   # cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE
-  cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE -DBUILD_UNIT_TESTS=ON -DDEBUG_MODE=OFF
+  cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE -DBUILD_UNIT_TESTS=ON -DDEBUG_MODE=ON
 
 # Execute the make command
   print_title "########## Executing make ##########"

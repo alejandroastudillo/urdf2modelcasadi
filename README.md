@@ -14,7 +14,8 @@ sudo apt-get install libboost-all-dev
 ```
 sudo apt-get install liburdfdom-dev
 ```
-* CASADI >= 3.4.4
+* CASADI >= 3.4.4 (with pkg-config support)
+
 * Pinocchio (with Casadi interface - needs pkg-config support) from branch 'devel' - commit 607bab825ae37749034f2da11d16e3b883670f0b
 ```
 # Clone Pinocchio's repository (devel branch)

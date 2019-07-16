@@ -26,24 +26,14 @@ namespace mecali
           func.generate(name+".c");
       }
     }
-    if (opts.find("python") != opts.end())  // If there exists a key "python" inside opts
+    if (opts.find("save") != opts.end())  // If there exists a key "save" inside opts
     {
-      if (opts["python"])
+      if (opts["save"])
       {
           #ifdef DEBUG
-            std::cout << "\t Python ... \t" << name << ".py" << std::endl;
+            std::cout << "\t CasADi save ... \t" << name << ".m" << std::endl;
           #endif
-          func.generate(name+".py");
-      }
-    }
-    if (opts.find("matlab") != opts.end())  // If there exists a key "matlab" inside opts
-    {
-      if (opts["matlab"])
-      {
-          #ifdef DEBUG
-            std::cout << "\t MATLAB ... \t" << name << ".m" << std::endl;
-          #endif
-          func.generate(name+".m");
+          func.save(name+".casadi");
       }
     }
 

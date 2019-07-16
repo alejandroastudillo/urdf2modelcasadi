@@ -70,13 +70,10 @@ int main(int argc, char ** argv)
       // irb120_forward_dynamics.generate("abb_fd.c");
       Dictionary opts;
       opts["c"]=true;
-      // opts["python"]=false;
+      opts["save"]=true;
       // opts["matlab"]=true;
       generate_code(irb120_forward_dynamics,"abb_fd_ext",opts);
 
-      irb120_forward_dynamics.save("abb_fd_ext.casadi");
       std::cout << "irb120 forward dynamics function loaded: " << casadi::Function::load("abb_fd_ext.casadi") << std::endl;
-
-
 
 }

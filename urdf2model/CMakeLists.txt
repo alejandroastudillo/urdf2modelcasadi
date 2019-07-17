@@ -13,7 +13,7 @@
 
 # options
   option(DEBUG_MODE "Build unit tests" OFF)
-  option(BUILD_UNIT_TESTS "Build unit tests" OFF)
+  option(BUILD_UNIT_TESTS "Build unit tests" ON)
   option(BUILD_EXAMPLES "Build examples" ON)
 
 # Set GCC flags
@@ -34,7 +34,7 @@
 # ----------------------------------------------------
   FILE(GLOB_RECURSE HEADERS
        ${PROJECT_SOURCE_DIR}/src/*.hpp
-       ${PROJECT_SOURCE_DIR}/src/*.cpp
+       # ${PROJECT_SOURCE_DIR}/src/*.cpp
        )
 
   MAKE_DIRECTORY("${${PROJECT_NAME}_BINARY_DIR}/include/mecali")

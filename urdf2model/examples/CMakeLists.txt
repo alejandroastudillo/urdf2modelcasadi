@@ -13,5 +13,5 @@ add_executable( basic_example
               )
 target_link_libraries( basic_example
 
-                       model_interface
+                       ${PROJECT_NAME}
                      )

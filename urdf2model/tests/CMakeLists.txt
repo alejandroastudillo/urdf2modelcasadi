@@ -24,7 +24,7 @@ target_link_libraries (Basic_tests
 add_executable (Interface_tests interface.cpp)
 target_link_libraries (Interface_tests
 
-                      model_interface
+                      ${PROJECT_NAME}
                       ${CASADI_LIB}
                       stdc++
                       boost_system

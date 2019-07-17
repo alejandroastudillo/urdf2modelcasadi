@@ -1,7 +1,15 @@
-  cmake_minimum_required(VERSION 2.8.3)
+  # cmake_minimum_required(VERSION 2.8.3)
+  CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 # Set the project name
-  project(urdf2model_casadi)
+  project(mecali)
+
+# set LINK command
+  IF(WIN32)
+    SET(LINK copy_if_different)
+  ELSE(WIN32)
+    SET(LINK create_symlink)
+  ENDIF(WIN32)
 
 # options
   option(DEBUG_MODE "Build unit tests" OFF)
@@ -20,6 +28,37 @@
 
 # Include root folder to the project's include path
   include_directories(${CMAKE_SOURCE_DIR})
+
+# ----------------------------------------------------
+# --- INCLUDE ----------------------------------------
+# ----------------------------------------------------
+  FILE(GLOB_RECURSE HEADERS
+       ${PROJECT_SOURCE_DIR}/src/*.hpp
+       ${PROJECT_SOURCE_DIR}/src/*.cpp
+       )
+
+  MAKE_DIRECTORY("${${PROJECT_NAME}_BINARY_DIR}/include/mecali")
+  MAKE_DIRECTORY("${${PROJECT_NAME}_BINARY_DIR}/include/mecali/functions")
+  MAKE_DIRECTORY("${${PROJECT_NAME}_BINARY_DIR}/include/mecali/interface")
+  MAKE_DIRECTORY("${${PROJECT_NAME}_BINARY_DIR}/include/mecali/utils")
+
+  SET(HEADERS_)
+  FOREACH(header ${HEADERS})
+   # MESSAGE( STATUS "HEADER is: " ${header} )
+   STRING(REGEX REPLACE "${PROJECT_SOURCE_DIR}/src/" "" header ${header})
+   # MESSAGE( STATUS "NEW_HEADER is: " ${header} )
+   LIST(APPEND HEADERS_ ${header})
+   GET_FILENAME_COMPONENT(headerName ${header} NAME)
+   GET_FILENAME_COMPONENT(headerPath ${header} PATH)
+   EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E ${LINK}
+     ${${PROJECT_NAME}_SOURCE_DIR}/src/${header}
+     ${${PROJECT_NAME}_BINARY_DIR}/include/${PROJECT_NAME}/${header})
+   INSTALL(FILES ${${PROJECT_NAME}_SOURCE_DIR}/src/${header}
+     DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}/${headerPath}
+           PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE)
+  ENDFOREACH(header)
+  SET(HEADERS ${HEADERS_})
+
 
 # Add subdirectories
   add_subdirectory (src)

@@ -2,12 +2,14 @@
 #ifndef PINOCCHIO_INTERFACE_H_INCLUDED
 #define PINOCCHIO_INTERFACE_H_INCLUDED
 
-#include <casadi/casadi.hpp>
-#include "pinocchio/math/casadi.hpp"
+#define PINOCCHIO_URDFDOM_TYPEDEF_SHARED_PTR // Needed for using pinocchio with urdfdom
 
-#include "pinocchio/multibody/model.hpp"
-#include "pinocchio/parsers/urdf.hpp"
-#include "pinocchio/algorithm/joint-configuration.hpp"
+#include <casadi/casadi.hpp>
+#include <pinocchio/math/casadi.hpp>
+
+#include <pinocchio/multibody/model.hpp>
+#include <pinocchio/parsers/urdf.hpp>
+#include <pinocchio/algorithm/joint-configuration.hpp>
 // #include "pinocchio/algorithm/frames.hpp"
 // #include "pinocchio/algorithm/kinematics.hpp"
 // #include "pinocchio/algorithm/rnea.hpp"
@@ -17,10 +19,10 @@
 // #include "pinocchio/algorithm/rnea-derivatives.hpp"
 // #include "pinocchio/algorithm/aba-derivatives.hpp"
 
-#include <src/functions/forward_dynamics.hpp>
-#include <src/functions/inverse_dynamics.hpp>
-#include <src/functions/forward_kinematics.hpp>
-#include <src/functions/code_generation.hpp>
+#include "functions/forward_dynamics.hpp"
+#include "functions/inverse_dynamics.hpp"
+#include "functions/forward_kinematics.hpp"
+#include "functions/code_generation.hpp"
 
 namespace mecali
 {

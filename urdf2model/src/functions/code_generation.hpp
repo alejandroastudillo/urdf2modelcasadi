@@ -2,7 +2,7 @@
 #define FUN_CODE_GENERATION_H_INCLUDED
 
 // #include <casadi/casadi.hpp>
-#include "src/utils/common.hpp"
+#include "common.hpp"
 
 namespace mecali
 {

@@ -22,7 +22,7 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
 
 #include "pinocchio_interface.hpp"
 
-#include <src/utils/debug_functions.hpp>
+#include "utils/debug_functions.hpp"
 
 namespace mecali
 {

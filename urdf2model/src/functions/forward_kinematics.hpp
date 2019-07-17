@@ -2,11 +2,11 @@
 #define FUN_FORWARD_KINEMATICS_H_INCLUDED
 
 #include <casadi/casadi.hpp>
-#include "pinocchio/math/casadi.hpp"
+#include <pinocchio/math/casadi.hpp>
 
-#include "pinocchio/multibody/model.hpp"
-#include "pinocchio/algorithm/frames.hpp"
-#include "pinocchio/algorithm/kinematics.hpp"
+#include <pinocchio/multibody/model.hpp>
+#include <pinocchio/algorithm/frames.hpp>
+#include <pinocchio/algorithm/kinematics.hpp>
 
 // Typedef
   typedef casadi::SX                          CasadiScalar;

@@ -22,12 +22,19 @@
   else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -fPIC -std=c++11 -DPINOCCHIO_URDFDOM_TYPEDEF_SHARED_PTR -DPINOCCHIO_WITH_URDFDOM")
   endif(DEBUG_MODE)
+
 # Set source directories
   set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
-  set(ROB_DYN_INTERFACE_DIR ${SRC_DIR}/interface)
+  set(ROB_DYN_INTERFACE_DIR ${SRC_DIR})
+
+
+# for linking directories (as the -L flag in gcc)
+  find_library(CASADI_LIB casadi HINTS ${CASADI_DIR}/lib)
+  # set(casadi_DIR /home/alejandro/phd_software/casadi_source/build)
+  # find_package(casadi REQUIRED)
 
 # Include root folder to the project's include path
-  include_directories(${CMAKE_SOURCE_DIR})
+  # include_directories(${CMAKE_SOURCE_DIR})
 
 # ----------------------------------------------------
 # --- INCLUDE ----------------------------------------

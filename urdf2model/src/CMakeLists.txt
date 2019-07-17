@@ -3,17 +3,14 @@
 SET(${PROJECT_NAME}_SOURCES)
 LIST(APPEND ${PROJECT_NAME}_SOURCES
 
-    ${ROB_DYN_INTERFACE_DIR}/pinocchio_interface.cpp
+    ${SRC_DIR}/pinocchio_interface.cpp
     ${SRC_DIR}/functions/forward_dynamics.cpp
     ${SRC_DIR}/functions/inverse_dynamics.cpp
     ${SRC_DIR}/functions/forward_kinematics.cpp
     ${SRC_DIR}/functions/code_generation.cpp
     )
 
-# link directories (as the -L flag in gcc)
-find_library(CASADI_LIB casadi HINTS ${CASADI_DIR}/lib)
-# set(casadi_DIR /home/alejandro/phd_software/casadi_source/build)
-# find_package(casadi REQUIRED)
+
 
 # include directories (as the -I flag in gcc)
 include_directories(${PINOCCHIO_INC})
@@ -30,7 +27,6 @@ target_link_libraries(${PROJECT_NAME}
                       boost_system
                       urdfdom_model
                       ${CASADI_LIB}
-                      # casadi
                     )
 
 # Install

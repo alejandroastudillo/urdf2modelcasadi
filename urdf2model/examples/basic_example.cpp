@@ -1,6 +1,6 @@
 #include <casadi/casadi.hpp>
-#include "src/interface/pinocchio_interface.hpp"
-#include "src/utils/debug_functions.hpp"
+#include "pinocchio_interface.hpp"
+#include "utils/debug_functions.hpp"
 
 // TODO: Remove the "using namespace ...". It is better to explicitely put the namespace before each attribute like: mecali::Serial_Robot
 // NOTE: With the following code, you can look for any file containint "text" in ../ : grep -inr "text" ../

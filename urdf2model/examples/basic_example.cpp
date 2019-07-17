@@ -1,5 +1,5 @@
 #include <casadi/casadi.hpp>
-#include "pinocchio_interface.hpp"
+#include "model_interface.hpp"
 #include "utils/debug_functions.hpp"
 
 // TODO: Remove the "using namespace ...". It is better to explicitely put the namespace before each attribute like: mecali::Serial_Robot

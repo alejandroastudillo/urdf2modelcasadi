@@ -20,7 +20,7 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
    TODO In randomConfiguration, assert that each ub[k] >= lb[k] (kind of implemented already) Check if there is a better way
 */
 
-#include "pinocchio_interface.hpp"
+#include "model_interface.hpp"
 
 #include "utils/debug_functions.hpp"
 

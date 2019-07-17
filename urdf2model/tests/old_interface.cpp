@@ -2,7 +2,7 @@
 #define BOOST_TEST_MODULE OLD_TESTS
 #include <boost/test/unit_test.hpp>
 
-#include "pinocchio_interface.hpp"
+#include "model_interface.hpp"
 
 std::string filename =  "../../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf";
 

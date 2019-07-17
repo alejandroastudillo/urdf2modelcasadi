@@ -2,7 +2,7 @@
 #define BOOST_TEST_MODULE INTERFACE_TESTS
 #include <boost/test/unit_test.hpp>
 
-#include "pinocchio_interface.hpp"
+#include "model_interface.hpp"
 
 using namespace mecali; // TODO: Remove this using namespace. It is better to explicitely put the namespace before each attribute like: mecali::Serial_Robot
 

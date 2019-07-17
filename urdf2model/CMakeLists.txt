@@ -1,7 +1,6 @@
-  # cmake_minimum_required(VERSION 2.8.3)
   CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-# Set the project name
+# Set project name
   project(mecali)
 
 # set LINK command
@@ -12,9 +11,9 @@
   ENDIF(WIN32)
 
 # options
-  option(DEBUG_MODE "Build unit tests" OFF)
-  option(BUILD_UNIT_TESTS "Build unit tests" ON)
-  option(BUILD_EXAMPLES "Build examples" ON)
+  option(DEBUG_MODE "Activate debug mode" OFF)
+  option(BUILD_UNIT_TESTS "Build the unit tests" ON)
+  option(BUILD_EXAMPLES "Build the examples" ON)
 
 # Set GCC flags
   if(DEBUG_MODE)
@@ -39,10 +38,13 @@
 # ----------------------------------------------------
 # --- INCLUDE ----------------------------------------
 # ----------------------------------------------------
-  FILE(GLOB_RECURSE HEADERS
-       ${PROJECT_SOURCE_DIR}/src/*.hpp
-       # ${PROJECT_SOURCE_DIR}/src/*.cpp
-       )
+  FILE( GLOB_RECURSE HEADERS
+        ${PROJECT_SOURCE_DIR}/src/*.hpp
+      )
+
+  # LIST( REMOVE_ITEM HEADERS
+  #       ${PROJECT_SOURCE_DIR}/src/utils/debug_functions.hpp
+  #     )
 
   MAKE_DIRECTORY("${${PROJECT_NAME}_BINARY_DIR}/include/mecali")
   MAKE_DIRECTORY("${${PROJECT_NAME}_BINARY_DIR}/include/mecali/functions")
@@ -51,23 +53,27 @@
 
   SET(HEADERS_)
   FOREACH(header ${HEADERS})
-   # MESSAGE( STATUS "HEADER is: " ${header} )
-   STRING(REGEX REPLACE "${PROJECT_SOURCE_DIR}/src/" "" header ${header})
-   # MESSAGE( STATUS "NEW_HEADER is: " ${header} )
-   LIST(APPEND HEADERS_ ${header})
-   GET_FILENAME_COMPONENT(headerName ${header} NAME)
-   GET_FILENAME_COMPONENT(headerPath ${header} PATH)
-   EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E ${LINK}
-     ${${PROJECT_NAME}_SOURCE_DIR}/src/${header}
-     ${${PROJECT_NAME}_BINARY_DIR}/include/${PROJECT_NAME}/${header})
-   INSTALL(FILES ${${PROJECT_NAME}_SOURCE_DIR}/src/${header}
-     DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}/${headerPath}
-           PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE)
+     STRING(REGEX REPLACE "${PROJECT_SOURCE_DIR}/src/" "" header ${header})
+
+     LIST(APPEND HEADERS_ ${header})
+
+     GET_FILENAME_COMPONENT(headerName ${header} NAME)
+     GET_FILENAME_COMPONENT(headerPath ${header} PATH)
+
+     EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E ${LINK}
+       ${${PROJECT_NAME}_SOURCE_DIR}/src/${header}
+       ${${PROJECT_NAME}_BINARY_DIR}/include/${PROJECT_NAME}/${header})
+
+     INSTALL(FILES ${${PROJECT_NAME}_SOURCE_DIR}/src/${header}
+             DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}/${headerPath}
+             PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE)
   ENDFOREACH(header)
   SET(HEADERS ${HEADERS_})
 
 
-# Add subdirectories
+# ----------------------------------------------------
+# --- ADD SUBDIRECTORIES -----------------------------
+# ----------------------------------------------------
   add_subdirectory (src)
 
   if(BUILD_EXAMPLES)

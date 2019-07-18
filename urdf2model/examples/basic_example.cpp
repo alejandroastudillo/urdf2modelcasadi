@@ -38,10 +38,12 @@ int main(int argc, char ** argv)
       casadi::DM ddq_res = robot_model.aba(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
       casadi::DM tau_res = robot_model.rnea(casadi::DMVector {q_vec, v_vec, a_vec})[0];
       casadi::DM pos_res = robot_model.fk_pos(casadi::DMVector {q_vec})[0];
+      casadi::DM rot_res = robot_model.fk_rot(casadi::DMVector {q_vec})[0];
 
       std::cout << "ddq: " << ddq_res << std::endl;
       std::cout << "tau: " << tau_res << std::endl;
       std::cout << "EE_pos: " << pos_res << std::endl;
+      std::cout << "EE_rot: " << rot_res << std::endl;
       std::cout << std::endl;
 
       // #ifdef DEBUG

@@ -71,6 +71,7 @@ namespace mecali
         rob_model.aba     = get_forward_dynamics( casadi_model, casadi_data );
         rob_model.rnea    = get_inverse_dynamics( casadi_model, casadi_data );
         rob_model.fk_pos  = get_forward_kinematics_position( casadi_model, casadi_data );
+        rob_model.fk_rot  = get_forward_kinematics_rotation( casadi_model, casadi_data );
 
       return rob_model;
   }

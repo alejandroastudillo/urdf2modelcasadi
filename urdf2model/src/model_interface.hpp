@@ -23,26 +23,10 @@
 #include "functions/inverse_dynamics.hpp"
 #include "functions/forward_kinematics.hpp"
 #include "functions/code_generation.hpp"
+#include "functions/common.hpp"
 
 namespace mecali
 {
-
-  // Typedef
-    typedef double                              Scalar;
-    typedef casadi::SX                          CasadiScalar;
-
-    typedef pinocchio::ModelTpl<Scalar>         Model;
-    typedef Model::Data                         Data;
-
-    typedef pinocchio::ModelTpl<CasadiScalar>   CasadiModel;
-    typedef CasadiModel::Data                   CasadiData;
-
-    typedef Model::ConfigVectorType             ConfigVector;
-    typedef Model::TangentVectorType            TangentVector;
-
-    typedef CasadiModel::ConfigVectorType       ConfigVectorCasadi;
-    typedef CasadiModel::TangentVectorType      TangentVectorCasadi;
-
 
   struct Serial_Robot {
      std::string              name;
@@ -62,6 +46,7 @@ namespace mecali
      casadi::Function         aba;
      casadi::Function         rnea;
      casadi::Function         fk_pos;
+     // TODO: Add rotation matrix, jacobians, and derivatives
   };
 
   Serial_Robot generate_model(std::string filename);

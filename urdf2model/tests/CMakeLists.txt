@@ -7,7 +7,7 @@ include_directories (${ROB_DYN_INTERFACE_DIR}
                      ${Boost_INCLUDE_DIRS}
                      )
 
-find_library(CASADI_LIB casadi HINTS ${CASADI_DIR}/lib)
+# find_library(CASADI_LIB casadi HINTS ${CASADI_DIR}/lib)
 
 add_definitions (-DBOOST_TEST_DYN_LINK)
 

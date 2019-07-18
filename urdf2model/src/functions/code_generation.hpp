@@ -1,7 +1,6 @@
 #ifndef FUN_CODE_GENERATION_H_INCLUDED
 #define FUN_CODE_GENERATION_H_INCLUDED
 
-// #include <casadi/casadi.hpp>
 #include "common.hpp"
 
 namespace mecali

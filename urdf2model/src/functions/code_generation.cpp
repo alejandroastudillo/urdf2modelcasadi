@@ -10,7 +10,7 @@ namespace mecali
   void generate_code(casadi::Function& func, std::string name, Dictionary& opts)
   {
     #ifdef DEBUG
-      if (opts.find("c") != opts.end() || opts.find("python") != opts.end() || opts.find("matlab") != opts.end())
+      if (opts.find("c") != opts.end() || opts.find("save") != opts.end())
       {
         std::cout << "** Code generating function \"" << func.name() << "\" in: " << std::endl;
       }

@@ -24,27 +24,29 @@
 
 namespace mecali
 {
-
-  struct Serial_Robot {
-     std::string              name;
-     int                      n_q;
-     int                      n_joints;
-     int                      n_dof;
-     int                      n_bodies;
-     int                      n_frames;
-     std::vector<std::string> joint_names;
-     Eigen::VectorXd          gravity;          // Eigen::Vector3d
-     Eigen::VectorXd          joint_torque_limit;
-     Eigen::VectorXd          joint_pos_ub;
-     Eigen::VectorXd          joint_pos_lb;
-     Eigen::VectorXd          joint_vel_limit;
-     Eigen::VectorXd          neutral_configuration;
-     std::vector<std::string> joint_types;
-     casadi::Function         aba;
-     casadi::Function         rnea;
-     casadi::Function         fk_pos;
-     casadi::Function         fk_rot;
+  class Serial_Robot {
+    public:
+      std::string              name;
+      int                      n_q;
+      int                      n_joints;
+      int                      n_dof;
+      int                      n_bodies;
+      int                      n_frames;
+      std::vector<std::string> joint_names;
+      Eigen::VectorXd          gravity;          // Eigen::Vector3d
+      Eigen::VectorXd          joint_torque_limit;
+      Eigen::VectorXd          joint_pos_ub;
+      Eigen::VectorXd          joint_pos_lb;
+      Eigen::VectorXd          joint_vel_limit;
+      Eigen::VectorXd          neutral_configuration;
+      std::vector<std::string> joint_types;
+      casadi::Function         aba;
+      casadi::Function         rnea;
+      casadi::Function         fk_pos;
+      casadi::Function         fk_rot;
      // TODO: Add rotation matrix, jacobians, and derivatives
+   private:
+
   };
 
   Serial_Robot generate_model(std::string filename);

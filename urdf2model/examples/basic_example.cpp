@@ -1,6 +1,6 @@
 #include <casadi/casadi.hpp>
-#include <src/interface/pinocchio_interface.hpp>
-#include <src/utils/debug_functions.hpp>
+#include "model_interface.hpp"
+#include "utils/debug_functions.hpp"
 
 // TODO: Remove the "using namespace ...". It is better to explicitely put the namespace before each attribute like: mecali::Serial_Robot
 // NOTE: With the following code, you can look for any file containint "text" in ../ : grep -inr "text" ../
@@ -38,10 +38,12 @@ int main(int argc, char ** argv)
       casadi::DM ddq_res = robot_model.aba(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
       casadi::DM tau_res = robot_model.rnea(casadi::DMVector {q_vec, v_vec, a_vec})[0];
       casadi::DM pos_res = robot_model.fk_pos(casadi::DMVector {q_vec})[0];
+      casadi::DM rot_res = robot_model.fk_rot(casadi::DMVector {q_vec})[0];
 
       std::cout << "ddq: " << ddq_res << std::endl;
       std::cout << "tau: " << tau_res << std::endl;
       std::cout << "EE_pos: " << pos_res << std::endl;
+      std::cout << "EE_rot: " << rot_res << std::endl;
       std::cout << std::endl;
 
       // #ifdef DEBUG
@@ -50,6 +52,14 @@ int main(int argc, char ** argv)
       print_indent("Neutral configuration = ",            robot_model.neutral_configuration, 38);
       print_indent("Random configuration = ",             randomConfiguration(robot_model),  38);
       print_indent("Random config. w/ custom bounds = ",  randomConfiguration(robot_model, -0.94159*Eigen::VectorXd::Ones(robot_model.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model.n_dof)),       38);
+
+      Dictionary opts1;
+      opts1["c"]=true;
+      opts1["save"]=true;
+      generate_code(robot_model.aba,"kin3_aba",opts1);
+      generate_code(robot_model.rnea,"kin3_rnea",opts1);
+      generate_code(robot_model.fk_pos,"kin3_fk_pos",opts1);
+      generate_code(robot_model.fk_rot,"kin3_fk_rot",opts1);
 
 
     // Example with another robot (ABB irb120)
@@ -66,12 +76,9 @@ int main(int argc, char ** argv)
       casadi::Function irb120_forward_dynamics = robot_model_abb.aba;
       std::cout << "irb120 forward dynamics function: " << irb120_forward_dynamics << std::endl;
 
-      // TODO Change generate_code to include only C-code and Function.save/load stuff.
-      // irb120_forward_dynamics.generate("abb_fd.c");
       Dictionary opts;
       opts["c"]=true;
       opts["save"]=true;
-      // opts["matlab"]=true;
       generate_code(irb120_forward_dynamics,"abb_fd_ext",opts);
 
       std::cout << "irb120 forward dynamics function loaded: " << casadi::Function::load("abb_fd_ext.casadi") << std::endl;

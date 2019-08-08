@@ -1,46 +1,29 @@
-
+// #pragma once
 #ifndef PINOCCHIO_INTERFACE_H_INCLUDED
 #define PINOCCHIO_INTERFACE_H_INCLUDED
 
-#include <casadi/casadi.hpp>
-#include "pinocchio/math/casadi.hpp"
+#define PINOCCHIO_URDFDOM_TYPEDEF_SHARED_PTR // Needed for using pinocchio with urdfdom
 
-#include "pinocchio/multibody/model.hpp"
-#include "pinocchio/parsers/urdf.hpp"
-#include "pinocchio/algorithm/joint-configuration.hpp"
-// #include "pinocchio/algorithm/frames.hpp"
-// #include "pinocchio/algorithm/kinematics.hpp"
-// #include "pinocchio/algorithm/rnea.hpp"
-// #include "pinocchio/algorithm/aba.hpp"
+#include <casadi/casadi.hpp>
+#include <pinocchio/math/casadi.hpp>
+
+#include <pinocchio/multibody/model.hpp>
+#include <pinocchio/parsers/urdf.hpp>
+#include <pinocchio/algorithm/joint-configuration.hpp>
+
 // #include "pinocchio/algorithm/jacobian.hpp"
 // #include "pinocchio/algorithm/crba.hpp"
 // #include "pinocchio/algorithm/rnea-derivatives.hpp"
 // #include "pinocchio/algorithm/aba-derivatives.hpp"
 
-#include <src/functions/forward_dynamics.hpp>
-#include <src/functions/inverse_dynamics.hpp>
-#include <src/functions/forward_kinematics.hpp>
-#include <src/functions/code_generation.hpp>
+#include "functions/forward_dynamics.hpp"
+#include "functions/inverse_dynamics.hpp"
+#include "functions/forward_kinematics.hpp"
+#include "functions/code_generation.hpp"
+#include "functions/common.hpp"
 
 namespace mecali
 {
-
-  // Typedef
-    typedef double                              Scalar;
-    typedef casadi::SX                          CasadiScalar;
-
-    typedef pinocchio::ModelTpl<Scalar>         Model;
-    typedef Model::Data                         Data;
-
-    typedef pinocchio::ModelTpl<CasadiScalar>   CasadiModel;
-    typedef CasadiModel::Data                   CasadiData;
-
-    typedef Model::ConfigVectorType             ConfigVector;
-    typedef Model::TangentVectorType            TangentVector;
-
-    typedef CasadiModel::ConfigVectorType       ConfigVectorCasadi;
-    typedef CasadiModel::TangentVectorType      TangentVectorCasadi;
-
 
   struct Serial_Robot {
      std::string              name;
@@ -60,6 +43,8 @@ namespace mecali
      casadi::Function         aba;
      casadi::Function         rnea;
      casadi::Function         fk_pos;
+     casadi::Function         fk_rot;
+     // TODO: Add rotation matrix, jacobians, and derivatives
   };
 
   Serial_Robot generate_model(std::string filename);

@@ -7,7 +7,7 @@ include_directories (${ROB_DYN_INTERFACE_DIR}
                      ${Boost_INCLUDE_DIRS}
                      )
 
-find_library(CASADI_LIB casadi HINTS ${CASADI_DIR}/lib)
+# find_library(CASADI_LIB casadi HINTS ${CASADI_DIR}/lib)
 
 add_definitions (-DBOOST_TEST_DYN_LINK)
 
@@ -24,7 +24,7 @@ target_link_libraries (Basic_tests
 add_executable (Interface_tests interface.cpp)
 target_link_libraries (Interface_tests
 
-                      model_interface
+                      ${PROJECT_NAME}
                       ${CASADI_LIB}
                       stdc++
                       boost_system

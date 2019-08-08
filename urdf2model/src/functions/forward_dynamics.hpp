@@ -1,20 +1,11 @@
 #ifndef FUN_FORWARD_DYNAMICS_H_INCLUDED
 #define FUN_FORWARD_DYNAMICS_H_INCLUDED
 
-#include <casadi/casadi.hpp>
-#include "pinocchio/math/casadi.hpp"
+#include "common.hpp"
 
-#include "pinocchio/multibody/model.hpp"
-#include "pinocchio/algorithm/aba.hpp"
+#include <pinocchio/algorithm/aba.hpp>
+#include <pinocchio/algorithm/aba-derivatives.hpp>
 
-// Typedef
-  typedef casadi::SX                          CasadiScalar;
-
-  typedef pinocchio::ModelTpl<CasadiScalar>   CasadiModel;
-  typedef CasadiModel::Data                   CasadiData;
-
-  typedef CasadiModel::ConfigVectorType       ConfigVectorCasadi;
-  typedef CasadiModel::TangentVectorType      TangentVectorCasadi;
 
 namespace mecali
 {

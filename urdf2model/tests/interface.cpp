@@ -2,7 +2,7 @@
 #define BOOST_TEST_MODULE INTERFACE_TESTS
 #include <boost/test/unit_test.hpp>
 
-#include <src/interface/pinocchio_interface.hpp>
+#include "model_interface.hpp"
 
 using namespace mecali; // TODO: Remove this using namespace. It is better to explicitely put the namespace before each attribute like: mecali::Serial_Robot
 
@@ -63,11 +63,15 @@ BOOST_AUTO_TEST_CASE(FK_pinocchio_casadi)
     Eigen::Map<ConfigVector>( q_vec.data(), model.nq, 1 ) = q_home;
 
     casadi::DM pos_res = robot_model.fk_pos(casadi::DMVector {q_vec})[0];
+    casadi::DM rot_res = robot_model.fk_rot(casadi::DMVector {q_vec})[0];
 
     Data::TangentVectorType pos_mat = Eigen::Map<Data::TangentVectorType>(static_cast< std::vector<double> >(pos_res).data(), 3,1);
+    Eigen::MatrixXd         rot_mat = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(rot_res).data(), 3,3);
+
 
   // Check
     BOOST_CHECK(pos_mat.isApprox(data.oMf[EE_idx].translation()));
+    BOOST_CHECK(rot_mat.isApprox(data.oMf[EE_idx].rotation()));
 }
 
 BOOST_AUTO_TEST_CASE(ABA_pinocchio_casadi)

@@ -8,6 +8,7 @@
   export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/build/install_matlab"
   export PINOCCHIO_INCLUDE="/opt/openrobots/include/"
   export EIGEN_INCLUDE="/usr/include/eigen3"
+  export INSTALL_FOLDER="install_folder"
 
 # If the CMakeCache.txt file exists, delete it.
   if test -f "CMakeCache.txt"; then
@@ -21,14 +22,19 @@
 # Execute the cmake command, assigning the variable reference values (CASADI_DIR, PINOCCHIO_INC, EIGEN_INC).
   print_title "########## Executing CMake ##########"
   # cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE
-  cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE -DBUILD_UNIT_TESTS=ON -DDEBUG_MODE=ON
+  # cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE -DBUILD_UNIT_TESTS=ON -DDEBUG_MODE=ON
+  cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE -DCMAKE_INSTALL_PREFIX=$INSTALL_FOLDER
 
 # Execute the make command
   print_title "########## Executing make ##########"
   make -j3
 
 # Execute unit tests
-   print_title "########## Executing unit tests ##########"
+  print_title "########## Executing unit tests ##########"
   # export BOOST_TEST_LOG_LEVEL="message"
   # # ctest -V
   make test ARGS="-j3" # -V
+
+# Execute the make install command
+  print_title "########## Installing the library ##########"
+  make install

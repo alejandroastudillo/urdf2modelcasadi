@@ -15,14 +15,13 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
 */
 
 /* TODO Handle (print error or warning) when the torque, position, or velocity limits are zero.
-   IDEA Create cpp-hpp which will handle the code-generation of functions (in C, Python, and MATLAB) created src/functions/code_generation.*pp
    IDEA Change struct Serial_Robot to a new class which can have private and public attributes and methods.
    TODO In randomConfiguration, assert that each ub[k] >= lb[k] (kind of implemented already) Check if there is a better way
 */
 
-#include "pinocchio_interface.hpp"
+#include "model_interface.hpp"
 
-#include <src/utils/debug_functions.hpp>
+#include "utils/debug_functions.hpp"
 
 namespace mecali
 {
@@ -71,6 +70,7 @@ namespace mecali
         rob_model.aba     = get_forward_dynamics( casadi_model, casadi_data );
         rob_model.rnea    = get_inverse_dynamics( casadi_model, casadi_data );
         rob_model.fk_pos  = get_forward_kinematics_position( casadi_model, casadi_data );
+        rob_model.fk_rot  = get_forward_kinematics_rotation( casadi_model, casadi_data );
 
       return rob_model;
   }

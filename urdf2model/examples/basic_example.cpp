@@ -53,6 +53,14 @@ int main(int argc, char ** argv)
       print_indent("Random configuration = ",             randomConfiguration(robot_model),  38);
       print_indent("Random config. w/ custom bounds = ",  randomConfiguration(robot_model, -0.94159*Eigen::VectorXd::Ones(robot_model.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model.n_dof)),       38);
 
+      Dictionary opts1;
+      opts1["c"]=true;
+      opts1["save"]=true;
+      generate_code(robot_model.aba,"kin3_aba",opts1);
+      generate_code(robot_model.rnea,"kin3_rnea",opts1);
+      generate_code(robot_model.fk_pos,"kin3_fk_pos",opts1);
+      generate_code(robot_model.fk_rot,"kin3_fk_rot",opts1);
+
 
     // Example with another robot (ABB irb120)
       Serial_Robot robot_model_abb;

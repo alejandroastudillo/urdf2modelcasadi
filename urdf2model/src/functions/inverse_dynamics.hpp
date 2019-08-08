@@ -4,6 +4,7 @@
 #include "common.hpp"
 
 #include <pinocchio/algorithm/rnea.hpp>
+#include <pinocchio/algorithm/rnea-derivatives.hpp>
 
 
 namespace mecali

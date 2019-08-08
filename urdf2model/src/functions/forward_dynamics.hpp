@@ -4,6 +4,7 @@
 #include "common.hpp"
 
 #include <pinocchio/algorithm/aba.hpp>
+#include <pinocchio/algorithm/aba-derivatives.hpp>
 
 
 namespace mecali

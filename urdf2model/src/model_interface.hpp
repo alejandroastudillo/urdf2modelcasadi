@@ -54,17 +54,16 @@ namespace mecali
       casadi::Function         fk_pos;
       casadi::Function         fk_rot;
 
-      void import_model(std::string filename);
+      void                     import_model(std::string filename);
+      void                     print_model_data();
+      Eigen::VectorXd          randomConfiguration();
+      Eigen::VectorXd          randomConfiguration(Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds);
+      Eigen::VectorXd          randomConfiguration(std::vector<double> lower_bounds_v, std::vector<double> upper_bounds_v);
+
 
    private:
 
   };
-
-  Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model);
-  Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model, Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds);
-  Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model, std::vector<double> lower_bounds_v, std::vector<double> upper_bounds_v);
-
-  void print_model_data(Serial_Robot robot_info);
 
 }
 

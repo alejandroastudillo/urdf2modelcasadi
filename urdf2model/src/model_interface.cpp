@@ -68,11 +68,10 @@ namespace mecali
         this->fk_pos  = get_forward_kinematics_position( casadi_model, casadi_data );
         this->fk_rot  = get_forward_kinematics_rotation( casadi_model, casadi_data );
   }
-
-  Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model)
+  Eigen::VectorXd Serial_Robot::randomConfiguration()
   {
-    Eigen::VectorXd lb = rob_model.joint_pos_lb;
-    Eigen::VectorXd ub = rob_model.joint_pos_ub; // In this function, lb and ub size = n_q
+    Eigen::VectorXd lb = this->joint_pos_lb;
+    Eigen::VectorXd ub = this->joint_pos_ub; // In this function, lb and ub size = n_q
 
     Eigen::VectorXd randConfig;
 
@@ -82,19 +81,19 @@ namespace mecali
     std::uniform_real_distribution<> rnd_dis(-1.0, 1.0);
 
     // Check for continuous joints
-    if (rob_model.n_q > rob_model.n_dof) // If the length of the configuration-vector is > than the DoF, some joints are continuous and represented by [cos(q_j) sin(q_j)]
+    if (this->n_q > this->n_dof) // If the length of the configuration-vector is > than the DoF, some joints are continuous and represented by [cos(q_j) sin(q_j)]
     {
       // Create a random vector of size = n_dof. (This is filled with numbers between -1 and 1).
-      Eigen::VectorXd randAngles = Eigen::VectorXd::Zero(rob_model.n_dof, 1);
+      Eigen::VectorXd randAngles = Eigen::VectorXd::Zero(this->n_dof, 1);
       // Create a configuration vector of size n_q, filled with zeros.
-      randConfig = Eigen::VectorXd::Zero(rob_model.n_q);
+      randConfig = Eigen::VectorXd::Zero(this->n_q);
       // Creates an index for the configuration vector
       int j = 0;
       // Iterates for all the components of the random angles vector.
-      for (Eigen::DenseIndex k = 0; k < rob_model.n_dof; ++k)
+      for (Eigen::DenseIndex k = 0; k < this->n_dof; ++k)
       {
         // Check if joint k is a revolute unbounded (continuous) joint (This joint types come from Pinocchio)
-        if (rob_model.joint_types[k].compare("JointModelRUBZ") == 0 || rob_model.joint_types[k].compare("JointModelRUBY") == 0 || rob_model.joint_types[k].compare("JointModelRUBX") == 0)
+        if (this->joint_types[k].compare("JointModelRUBZ") == 0 || this->joint_types[k].compare("JointModelRUBY") == 0 || this->joint_types[k].compare("JointModelRUBX") == 0)
         {
           // Use mt19937 to set a random number in [-1, 1], then multiply it by PI to have [-PI, PI] (Here you can have bounds < or > than PI because it is a continuous joint.
           randAngles[k] = PI*rnd_dis(mt_rand);
@@ -120,9 +119,9 @@ namespace mecali
     } else // There is no continuous joint in this robot
     {
       // Create a random configuration vector of size = n_q. (This is filled with numbers between -1 and 1).
-      randConfig = Eigen::VectorXd::Zero(rob_model.n_q, 1);
+      randConfig = Eigen::VectorXd::Zero(this->n_q, 1);
 
-      for (Eigen::DenseIndex k = 0; k < rob_model.n_q; ++k)
+      for (Eigen::DenseIndex k = 0; k < this->n_q; ++k)
       {
         // Use mt19937 to set a random number between -1 and 1.
         randConfig[k] = rnd_dis(mt_rand);
@@ -134,14 +133,14 @@ namespace mecali
 
     return randConfig;
   }
-  Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model, Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds)
+  Eigen::VectorXd Serial_Robot::randomConfiguration(Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds)
   {
-    // QUESTION Should these lower and upper bounds be compared with rob_model.joint_pos_lb and rob_model.joint_pos_ub?
+    // QUESTION Should these lower and upper bounds be compared with this->joint_pos_lb and this->joint_pos_ub?
 
     // Assert that both the lower_bounds and upper_bounds vectors are of length equal to n_dof.
-    custom_assert(lower_bounds.size() == rob_model.n_dof && upper_bounds.size() == rob_model.n_dof, "Error in " + std::string(__FUNCTION__) + "(): Lower and upper bound vectors must be of length equal to n_dof.");
+    custom_assert(lower_bounds.size() == this->n_dof && upper_bounds.size() == this->n_dof, "Error in " + std::string(__FUNCTION__) + "(): Lower and upper bound vectors must be of length equal to n_dof.");
 
-    for (int i = 0; i < rob_model.n_dof; ++i)
+    for (int i = 0; i < this->n_dof; ++i)
     {
       custom_assert(lower_bounds[i] <= upper_bounds[i], "Error in " + std::string(__FUNCTION__) + "(): Lower bound [" + std::to_string(i) + "] must be lower than upper bound [" + std::to_string(i) + "]");
     }
@@ -156,16 +155,16 @@ namespace mecali
     std::uniform_real_distribution<> rnd_dis(-1.0, 1.0);
 
     // Check for continuous joints
-    if (rob_model.n_q > rob_model.n_dof) // If the length of the configuration-vector is > than the DoF, some joints are continuous and represented by [cos(q_j) sin(q_j)]
+    if (this->n_q > this->n_dof) // If the length of the configuration-vector is > than the DoF, some joints are continuous and represented by [cos(q_j) sin(q_j)]
     {
       // Create a vector of size = n_dof. (This will be filled with random numbers between lb and ub).
-      Eigen::VectorXd randAngles = Eigen::VectorXd::Zero(rob_model.n_dof, 1);
+      Eigen::VectorXd randAngles = Eigen::VectorXd::Zero(this->n_dof, 1);
       // Create a configuration vector of size n_q, filled with zeros.
-      randConfig = Eigen::VectorXd::Zero(rob_model.n_q);
+      randConfig = Eigen::VectorXd::Zero(this->n_q);
       // Creates an index for the configuration vector
       int j = 0;
       // Iterates for all the components of the random angles vector.
-      for (Eigen::DenseIndex k = 0; k < rob_model.n_dof; ++k)
+      for (Eigen::DenseIndex k = 0; k < this->n_dof; ++k)
       {
         // Use mt19937 to set a random number between -1 and 1.
         randAngles[k] = rnd_dis(mt_rand);
@@ -173,7 +172,7 @@ namespace mecali
         if (randAngles[k] < 0) { randAngles[k] = -1*lb[k]*randAngles[k]; }
         else { randAngles[k] = ub[k]*randAngles[k]; }
         // Check if joint k is a revolute unbounded (continuous) joint (This joint types come from Pinocchio)
-        if (rob_model.joint_types[k].compare("JointModelRUBZ") == 0 || rob_model.joint_types[k].compare("JointModelRUBY") == 0 || rob_model.joint_types[k].compare("JointModelRUBX") == 0)
+        if (this->joint_types[k].compare("JointModelRUBZ") == 0 || this->joint_types[k].compare("JointModelRUBY") == 0 || this->joint_types[k].compare("JointModelRUBX") == 0)
         {
           // Fill the corresponding values in the configuration vector.
           randConfig[j] = cos(randAngles[k]);
@@ -191,9 +190,9 @@ namespace mecali
     } else // If there is no continuous joint in this robot
     {
       // Create a configuration vector of size = n_q.
-      randConfig = Eigen::VectorXd::Zero(rob_model.n_q, 1);
+      randConfig = Eigen::VectorXd::Zero(this->n_q, 1);
 
-      for (Eigen::DenseIndex k = 0; k < rob_model.n_q; ++k)
+      for (Eigen::DenseIndex k = 0; k < this->n_q; ++k)
       {
         // Use mt19937 to set a random number between -1 and 1.
         randConfig[k] = rnd_dis(mt_rand);
@@ -204,49 +203,45 @@ namespace mecali
     }
     return randConfig;
   }
-  Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model, std::vector<double> lower_bounds_v, std::vector<double> upper_bounds_v)
+  Eigen::VectorXd Serial_Robot::randomConfiguration(std::vector<double> lower_bounds_v, std::vector<double> upper_bounds_v)
   {
-    // QUESTION Should these lower and upper bounds be compared with rob_model.joint_pos_lb and rob_model.joint_pos_ub?
+    // QUESTION Should these lower and upper bounds be compared with this->joint_pos_lb and this->joint_pos_ub?
 
     // Assert that both the lower_bounds and upper_bounds vectors are of length equal to n_dof.
-    custom_assert(lower_bounds_v.size() == rob_model.n_dof && upper_bounds_v.size() == rob_model.n_dof, "Error in " + std::string(__FUNCTION__) + "(): Lower and upper bound vectors must be of length equal to n_dof.");
+    custom_assert(lower_bounds_v.size() == this->n_dof && upper_bounds_v.size() == this->n_dof, "Error in " + std::string(__FUNCTION__) + "(): Lower and upper bound vectors must be of length equal to n_dof.");
 
-    // double* ptr_lb = &lower_bounds_v[0];
-    // double* ptr_ub = &upper_bounds_v[0];
-
-    Eigen::Map<Eigen::VectorXd> lb(&lower_bounds_v[0], rob_model.n_dof);
-    Eigen::Map<Eigen::VectorXd> ub(&upper_bounds_v[0], rob_model.n_dof);
+    Eigen::Map<Eigen::VectorXd> lb(&lower_bounds_v[0], this->n_dof);
+    Eigen::Map<Eigen::VectorXd> ub(&upper_bounds_v[0], this->n_dof);
 
     // std::cout << "lb: " << lb.transpose() << "\t ub: " << ub.transpose() << std::endl;
 
-    return randomConfiguration(rob_model, lb, ub);
+    return this->randomConfiguration(lb, ub);
   }
-
-  void print_model_data(Serial_Robot rob_info)
+  void Serial_Robot::print_model_data()
   {
       std::cout << "\n----- Robot model information: " << std::endl;
-      print_indent("Model name = ",                         rob_info.name,               38);
-      print_indent("Size of configuration vector = ",       rob_info.n_q,                38);
-      print_indent("Number of joints (with universe) = ",   rob_info.n_joints,           38);
-      print_indent("Number of DoF = ",                      rob_info.n_dof,              38);
-      print_indent("Number of bodies = ",                   rob_info.n_bodies,           38);
-      print_indent("Number of operational frames = ",       rob_info.n_frames,           38);
-      print_indent("Gravity = ",                            rob_info.gravity,            38);
-      print_indent("Joint torque bounds = ",                rob_info.joint_torque_limit, 38);
-      print_indent("Joint configuration upper bounds = ",   rob_info.joint_pos_ub,       38);
-      print_indent("Joint configuration lower bounds = ",   rob_info.joint_pos_lb,       38);
-      print_indent("Joint velocity bounds = ",              rob_info.joint_vel_limit,    38);
+      print_indent("Model name = ",                         this->name,               38);
+      print_indent("Size of configuration vector = ",       this->n_q,                38);
+      print_indent("Number of joints (with universe) = ",   this->n_joints,           38);
+      print_indent("Number of DoF = ",                      this->n_dof,              38);
+      print_indent("Number of bodies = ",                   this->n_bodies,           38);
+      print_indent("Number of operational frames = ",       this->n_frames,           38);
+      print_indent("Gravity = ",                            this->gravity,            38);
+      print_indent("Joint torque bounds = ",                this->joint_torque_limit, 38);
+      print_indent("Joint configuration upper bounds = ",   this->joint_pos_ub,       38);
+      print_indent("Joint configuration lower bounds = ",   this->joint_pos_lb,       38);
+      print_indent("Joint velocity bounds = ",              this->joint_vel_limit,    38);
       std::cout << std::endl;
       // std::cout << "\n----- Placement of each joint in the model: " << std::endl;
       // std::cout << "\n-----Name of each joint in the model: " << std::endl;
-      // for (int k=0 ; k<rob_info.n_joints ; ++k)
+      // for (int k=0 ; k<this->n_joints ; ++k)
       // {
-      //     std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << rob_info.joint_names[k] << std::setw(10) << std::endl; // << data.oMi[k].translation().transpose()
+      //     std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << this->joint_names[k] << std::setw(10) << std::endl; // << data.oMi[k].translation().transpose()
       // }
 
       //
       // std::cout << "\n----- Placement of each frame in the model: " << std::endl;
-      // for (int k=0 ; k<rob_info.n_frames ; ++k)
+      // for (int k=0 ; k<this->n_frames ; ++k)
       // {
       //     std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << model.frames[k].name << std::setw(10) << data.oMf[k].translation().transpose() << std::endl;
       // }

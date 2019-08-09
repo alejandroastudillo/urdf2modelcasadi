@@ -47,11 +47,11 @@ int main(int argc, char ** argv)
       std::cout << std::endl;
 
       // #ifdef DEBUG
-      print_model_data(robot_model);
+      robot_model.print_model_data();
       // #endif
       print_indent("Neutral configuration = ",            robot_model.neutral_configuration, 38);
-      print_indent("Random configuration = ",             randomConfiguration(robot_model),  38);
-      print_indent("Random config. w/ custom bounds = ",  randomConfiguration(robot_model, -0.94159*Eigen::VectorXd::Ones(robot_model.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model.n_dof)),       38);
+      print_indent("Random configuration = ",             robot_model.randomConfiguration(),  38);
+      print_indent("Random config. w/ custom bounds = ",  robot_model.randomConfiguration(-0.94159*Eigen::VectorXd::Ones(robot_model.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model.n_dof)),       38);
 
       Dictionary opts1;
       opts1["c"]=true;
@@ -66,12 +66,12 @@ int main(int argc, char ** argv)
       Serial_Robot robot_model_abb;
       robot_model_abb.import_model("../urdf2model/models/abb_common/urdf/irb120.urdf");
 
-      print_model_data(robot_model_abb);
+      robot_model_abb.print_model_data();
 
       print_indent("Neutral configuration = ",            robot_model_abb.neutral_configuration, 38);
-      print_indent("Random configuration = ",             randomConfiguration(robot_model_abb),  38);
-      print_indent("Random config. w/ custom bounds = ",  randomConfiguration(robot_model_abb, -0.94159*Eigen::VectorXd::Ones(robot_model_abb.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model_abb.n_dof)),       38);
-      print_indent("Random config. w/ vector bounds = ",  randomConfiguration(robot_model_abb, std::vector<double>{-2, -2.2, -3.0, -2.4, -2.5, -2.6}, std::vector<double>{2.1, 2.2, 2.3, 2.4, 2.5, 2.6}), 38);
+      print_indent("Random configuration = ",             robot_model_abb.randomConfiguration(),  38);
+      print_indent("Random config. w/ custom bounds = ",  robot_model_abb.randomConfiguration(-0.94159*Eigen::VectorXd::Ones(robot_model_abb.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model_abb.n_dof)),       38);
+      print_indent("Random config. w/ vector bounds = ",  robot_model_abb.randomConfiguration(std::vector<double>{-2, -2.2, -3.0, -2.4, -2.5, -2.6}, std::vector<double>{2.1, 2.2, 2.3, 2.4, 2.5, 2.6}), 38);
 
       casadi::Function irb120_forward_dynamics = robot_model_abb.aba;
       std::cout << "irb120 forward dynamics function: " << irb120_forward_dynamics << std::endl;
@@ -83,13 +83,5 @@ int main(int argc, char ** argv)
 
       std::cout << "irb120 forward dynamics function loaded: " << casadi::Function::load("abb_fd_ext.casadi") << std::endl;
 
-    // Example with new syntax
-      Serial_Robot rob_model_iiwa;
-      rob_model_iiwa.import_model("../urdf2model/models/iiwa_description/urdf/iiwa14.urdf");
-
-      std::cout << "Iiwa name: " << rob_model_iiwa.name << std::endl;
-      std::cout << "Iiwa dof: " << rob_model_iiwa.n_dof << std::endl;
-      std::cout << "Iiwa nq: " << rob_model_iiwa.n_q << std::endl;
-      std::cout << "Iiwa joint types: " << rob_model_iiwa.joint_types << std::endl;
 
 }

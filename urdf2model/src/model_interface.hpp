@@ -32,13 +32,11 @@ namespace mecali
   class Serial_Robot {
 
     public:
-
+      // data variables
       std::string              name;
       int                      n_q;
       int                      n_joints;
       int                      n_dof;
-      int                      n_bodies;
-      int                      n_frames;
 
       std::vector<std::string> joint_names;
       std::vector<std::string> joint_types;
@@ -49,11 +47,13 @@ namespace mecali
       Eigen::VectorXd          joint_vel_limit;
       Eigen::VectorXd          neutral_configuration;
 
+      // function variables
       casadi::Function         aba;
       casadi::Function         rnea;
       casadi::Function         fk_pos;
       casadi::Function         fk_rot;
 
+      // methods
       void                     import_model(std::string filename);
       void                     print_model_data();
       Eigen::VectorXd          randomConfiguration();
@@ -62,7 +62,9 @@ namespace mecali
 
 
    private:
-
+      // data variables
+      int                      _n_bodies;
+      int                      _n_frames;
   };
 
 }

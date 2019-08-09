@@ -44,8 +44,6 @@ namespace mecali
         this->n_joints              = model.njoints;  // data.oMi.size()
         this->n_q                   = model.nq;
         this->n_dof                 = model.nv;
-        this->n_bodies              = model.nbodies;
-        this->n_frames              = model.nframes;
         this->gravity               = model.gravity.linear_impl();
         this->joint_torque_limit    = model.effortLimit;
         this->joint_pos_ub          = model.upperPositionLimit;
@@ -53,6 +51,8 @@ namespace mecali
         this->joint_vel_limit       = model.velocityLimit;
         this->joint_names           = model.names;
         this->neutral_configuration = pinocchio::neutral(model);
+        this->_n_bodies             = model.nbodies;
+        this->_n_frames             = model.nframes;
 
         std::vector<std::string> joint_types(this->n_dof);
         for (int i = 1; i < this->n_joints; i++){ joint_types[i-1] = model.joints[i].shortname(); }
@@ -67,6 +67,7 @@ namespace mecali
         this->rnea    = get_inverse_dynamics( casadi_model, casadi_data );
         this->fk_pos  = get_forward_kinematics_position( casadi_model, casadi_data );
         this->fk_rot  = get_forward_kinematics_rotation( casadi_model, casadi_data );
+
   }
   Eigen::VectorXd Serial_Robot::randomConfiguration()
   {
@@ -224,8 +225,8 @@ namespace mecali
       print_indent("Size of configuration vector = ",       this->n_q,                38);
       print_indent("Number of joints (with universe) = ",   this->n_joints,           38);
       print_indent("Number of DoF = ",                      this->n_dof,              38);
-      print_indent("Number of bodies = ",                   this->n_bodies,           38);
-      print_indent("Number of operational frames = ",       this->n_frames,           38);
+      print_indent("Number of bodies = ",                   this->_n_bodies,           38);
+      print_indent("Number of operational frames = ",       this->_n_frames,           38);
       print_indent("Gravity = ",                            this->gravity,            38);
       print_indent("Joint torque bounds = ",                this->joint_torque_limit, 38);
       print_indent("Joint configuration upper bounds = ",   this->joint_pos_ub,       38);

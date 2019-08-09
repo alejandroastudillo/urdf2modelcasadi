@@ -20,7 +20,7 @@ int main(int argc, char ** argv)
 
       std::vector<double> q_vec((size_t)robot_model.n_q);
       Eigen::Map<mecali::ConfigVector>( q_vec.data(), robot_model.n_q, 1 ) = robot_model.neutral_configuration; // Populate q_vec with the robot's neutral configuration
-      // std::vector<double> q_vec = {1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0};
+      // std::vector<double> q_vec = {0.86602540378, 0.5, 0, 1, 0, 0, 1, 0, 0, 1, 0};
       std::vector<double> v_vec((size_t)robot_model.n_dof);
       Eigen::Map<mecali::TangentVector>(v_vec.data(),robot_model.n_dof,1) = Eigen::VectorXd::Zero(robot_model.n_dof);
       // std::vector<double> v_vec = {0, 0, 0, 0, 0, 0, 0};
@@ -49,13 +49,13 @@ int main(int argc, char ** argv)
       mecali::print_indent("Random configuration = ",             robot_model.randomConfiguration(),  38);
       mecali::print_indent("Random config. w/ custom bounds = ",  robot_model.randomConfiguration(-0.94159*Eigen::VectorXd::Ones(robot_model.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model.n_dof)),       38);
 
-      // Dictionary opts1;
+      // mecali::Dictionary opts1;
       // opts1["c"]=true;
       // opts1["save"]=true;
-      // generate_code(robot_model.aba,"kin3_aba",opts1);
-      // generate_code(robot_model.rnea,"kin3_rnea",opts1);
-      // generate_code(robot_model.fk_pos,"kin3_fk_pos",opts1);
-      // generate_code(robot_model.fk_rot,"kin3_fk_rot",opts1);
+      // mecali::generate_code(robot_model.aba,"kin3_aba",opts1);
+      // mecali::generate_code(robot_model.rnea,"kin3_rnea",opts1);
+      // mecali::generate_code(robot_model.fk_pos,"kin3_fk_pos",opts1);
+      // mecali::generate_code(robot_model.fk_rot,"kin3_fk_rot",opts1);
 
 
     // Example with another robot (ABB irb120)
@@ -72,10 +72,10 @@ int main(int argc, char ** argv)
       casadi::Function irb120_forward_dynamics = robot_model_abb.aba;
       std::cout << "irb120 forward dynamics function: " << irb120_forward_dynamics << std::endl;
 
-      // Dictionary opts;
+      // mecali::Dictionary opts;
       // opts["c"]=true;
       // opts["save"]=true;
-      // generate_code(irb120_forward_dynamics,"abb_fd_ext",opts);
+      // mecali::generate_code(irb120_forward_dynamics,"abb_fd_ext",opts);
       //
       // std::cout << "irb120 forward dynamics function loaded: " << casadi::Function::load("abb_fd_ext.casadi") << std::endl;
 

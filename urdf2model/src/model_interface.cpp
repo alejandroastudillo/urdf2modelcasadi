@@ -15,7 +15,7 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
 */
 
 /* TODO Handle (print error or warning) when the torque, position, or velocity limits are zero.
-   TODO In randomConfiguration, assert that each ub[k] >= lb[k] (kind of implemented already) Check if there is a better way
+   TODO Improve how randomConfiguration is coded, so that it can be reused when overloaded.
 */
 
 #include "model_interface.hpp"
@@ -27,7 +27,7 @@ namespace mecali
   // const double PI = boost::math::constants::pi<double>();
   const double PI = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862;
 
-  void Serial_Robot::import_model(std::string filename)
+  void            Serial_Robot::import_model(std::string filename)
   {
       // Pinocchio model
         Model         model;
@@ -93,7 +93,7 @@ namespace mecali
       // Iterates for all the components of the random angles vector.
       for (Eigen::DenseIndex k = 0; k < this->n_dof; ++k)
       {
-        // Check if joint k is a revolute unbounded (continuous) joint (This joint types come from Pinocchio)
+        // Check if joint k is a revolute unbounded (continuous) joint (These joint types come from Pinocchio)
         if (this->joint_types[k].compare("JointModelRUBZ") == 0 || this->joint_types[k].compare("JointModelRUBY") == 0 || this->joint_types[k].compare("JointModelRUBX") == 0)
         {
           // Use mt19937 to set a random number in [-1, 1], then multiply it by PI to have [-PI, PI] (Here you can have bounds < or > than PI because it is a continuous joint.
@@ -119,7 +119,7 @@ namespace mecali
 
     } else // There is no continuous joint in this robot
     {
-      // Create a random configuration vector of size = n_q. (This is filled with numbers between -1 and 1).
+      // Create a random configuration vector of size = n_q. (This is filled with zeros).
       randConfig = Eigen::VectorXd::Zero(this->n_q, 1);
 
       for (Eigen::DenseIndex k = 0; k < this->n_q; ++k)
@@ -206,19 +206,15 @@ namespace mecali
   }
   Eigen::VectorXd Serial_Robot::randomConfiguration(std::vector<double> lower_bounds_v, std::vector<double> upper_bounds_v)
   {
-    // QUESTION Should these lower and upper bounds be compared with this->joint_pos_lb and this->joint_pos_ub?
-
     // Assert that both the lower_bounds and upper_bounds vectors are of length equal to n_dof.
     custom_assert(lower_bounds_v.size() == this->n_dof && upper_bounds_v.size() == this->n_dof, "Error in " + std::string(__FUNCTION__) + "(): Lower and upper bound vectors must be of length equal to n_dof.");
 
     Eigen::Map<Eigen::VectorXd> lb(&lower_bounds_v[0], this->n_dof);
     Eigen::Map<Eigen::VectorXd> ub(&upper_bounds_v[0], this->n_dof);
 
-    // std::cout << "lb: " << lb.transpose() << "\t ub: " << ub.transpose() << std::endl;
-
     return this->randomConfiguration(lb, ub);
   }
-  void Serial_Robot::print_model_data()
+  void            Serial_Robot::print_model_data()
   {
       std::cout << "\n----- Robot model information: " << std::endl;
       print_indent("Model name = ",                         this->name,               38);

@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(FK_pinocchio_casadi)
 
   // Interface
     Serial_Robot robot_model;
-    robot_model = generate_model(filename);
+    robot_model.import_model(filename);
 
     std::vector<double> q_vec((size_t)model.nq);
     Eigen::Map<ConfigVector>( q_vec.data(), model.nq, 1 ) = q_home;
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(ABA_pinocchio_casadi)
 
   // Interface
     Serial_Robot robot_model;
-    robot_model = generate_model(filename);
+    robot_model.import_model(filename);
 
     std::vector<double> q_vec((size_t)model.nq);
     Eigen::Map<ConfigVector>(q_vec.data(),model.nq,1) = q_home;
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(RNEA_pinocchio_casadi)
 
   // Interface
     Serial_Robot robot_model;
-    robot_model = generate_model(filename);
+    robot_model.import_model(filename);
 
     std::vector<double> q_vec((size_t)model.nq);
     Eigen::Map<ConfigVector>(q_vec.data(),model.nq,1) = q_home;

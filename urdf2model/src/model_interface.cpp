@@ -15,7 +15,6 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
 */
 
 /* TODO Handle (print error or warning) when the torque, position, or velocity limits are zero.
-   IDEA Change struct Serial_Robot to a new class which can have private and public attributes and methods.
    TODO In randomConfiguration, assert that each ub[k] >= lb[k] (kind of implemented already) Check if there is a better way
 */
 
@@ -28,11 +27,9 @@ namespace mecali
   // const double PI = boost::math::constants::pi<double>();
   const double PI = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862;
 
-  Serial_Robot generate_model(std::string filename)
+  void Serial_Robot::import_model(std::string filename)
   {
-        Serial_Robot  rob_model;
-
-    // Pinocchio model
+      // Pinocchio model
         Model         model;
       // Build the model using the URDF parser
         bool          verbose = false;                                   // verbose can be omitted from the buildModel execution: <pinocchio::urdf::buildModel(filename,model)>
@@ -43,36 +40,33 @@ namespace mecali
         Data          data = pinocchio::Data(model);
 
       // populate the data structure with some basic information about the robot
-        rob_model.name                  = model.name;
-        rob_model.n_joints              = model.njoints;  // data.oMi.size()
-        rob_model.n_q                   = model.nq;
-        rob_model.n_dof                 = model.nv;
-        rob_model.n_bodies              = model.nbodies;
-        rob_model.n_frames              = model.nframes;
-        rob_model.gravity               = model.gravity.linear_impl();
-        rob_model.joint_torque_limit    = model.effortLimit;
-        rob_model.joint_pos_ub          = model.upperPositionLimit;
-        rob_model.joint_pos_lb          = model.lowerPositionLimit;
-        rob_model.joint_vel_limit       = model.velocityLimit;
-        rob_model.joint_names           = model.names;
-        rob_model.neutral_configuration = pinocchio::neutral(model);
+        this->name                  = model.name;
+        this->n_joints              = model.njoints;  // data.oMi.size()
+        this->n_q                   = model.nq;
+        this->n_dof                 = model.nv;
+        this->n_bodies              = model.nbodies;
+        this->n_frames              = model.nframes;
+        this->gravity               = model.gravity.linear_impl();
+        this->joint_torque_limit    = model.effortLimit;
+        this->joint_pos_ub          = model.upperPositionLimit;
+        this->joint_pos_lb          = model.lowerPositionLimit;
+        this->joint_vel_limit       = model.velocityLimit;
+        this->joint_names           = model.names;
+        this->neutral_configuration = pinocchio::neutral(model);
 
-        std::vector<std::string> joint_types(rob_model.n_dof);
-        for (int i = 1; i < rob_model.n_joints; i++){ joint_types[i-1] = model.joints[i].shortname(); }
-        rob_model.joint_types           = joint_types;
-
+        std::vector<std::string> joint_types(this->n_dof);
+        for (int i = 1; i < this->n_joints; i++){ joint_types[i-1] = model.joints[i].shortname(); }
+        this->joint_types           = joint_types;
 
       // Casadi model
         CasadiModel casadi_model = model.cast<CasadiScalar>();
         CasadiData casadi_data( casadi_model );
 
       // Get functions and populate data structure
-        rob_model.aba     = get_forward_dynamics( casadi_model, casadi_data );
-        rob_model.rnea    = get_inverse_dynamics( casadi_model, casadi_data );
-        rob_model.fk_pos  = get_forward_kinematics_position( casadi_model, casadi_data );
-        rob_model.fk_rot  = get_forward_kinematics_rotation( casadi_model, casadi_data );
-
-      return rob_model;
+        this->aba     = get_forward_dynamics( casadi_model, casadi_data );
+        this->rnea    = get_inverse_dynamics( casadi_model, casadi_data );
+        this->fk_pos  = get_forward_kinematics_position( casadi_model, casadi_data );
+        this->fk_rot  = get_forward_kinematics_rotation( casadi_model, casadi_data );
   }
 
   Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model)

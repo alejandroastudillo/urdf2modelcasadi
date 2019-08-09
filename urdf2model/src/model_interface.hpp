@@ -22,34 +22,43 @@
 #include "functions/code_generation.hpp"
 #include "functions/common.hpp"
 
+/*
+TODO Check how to include code_generation as a public method in class Serial_Robot: follow the save example https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp
+TODO Add rotation matrix, jacobians, and derivatives to Serial_Robot
+*/
+
 namespace mecali
 {
   class Serial_Robot {
+
     public:
+
       std::string              name;
       int                      n_q;
       int                      n_joints;
       int                      n_dof;
       int                      n_bodies;
       int                      n_frames;
+
       std::vector<std::string> joint_names;
+      std::vector<std::string> joint_types;
       Eigen::VectorXd          gravity;          // Eigen::Vector3d
       Eigen::VectorXd          joint_torque_limit;
       Eigen::VectorXd          joint_pos_ub;
       Eigen::VectorXd          joint_pos_lb;
       Eigen::VectorXd          joint_vel_limit;
       Eigen::VectorXd          neutral_configuration;
-      std::vector<std::string> joint_types;
+
       casadi::Function         aba;
       casadi::Function         rnea;
       casadi::Function         fk_pos;
       casadi::Function         fk_rot;
-     // TODO: Add rotation matrix, jacobians, and derivatives
+
+      void import_model(std::string filename);
+
    private:
 
   };
-
-  Serial_Robot generate_model(std::string filename);
 
   Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model);
   Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model, Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds);

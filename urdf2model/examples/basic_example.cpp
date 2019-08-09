@@ -17,7 +17,7 @@ int main(int argc, char ** argv)
         // ../urdf2model/models/abb_common/urdf/irb120.urdf
 
       Serial_Robot robot_model;
-      robot_model = generate_model(urdf_filename);
+      robot_model.import_model(urdf_filename);
 
       std::cout << "robot_model name: " << robot_model.name << std::endl;
       std::cout << "robot_model ABA: " << robot_model.aba << std::endl;
@@ -64,7 +64,7 @@ int main(int argc, char ** argv)
 
     // Example with another robot (ABB irb120)
       Serial_Robot robot_model_abb;
-      robot_model_abb = generate_model("../urdf2model/models/abb_common/urdf/irb120.urdf");
+      robot_model_abb.import_model("../urdf2model/models/abb_common/urdf/irb120.urdf");
 
       print_model_data(robot_model_abb);
 
@@ -82,5 +82,14 @@ int main(int argc, char ** argv)
       generate_code(irb120_forward_dynamics,"abb_fd_ext",opts);
 
       std::cout << "irb120 forward dynamics function loaded: " << casadi::Function::load("abb_fd_ext.casadi") << std::endl;
+
+    // Example with new syntax
+      Serial_Robot rob_model_iiwa;
+      rob_model_iiwa.import_model("../urdf2model/models/iiwa_description/urdf/iiwa14.urdf");
+
+      std::cout << "Iiwa name: " << rob_model_iiwa.name << std::endl;
+      std::cout << "Iiwa dof: " << rob_model_iiwa.n_dof << std::endl;
+      std::cout << "Iiwa nq: " << rob_model_iiwa.n_q << std::endl;
+      std::cout << "Iiwa joint types: " << rob_model_iiwa.joint_types << std::endl;
 
 }

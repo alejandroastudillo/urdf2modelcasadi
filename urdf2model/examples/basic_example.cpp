@@ -57,7 +57,6 @@ int main(int argc, char ** argv)
       // mecali::generate_code(robot_model.fk_pos,"kin3_fk_pos",opts1);
       // mecali::generate_code(robot_model.fk_rot,"kin3_fk_rot",opts1);
 
-
     // Example with another robot (ABB irb120)
       mecali::Serial_Robot robot_model_abb;
       robot_model_abb.import_model("../urdf2model/models/abb_common/urdf/irb120.urdf");

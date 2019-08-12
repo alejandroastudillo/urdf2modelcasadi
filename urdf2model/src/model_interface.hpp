@@ -55,6 +55,7 @@ namespace mecali
 
       // methods
       void                     import_model(std::string filename);
+      void                     import_model(std::string filename, bool verbose);
       void                     print_model_data();
       Eigen::VectorXd          randomConfiguration();
       Eigen::VectorXd          randomConfiguration(Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds);

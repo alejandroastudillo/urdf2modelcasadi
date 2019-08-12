@@ -25,47 +25,51 @@ namespace mecali
 {
   const double PI = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862;
 
+  void            Serial_Robot::import_model(std::string filename, bool verbose)
+  {
+    // Pinocchio model
+      Model         model;
+    // Build the model using the URDF parser
+      pinocchio::urdf::buildModel(filename,model,verbose);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
+    // Set the gravity applied to the model
+      model.gravity.linear(pinocchio::Model::gravity981);
+    // Initialize the data structure for the model
+      Data          data = pinocchio::Data(model);
+
+    // populate the data structure with some basic information about the robot
+      this->name                  = model.name;
+      this->n_joints              = model.njoints;  // data.oMi.size()
+      this->n_q                   = model.nq;
+      this->n_dof                 = model.nv;
+      this->gravity               = model.gravity.linear_impl();
+      this->joint_torque_limit    = model.effortLimit;
+      this->joint_pos_ub          = model.upperPositionLimit;
+      this->joint_pos_lb          = model.lowerPositionLimit;
+      this->joint_vel_limit       = model.velocityLimit;
+      this->joint_names           = model.names;
+      this->neutral_configuration = pinocchio::neutral(model);
+      this->_n_bodies             = model.nbodies;
+      this->_n_frames             = model.nframes;
+
+      std::vector<std::string> joint_types(this->n_dof);
+      for (int i = 1; i < this->n_joints; i++){ joint_types[i-1] = model.joints[i].shortname(); }
+      this->joint_types           = joint_types;
+
+    // Casadi model
+      CasadiModel casadi_model = model.cast<CasadiScalar>();
+      CasadiData casadi_data( casadi_model );
+
+    // Get functions and populate data structure
+      this->aba     = get_forward_dynamics( casadi_model, casadi_data );
+      this->rnea    = get_inverse_dynamics( casadi_model, casadi_data );
+      this->fk_pos  = get_forward_kinematics_position( casadi_model, casadi_data );
+      this->fk_rot  = get_forward_kinematics_rotation( casadi_model, casadi_data );
+
+  }
   void            Serial_Robot::import_model(std::string filename)
   {
-      // Pinocchio model
-        Model         model;
-      // Build the model using the URDF parser
-        bool          verbose = false;                                   // verbose can be omitted from the buildModel execution: <pinocchio::urdf::buildModel(filename,model)>
-        pinocchio::urdf::buildModel(filename,model,verbose);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
-      // Set the gravity applied to the model
-        model.gravity.linear(pinocchio::Model::gravity981);
-      // Initialize the data structure for the model
-        Data          data = pinocchio::Data(model);
-
-      // populate the data structure with some basic information about the robot
-        this->name                  = model.name;
-        this->n_joints              = model.njoints;  // data.oMi.size()
-        this->n_q                   = model.nq;
-        this->n_dof                 = model.nv;
-        this->gravity               = model.gravity.linear_impl();
-        this->joint_torque_limit    = model.effortLimit;
-        this->joint_pos_ub          = model.upperPositionLimit;
-        this->joint_pos_lb          = model.lowerPositionLimit;
-        this->joint_vel_limit       = model.velocityLimit;
-        this->joint_names           = model.names;
-        this->neutral_configuration = pinocchio::neutral(model);
-        this->_n_bodies             = model.nbodies;
-        this->_n_frames             = model.nframes;
-
-        std::vector<std::string> joint_types(this->n_dof);
-        for (int i = 1; i < this->n_joints; i++){ joint_types[i-1] = model.joints[i].shortname(); }
-        this->joint_types           = joint_types;
-
-      // Casadi model
-        CasadiModel casadi_model = model.cast<CasadiScalar>();
-        CasadiData casadi_data( casadi_model );
-
-      // Get functions and populate data structure
-        this->aba     = get_forward_dynamics( casadi_model, casadi_data );
-        this->rnea    = get_inverse_dynamics( casadi_model, casadi_data );
-        this->fk_pos  = get_forward_kinematics_position( casadi_model, casadi_data );
-        this->fk_rot  = get_forward_kinematics_rotation( casadi_model, casadi_data );
-
+    bool          verbose = false;                                   // verbose can be omitted from the buildModel execution: <pinocchio::urdf::buildModel(filename,model)>
+    this->import_model(filename,verbose);
   }
   Eigen::VectorXd Serial_Robot::randomConfiguration()
   {

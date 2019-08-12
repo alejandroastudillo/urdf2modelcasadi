@@ -23,7 +23,6 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
 
 namespace mecali
 {
-  // const double PI = boost::math::constants::pi<double>();
   const double PI = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862;
 
   void            Serial_Robot::import_model(std::string filename)
@@ -234,72 +233,3 @@ namespace mecali
 //       //
 //       // pinocchio::casadi::copy(eig_mat2, cs_mat2);
 //       // std::cout << cs_mat2 << std::endl;
-
-
-
-
-// Eigen::VectorXd Serial_Robot::randomConfiguration()
-// {
-//   Eigen::VectorXd lb = this->joint_pos_lb;
-//   Eigen::VectorXd ub = this->joint_pos_ub; // In this function, lb and ub size = n_q
-//
-//   Eigen::VectorXd randConfig;
-//
-//   // std::mt19937 mt_rand(time(0));
-//   std::random_device rd;  //Will be used to obtain a seed for the random number engine
-//   std::mt19937 mt_rand(rd()); //Standard mersenne_twister_engine seeded with rd()
-//   std::uniform_real_distribution<> rnd_dis(-1.0, 1.0);
-//
-//   // Check for continuous joints
-//   if (this->n_q > this->n_dof) // If the length of the configuration-vector is > than the DoF, some joints are continuous and represented by [cos(q_j) sin(q_j)]
-//   {
-//     // Create a random vector of size = n_dof. (This is filled with numbers between -1 and 1).
-//     Eigen::VectorXd randAngles = Eigen::VectorXd::Zero(this->n_dof, 1);
-//     // Create a configuration vector of size n_q, filled with zeros.
-//     randConfig = Eigen::VectorXd::Zero(this->n_q);
-//     // Creates an index for the configuration vector
-//     int j = 0;
-//     // Iterates for all the components of the random angles vector.
-//     for (Eigen::DenseIndex k = 0; k < this->n_dof; ++k)
-//     {
-//       // Check if joint k is a revolute unbounded (continuous) joint (These joint types come from Pinocchio)
-//       if (this->joint_types[k].compare("JointModelRUBZ") == 0 || this->joint_types[k].compare("JointModelRUBY") == 0 || this->joint_types[k].compare("JointModelRUBX") == 0)
-//       {
-//         // Use mt19937 to set a random number in [-1, 1], then multiply it by PI to have [-PI, PI] (Here you can have bounds < or > than PI because it is a continuous joint.
-//         randAngles[k] = PI*rnd_dis(mt_rand);
-//         // Fill the corresponding values in the configuration vector.
-//         randConfig[j] = cos(randAngles[k]);
-//         randConfig[j+1] = sin(randAngles[k]);
-//         // Update the configuration vector index.
-//         j = j+2;
-//       } else // If joint k is not a continuous joint
-//       {
-//         // Use mt19937 to set a random number between -1 and 1.
-//         randAngles[k] = rnd_dis(mt_rand);
-//         // Adjust the range of the random values from [-1, 1] to [ub, lb].
-//         if (randAngles[k] < 0) { randAngles[k] = -1*lb[j]*randAngles[k]; }
-//         else { randAngles[k] = ub[j]*randAngles[k]; }
-//         // Fill the corresponding value in the configuration vector
-//         randConfig[j] = randAngles[k];
-//         // Update the configuration vector index.
-//         j++;
-//       }
-//     }
-//
-//   } else // There is no continuous joint in this robot
-//   {
-//     // Create a random configuration vector of size = n_q. (This is filled with zeros).
-//     randConfig = Eigen::VectorXd::Zero(this->n_q, 1);
-//
-//     for (Eigen::DenseIndex k = 0; k < this->n_q; ++k)
-//     {
-//       // Use mt19937 to set a random number between -1 and 1.
-//       randConfig[k] = rnd_dis(mt_rand);
-//       // Adjust the range of the random values from [-1, 1] to [ub, lb].
-//       if (randConfig[k] < 0) { randConfig[k] = -1*lb[k]*randConfig[k]; }
-//       else { randConfig[k] = ub[k]*randConfig[k]; }
-//     }
-//   }
-//
-//   return randConfig;
-// }

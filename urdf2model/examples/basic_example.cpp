@@ -47,7 +47,7 @@ int main(int argc, char ** argv)
       // #endif
       mecali::print_indent("Neutral configuration = ",            robot_model.neutral_configuration, 38);
       mecali::print_indent("Random configuration = ",             robot_model.randomConfiguration(),  38);
-      mecali::print_indent("Random config. w/ custom bounds = ",  robot_model.randomConfiguration(-0.94159*Eigen::VectorXd::Ones(robot_model.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model.n_dof)),       38);
+      mecali::print_indent("Random config. w/ custom bounds = ",  robot_model.randomConfiguration(-0.94159*Eigen::VectorXd::Ones(robot_model.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model.n_dof)), 38);
 
       // mecali::Dictionary opts1;
       // opts1["c"]=true;

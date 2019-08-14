@@ -77,6 +77,8 @@ int main(int argc, char ** argv)
       // mecali::generate_code(irb120_forward_dynamics,"abb_fd_ext",opts);
       //
       // std::cout << "irb120 forward dynamics function loaded: " << casadi::Function::load("abb_fd_ext.casadi") << std::endl;
-
+      std::cout << "#########################################################" << std::endl;
+      mecali::Serial_Robot robot_model_abb;
+      robot_model_abb.import_model("../urdf2model/models/abb_common/urdf/irb120.urdf",true);
 
 }

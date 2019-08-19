@@ -48,8 +48,10 @@ namespace mecali
       this->joint_vel_limit       = model.velocityLimit;
       this->joint_names           = model.names;
       this->neutral_configuration = pinocchio::neutral(model);
+
       this->_n_bodies             = model.nbodies;
       this->_n_frames             = model.nframes;
+      this->_model                = model;
 
       std::vector<std::string> joint_types(this->n_dof);
       for (int i = 1; i < this->n_joints; i++){ joint_types[i-1] = model.joints[i].shortname(); }
@@ -62,8 +64,11 @@ namespace mecali
     // Get functions and populate data structure
       this->aba     = get_forward_dynamics( casadi_model, casadi_data );
       this->rnea    = get_inverse_dynamics( casadi_model, casadi_data );
-      this->fk_pos  = get_forward_kinematics_position( casadi_model, casadi_data );
-      this->fk_rot  = get_forward_kinematics_rotation( casadi_model, casadi_data );
+      this->fk_pos  = get_forward_kinematics_position( casadi_model, casadi_data);
+      this->fk_rot  = get_forward_kinematics_rotation( casadi_model, casadi_data);
+      // this->fk_pos  = get_forward_kinematics_position( casadi_model, casadi_data, "gripper_l_base");
+      // this->fk_rot  = get_forward_kinematics_rotation( casadi_model, casadi_data, "gripper_l_base" );
+      // TODO: Check how to generate fk for any frame name
 
   }
   void            Serial_Robot::import_model(std::string filename)
@@ -206,19 +211,28 @@ namespace mecali
       print_indent("Joint configuration lower bounds = ",   this->joint_pos_lb,       38);
       print_indent("Joint velocity bounds = ",              this->joint_vel_limit,    38);
       std::cout << std::endl;
+
       // std::cout << "\n----- Placement of each joint in the model: " << std::endl;
-      // std::cout << "\n-----Name of each joint in the model: " << std::endl;
-      // for (int k=0 ; k<this->n_joints ; ++k)
+      std::cout << "\n-----Name of each joint in the model: " << std::endl;
+      for (int k=0 ; k<this->n_joints ; ++k)
+      {
+          std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << this->joint_names[k] << std::setw(10) << std::endl; // << data.oMi[k].translation().transpose()
+      }
+
+      // std::cout << "\n----- Name of each frame in the model: " << std::endl;
+      // for (int k=0 ; k<this->_n_frames ; ++k)
       // {
-      //     std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << this->joint_names[k] << std::setw(10) << std::endl; // << data.oMi[k].translation().transpose()
+      //     std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << this->_model.frames[k].name << std::endl;
       // }
 
-      //
-      // std::cout << "\n----- Placement of each frame in the model: " << std::endl;
-      // for (int k=0 ; k<this->n_frames ; ++k)
-      // {
-      //     std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << model.frames[k].name << std::setw(10) << data.oMf[k].translation().transpose() << std::endl;
-      // }
+      Data _data = pinocchio::Data(this->_model);
+      pinocchio::forwardKinematics(this->_model, _data, this->neutral_configuration);
+      pinocchio::updateFramePlacements(this->_model, _data);
+      std::cout << "\n----- Placement of each frame in the model (in neutral configuration): " << std::endl;
+      for (int k=0 ; k<this->_n_frames ; ++k)
+      {
+          std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << _model.frames[k].name << std::setw(10) << _data.oMf[k].translation().transpose() << std::endl;
+      }
   }
 
 }

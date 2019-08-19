@@ -66,6 +66,7 @@ namespace mecali
       // data variables
       int                      _n_bodies;
       int                      _n_frames;
+      Model                    _model;
   };
 
 }

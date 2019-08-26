@@ -15,7 +15,6 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
 */
 
 /* TODO Handle (print error or warning) when the torque, position, or velocity limits are zero.
-   TODO Add somehow forward_kinematics(content, int index) and forward_kinematics(content, std::vector<int> indexes)
    TODO Add some option to simplify the input of the functions (for instance instead of q[11] use q[7] for Kinova)
 */
 
@@ -309,9 +308,22 @@ namespace mecali
       }
 
   }
+  casadi::Function  Serial_Robot::forward_kinematics(std::string content, std::vector<int> frame_indices)
+  {
+      std::vector<std::string> req_frame_names;
+      for (int i = 0; i < frame_indices.size(); i++)
+      {
+          req_frame_names.insert(req_frame_names.end(), this->_model.frames[frame_indices[i]].name);
+      }
+      return this->forward_kinematics(content, req_frame_names);
+  }
   casadi::Function  Serial_Robot::forward_kinematics(std::string content, std::string frame_name)
   {
       return this->forward_kinematics(content, std::vector<std::string>{frame_name});
+  }
+  casadi::Function  Serial_Robot::forward_kinematics(std::string content, int frame_index)
+  {
+      return this->forward_kinematics(content, std::vector<int>{frame_index});
   }
   casadi::Function  Serial_Robot::forward_kinematics(std::string content)
   {

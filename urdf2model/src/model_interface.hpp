@@ -62,7 +62,9 @@ namespace mecali
       casadi::Function         forward_dynamics();
       casadi::Function         inverse_dynamics();
       casadi::Function         forward_kinematics(std::string content, std::vector<std::string> frame_names);
+      casadi::Function         forward_kinematics(std::string content, std::vector<int> frame_indices);
       casadi::Function         forward_kinematics(std::string content, std::string frame_name);
+      casadi::Function         forward_kinematics(std::string content, int frame_index);
       casadi::Function         forward_kinematics(std::string content);
       casadi::Function         forward_kinematics();
 

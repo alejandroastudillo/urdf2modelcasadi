@@ -58,8 +58,6 @@ namespace mecali
       void                     import_model(std::string filename);
       void                     import_model(std::string filename, bool verbose);
 
-      void                     print_model_data();
-
       // random configuration methods
       Eigen::VectorXd          randomConfiguration();
       Eigen::VectorXd          randomConfiguration(Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds);
@@ -69,7 +67,12 @@ namespace mecali
       casadi::Function         forward_dynamics();
       casadi::Function         inverse_dynamics();
       casadi::Function         forward_kinematics(std::string content, std::vector<std::string> frame_names);
+      casadi::Function         forward_kinematics(std::string content, std::string frame_name);
+      casadi::Function         forward_kinematics(std::string content);
+      casadi::Function         forward_kinematics();
 
+      // debug methods
+      void                     print_model_data();
 
    private:
       // data variables

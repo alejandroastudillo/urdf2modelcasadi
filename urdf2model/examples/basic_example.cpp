@@ -50,35 +50,43 @@ int main(int argc, char ** argv)
       mecali::print_indent("Random config. w/ custom bounds = ",  robot_model.randomConfiguration(-0.94159*Eigen::VectorXd::Ones(robot_model.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model.n_dof)), 38);
 
       // mecali::Dictionary opts1;
-      // opts1["c"]=true;
+      // opts1["c"]=false;
       // opts1["save"]=true;
       // mecali::generate_code(robot_model.aba,"kin3_aba",opts1);
       // mecali::generate_code(robot_model.rnea,"kin3_rnea",opts1);
       // mecali::generate_code(robot_model.fk_pos,"kin3_fk_pos",opts1);
       // mecali::generate_code(robot_model.fk_rot,"kin3_fk_rot",opts1);
+      // mecali::Dictionary opts1;
+      // opts1["c"]=false;
+      // opts1["save"]=false;
+      // mecali::generate_code(robot_model.aba,"yumi_aba",opts1);
+      // mecali::generate_code(robot_model.rnea,"yumi_rnea",opts1);
+      // mecali::generate_code(robot_model.fk_pos,"gripper_l_base_fk_pos",opts1);
+      // mecali::generate_code(robot_model.fk_rot,"gripper_l_base_fk_rot",opts1);
 
-    // Example with another robot (ABB irb120)
-      mecali::Serial_Robot robot_model_abb;
-      robot_model_abb.import_model("../urdf2model/models/abb_common/urdf/irb120.urdf");
 
-      robot_model_abb.print_model_data();
-
-      mecali::print_indent("Neutral configuration = ",            robot_model_abb.neutral_configuration, 38);
-      mecali::print_indent("Random configuration = ",             robot_model_abb.randomConfiguration(),  38);
-      mecali::print_indent("Random config. w/ custom bounds = ",  robot_model_abb.randomConfiguration(-0.94159*Eigen::VectorXd::Ones(robot_model_abb.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model_abb.n_dof)),       38);
-      mecali::print_indent("Random config. w/ vector bounds = ",  robot_model_abb.randomConfiguration(std::vector<double>{-2, -2.2, -3.0, -2.4, -2.5, -2.6}, std::vector<double>{2.1, 2.2, 2.3, 2.4, 2.5, 2.6}), 38);
-
-      casadi::Function irb120_forward_dynamics = robot_model_abb.aba;
-      std::cout << "irb120 forward dynamics function: " << irb120_forward_dynamics << std::endl;
-
-      // mecali::Dictionary opts;
-      // opts["c"]=true;
-      // opts["save"]=true;
-      // mecali::generate_code(irb120_forward_dynamics,"abb_fd_ext",opts);
-      //
-      // std::cout << "irb120 forward dynamics function loaded: " << casadi::Function::load("abb_fd_ext.casadi") << std::endl;
-      std::cout << "#########################################################" << std::endl;
-      mecali::Serial_Robot robot_model_abb;
-      robot_model_abb.import_model("../urdf2model/models/abb_common/urdf/irb120.urdf",true);
+    // // Example with another robot (ABB irb120)
+    //   mecali::Serial_Robot robot_model_abb;
+    //   robot_model_abb.import_model("../urdf2model/models/abb_common/urdf/irb120.urdf");
+    //
+    //   robot_model_abb.print_model_data();
+    //
+    //   mecali::print_indent("Neutral configuration = ",            robot_model_abb.neutral_configuration, 38);
+    //   mecali::print_indent("Random configuration = ",             robot_model_abb.randomConfiguration(),  38);
+    //   mecali::print_indent("Random config. w/ custom bounds = ",  robot_model_abb.randomConfiguration(-0.94159*Eigen::VectorXd::Ones(robot_model_abb.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model_abb.n_dof)),       38);
+    //   mecali::print_indent("Random config. w/ vector bounds = ",  robot_model_abb.randomConfiguration(std::vector<double>{-2, -2.2, -3.0, -2.4, -2.5, -2.6}, std::vector<double>{2.1, 2.2, 2.3, 2.4, 2.5, 2.6}), 38);
+    //
+    //   casadi::Function irb120_forward_dynamics = robot_model_abb.aba;
+    //   std::cout << "irb120 forward dynamics function: " << irb120_forward_dynamics << std::endl;
+    //
+    //   // mecali::Dictionary opts;
+    //   // opts["c"]=true;
+    //   // opts["save"]=true;
+    //   // mecali::generate_code(irb120_forward_dynamics,"abb_fd_ext",opts);
+    //   //
+    //   // std::cout << "irb120 forward dynamics function loaded: " << casadi::Function::load("abb_fd_ext.casadi") << std::endl;
+    //   std::cout << "#########################################################" << std::endl;
+    //   mecali::Serial_Robot robot_model_abb_2;
+    //   robot_model_abb_2.import_model("../urdf2model/models/abb_common/urdf/irb120.urdf",true);
 
 }

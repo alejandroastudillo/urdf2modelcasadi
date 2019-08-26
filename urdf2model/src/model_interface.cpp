@@ -61,6 +61,8 @@ namespace mecali
       CasadiModel casadi_model = model.cast<CasadiScalar>();
       CasadiData casadi_data( casadi_model );
 
+      this->_casadi_model         = casadi_model;
+
     // Get functions and populate data structure
       this->aba     = get_forward_dynamics( casadi_model, casadi_data );
       this->rnea    = get_inverse_dynamics( casadi_model, casadi_data );

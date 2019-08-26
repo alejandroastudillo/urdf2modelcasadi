@@ -56,10 +56,16 @@ namespace mecali
       // methods
       void                     import_model(std::string filename);
       void                     import_model(std::string filename, bool verbose);
+
       void                     print_model_data();
+
+      // random configuration methods
       Eigen::VectorXd          randomConfiguration();
       Eigen::VectorXd          randomConfiguration(Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds);
       Eigen::VectorXd          randomConfiguration(std::vector<double> lower_bounds_v, std::vector<double> upper_bounds_v);
+
+      // function methods
+
 
 
    private:
@@ -67,6 +73,7 @@ namespace mecali
       int                      _n_bodies;
       int                      _n_frames;
       Model                    _model;
+      CasadiModel              _casadi_model;
   };
 
 }

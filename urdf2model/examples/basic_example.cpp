@@ -8,11 +8,12 @@ int main(int argc, char ** argv)
 {
     // Example with robot urdf passed as argument, or Kinova Gen3 by default.
       std::string urdf_filename = (argc<=1) ? "../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf" : argv[1];
-      // std::string urdf_filename = "../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf";
+      // std::string urdf_filename = "../urdf2model/models/yumi/urdf/yumi.urdf";
         // ../urdf2model/models/kortex_description/urdf/JACO3_URDF_V10rev.urdf
         // ../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf
         // ../urdf2model/models/iiwa_description/urdf/iiwa14.urdf
         // ../urdf2model/models/abb_common/urdf/irb120.urdf
+        // ../urdf2model/models/yumi/urdf/yumi.urdf
 
       mecali::Serial_Robot robot_model;
       robot_model.import_model(urdf_filename);
@@ -36,6 +37,17 @@ int main(int argc, char ** argv)
         // casadi::Function fk_pos_multiFrames_byInt     = robot_model.forward_kinematics("position",std::vector<int>{18, 11, 5});
 
         casadi::Function fk_pos_allframes = robot_model.forward_kinematics("position");
+        casadi::Function fk_rot_allframes = robot_model.forward_kinematics("rotation");
+        casadi::Function fk_T_allframes   = robot_model.forward_kinematics("transformation");
+        // std::vector<std::string> required_Frames = {"yumi_body",
+        //     "yumi_link_1_l", "yumi_link_2_l", "yumi_link_3_l", "yumi_link_4_l", "yumi_link_5_l", "yumi_link_6_l", "yumi_link_7_l",
+        //     "gripper_l_base", "gripper_l_finger_r", "gripper_l_finger_l",
+        //     "yumi_link_1_r", "yumi_link_2_r", "yumi_link_3_r", "yumi_link_4_r", "yumi_link_5_r", "yumi_link_6_r", "yumi_link_7_r",
+        //     "gripper_r_base", "gripper_r_finger_r", "gripper_r_finger_l" };
+        //
+        // casadi::Function fk_pos_allframes = robot_model.forward_kinematics("position", required_Frames);
+        // casadi::Function fk_rot_allframes = robot_model.forward_kinematics("rotation", required_Frames);
+        // casadi::Function fk_T_allframes   = robot_model.forward_kinematics("transformation", required_Frames);
 
         std::cout << "Position all frames: \n" << fk_pos_allframes << std::endl;
 
@@ -69,14 +81,15 @@ int main(int argc, char ** argv)
         mecali::print_indent("Random configuration = ",             robot_model.randomConfiguration(),  38);
         mecali::print_indent("Random config. w/ custom bounds = ",  robot_model.randomConfiguration(-0.94159*Eigen::VectorXd::Ones(robot_model.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model.n_dof)), 38);
 
-      // mecali::Dictionary opts1;
-      // opts1["c"]=false;
-      // opts1["save"]=true;
+      mecali::Dictionary opts1;
+      opts1["c"]=false;
+      opts1["save"]=true;
       // mecali::generate_code(aba,"kin3_aba",opts1);
       // mecali::generate_code(rnea,"kin3_rnea",opts1);
       // mecali::generate_code(fk_pos,"kin3_fk_pos",opts1);
-      // mecali::generate_code(fk_rot,"kin3_fk_rot",opts1);
-
+      mecali::generate_code(fk_pos_allframes,robot_model.name+"_fk_pos",opts1);
+      mecali::generate_code(fk_rot_allframes,robot_model.name+"_fk_rot",opts1);
+      mecali::generate_code(fk_T_allframes,robot_model.name+"_fk_T",opts1);
 
 
     // // Example with another robot (ABB irb120)

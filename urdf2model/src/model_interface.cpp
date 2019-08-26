@@ -219,13 +219,15 @@ namespace mecali
 
       std::vector<CasadiScalar> func_outputs;
 
+      std::vector<std::string>  output_names;
+
       // create the input vector (for pinocchio and for the returned function)
       CasadiScalar        q_sx = casadi::SX::sym("q", this->_casadi_model.nq);
       ConfigVectorCasadi  q_casadi(this->_casadi_model.nq);
       pinocchio::casadi::copy( q_sx, q_casadi );
 
       // call the forward kinematics function
-      pinocchio::forwardKinematics(     this->_casadi_model,   casadi_data,    q_casadi);
+      pinocchio::forwardKinematics(    this->_casadi_model,   casadi_data,    q_casadi);
       pinocchio::updateFramePlacements(this->_casadi_model,   casadi_data);
 
       int frame_idx;
@@ -245,9 +247,12 @@ namespace mecali
 
               // fill the output vector of the function
               func_outputs.insert(func_outputs.end(), pos_sx);
+
+              // fill the output names vector
+              output_names.insert(output_names.end(), "Pos_"+this->_model.frames[frame_idx].name);
           }
 
-          return casadi::Function( "fk_pos", casadi::SXVector {q_sx}, func_outputs );
+          return casadi::Function( "fk_pos", casadi::SXVector {q_sx}, func_outputs, std::vector<std::string>{"q"}, output_names);
       }
       else if (content.compare("rotation") == 0)
       {
@@ -259,20 +264,16 @@ namespace mecali
               frame_idx = this->_casadi_model.getFrameId(frame_names[i]);
 
               // get the result (rotation matrix) from FK
-              for(Eigen::DenseIndex i = 0; i < 3; ++i)
-              {
-                for(Eigen::DenseIndex j = 0; j < 3; ++j)
-                {
-                  rot_sx(i,j) = casadi_data.oMf[frame_idx].rotation()(i,j);
-                }
-              }
-              // TODO: Create function in common.hpp to copy rotation matrix
+              pinocchio::casadi::copy( casadi_data.oMf[frame_idx].rotation(), rot_sx );
 
               // fill the output vector of the function
               func_outputs.insert(func_outputs.end(), rot_sx);
+
+              // fill the output names vector
+              output_names.insert(output_names.end(), "Rot_"+this->_model.frames[frame_idx].name);
           }
 
-          return casadi::Function( "fk_rot", casadi::SXVector {q_sx}, func_outputs );
+          return casadi::Function( "fk_rot", casadi::SXVector {q_sx}, func_outputs, std::vector<std::string>{"q"}, output_names);
 
       }
       else if (content.compare("transformation") == 0)
@@ -302,9 +303,12 @@ namespace mecali
 
               // fill the output vector of the function
               func_outputs.insert(func_outputs.end(), T_sx);
+
+              // fill the output names vector
+              output_names.insert(output_names.end(), "T_"+this->_model.frames[frame_idx].name);
           }
 
-          return casadi::Function( "fk_T", casadi::SXVector {q_sx}, func_outputs );
+          return casadi::Function( "fk_T", casadi::SXVector {q_sx}, func_outputs, std::vector<std::string>{"q"}, output_names);
       }
       else
       {

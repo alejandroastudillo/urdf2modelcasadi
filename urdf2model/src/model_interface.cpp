@@ -15,6 +15,8 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
 */
 
 /* TODO Handle (print error or warning) when the torque, position, or velocity limits are zero.
+   TODO Add somehow forward_kinematics(content, int index) and forward_kinematics(content, std::vector<int> indexes)
+   TODO Add some option to simplify the input of the functions (for instance instead of q[11] use q[7] for Kinova)
 */
 
 #include "model_interface.hpp"
@@ -39,6 +41,7 @@ namespace mecali
     // populate the data structure with some basic information about the robot
       this->name                  = model.name;
       this->n_joints              = model.njoints;  // data.oMi.size()
+      this->n_frames              = model.nframes;
       this->n_q                   = model.nq;
       this->n_dof                 = model.nv;
       this->gravity               = model.gravity.linear_impl();
@@ -50,7 +53,6 @@ namespace mecali
       this->neutral_configuration = pinocchio::neutral(model);
 
       this->_n_bodies             = model.nbodies;
-      this->_n_frames             = model.nframes;
       this->_model                = model;
 
       std::vector<std::string> joint_types(this->n_dof);
@@ -62,15 +64,6 @@ namespace mecali
       CasadiData casadi_data( casadi_model );
 
       this->_casadi_model         = casadi_model;
-
-    // Get functions and populate data structure
-      this->aba     = get_forward_dynamics( casadi_model, casadi_data );
-      this->rnea    = get_inverse_dynamics( casadi_model, casadi_data );
-      this->fk_pos  = get_forward_kinematics_position( casadi_model, casadi_data);
-      this->fk_rot  = get_forward_kinematics_rotation( casadi_model, casadi_data);
-      // this->fk_pos  = get_forward_kinematics_position( casadi_model, casadi_data, "gripper_l_base");
-      // this->fk_rot  = get_forward_kinematics_rotation( casadi_model, casadi_data, "gripper_l_base" );
-
   }
   void              Serial_Robot::import_model(std::string filename)
   {
@@ -323,7 +316,8 @@ namespace mecali
   casadi::Function  Serial_Robot::forward_kinematics(std::string content)
   {
       std::vector<std::string> all_frame_names;
-      for (int i = 0; i < this->_n_frames; i++)
+      // Frames "universe" and "root_joint" are not taken into account (they are added by Pinocchio, not from URDF)
+      for (int i = 2; i < this->n_frames; i++)
       {
           all_frame_names.insert(all_frame_names.end(), this->_model.frames[i].name);
       }
@@ -342,8 +336,8 @@ namespace mecali
       print_indent("Size of configuration vector = ",       this->n_q,                38);
       print_indent("Number of joints (with universe) = ",   this->n_joints,           38);
       print_indent("Number of DoF = ",                      this->n_dof,              38);
-      print_indent("Number of bodies = ",                   this->_n_bodies,           38);
-      print_indent("Number of operational frames = ",       this->_n_frames,           38);
+      print_indent("Number of bodies = ",                   this->_n_bodies,          38);
+      print_indent("Number of operational frames = ",       this->n_frames,           38);
       print_indent("Gravity = ",                            this->gravity,            38);
       print_indent("Joint torque bounds = ",                this->joint_torque_limit, 38);
       print_indent("Joint configuration upper bounds = ",   this->joint_pos_ub,       38);
@@ -359,7 +353,7 @@ namespace mecali
       }
 
       // std::cout << "\n----- Name of each frame in the model: " << std::endl;
-      // for (int k=0 ; k<this->_n_frames ; ++k)
+      // for (int k=0 ; k<this->n_frames ; ++k)
       // {
       //     std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << this->_model.frames[k].name << std::endl;
       // }
@@ -368,7 +362,7 @@ namespace mecali
       pinocchio::forwardKinematics(this->_model, _data, this->neutral_configuration);
       pinocchio::updateFramePlacements(this->_model, _data);
       std::cout << "\n----- Placement of each frame in the model (in neutral configuration): " << std::endl;
-      for (int k=0 ; k<this->_n_frames ; ++k)
+      for (int k=0 ; k<this->n_frames ; ++k)
       {
           std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << _model.frames[k].name << std::setw(10) << _data.oMf[k].translation().transpose() << std::endl;
       }

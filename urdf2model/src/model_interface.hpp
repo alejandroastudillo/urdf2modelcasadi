@@ -38,6 +38,7 @@ namespace mecali
       int                      n_q;
       int                      n_joints;
       int                      n_dof;
+      int                      n_frames;
 
       std::vector<std::string> joint_names;
       std::vector<std::string> joint_types;
@@ -47,12 +48,6 @@ namespace mecali
       Eigen::VectorXd          joint_pos_lb;
       Eigen::VectorXd          joint_vel_limit;
       Eigen::VectorXd          neutral_configuration;
-
-      // function variables
-      casadi::Function         aba;
-      casadi::Function         rnea;
-      casadi::Function         fk_pos;
-      casadi::Function         fk_rot;
 
       // METHODS
       void                     import_model(std::string filename);
@@ -77,7 +72,6 @@ namespace mecali
    private:
       // data variables
       int                      _n_bodies;
-      int                      _n_frames;
       Model                    _model;
       CasadiModel              _casadi_model;
   };

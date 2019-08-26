@@ -32,6 +32,7 @@ namespace mecali
   class Serial_Robot {
 
     public:
+      // VARIABLES
       // data variables
       std::string              name;
       int                      n_q;
@@ -53,7 +54,7 @@ namespace mecali
       casadi::Function         fk_pos;
       casadi::Function         fk_rot;
 
-      // methods
+      // METHODS
       void                     import_model(std::string filename);
       void                     import_model(std::string filename, bool verbose);
 
@@ -65,7 +66,9 @@ namespace mecali
       Eigen::VectorXd          randomConfiguration(std::vector<double> lower_bounds_v, std::vector<double> upper_bounds_v);
 
       // function methods
-
+      casadi::Function         forward_dynamics();
+      casadi::Function         inverse_dynamics();
+      casadi::Function         forward_kinematics(std::string content, std::vector<std::string> frame_names);
 
 
    private:

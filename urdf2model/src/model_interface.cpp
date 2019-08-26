@@ -25,7 +25,7 @@ namespace mecali
 {
   const double PI = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862;
 
-  void            Serial_Robot::import_model(std::string filename, bool verbose)
+  void              Serial_Robot::import_model(std::string filename, bool verbose)
   {
     // Pinocchio model
       Model         model;
@@ -73,12 +73,12 @@ namespace mecali
       // TODO: Check how to generate fk for any frame name
 
   }
-  void            Serial_Robot::import_model(std::string filename)
+  void              Serial_Robot::import_model(std::string filename)
   {
     bool          verbose = false;                                   // verbose can be omitted from the buildModel execution: <pinocchio::urdf::buildModel(filename,model)>
     this->import_model(filename,verbose);
   }
-  Eigen::VectorXd Serial_Robot::randomConfiguration()
+  Eigen::VectorXd   Serial_Robot::randomConfiguration()
   {
     Eigen::VectorXd lb_model = this->joint_pos_lb;
     Eigen::VectorXd ub_model = this->joint_pos_ub; // In this function, lb and ub size = n_q
@@ -118,7 +118,7 @@ namespace mecali
       return this->randomConfiguration(lb_model, ub_model);
     }
   }
-  Eigen::VectorXd Serial_Robot::randomConfiguration(Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds)
+  Eigen::VectorXd   Serial_Robot::randomConfiguration(Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds)
   {
     // QUESTION Should these lower and upper bounds be compared with this->joint_pos_lb and this->joint_pos_ub?
 
@@ -188,7 +188,7 @@ namespace mecali
     }
     return randConfig;
   }
-  Eigen::VectorXd Serial_Robot::randomConfiguration(std::vector<double> lower_bounds_v, std::vector<double> upper_bounds_v)
+  Eigen::VectorXd   Serial_Robot::randomConfiguration(std::vector<double> lower_bounds_v, std::vector<double> upper_bounds_v)
   {
     // Assert that both the lower_bounds and upper_bounds vectors are of length equal to n_dof.
     custom_assert(lower_bounds_v.size() == this->n_dof && upper_bounds_v.size() == this->n_dof, "Error in " + std::string(__FUNCTION__) + "(): Lower and upper bound vectors must be of length equal to n_dof.");
@@ -198,7 +198,7 @@ namespace mecali
 
     return this->randomConfiguration(lb, ub);
   }
-  void            Serial_Robot::print_model_data()
+  void              Serial_Robot::print_model_data()
   {
       std::cout << "\n----- Robot model information: " << std::endl;
       print_indent("Model name = ",                         this->name,               38);
@@ -236,7 +236,126 @@ namespace mecali
           std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << _model.frames[k].name << std::setw(10) << _data.oMf[k].translation().transpose() << std::endl;
       }
   }
+  casadi::Function  Serial_Robot::forward_dynamics()
+  {
+      CasadiData casadi_data( this->_casadi_model );
 
+      return get_forward_dynamics( this->_casadi_model, casadi_data );
+  }
+  casadi::Function  Serial_Robot::inverse_dynamics()
+  {
+      CasadiData casadi_data( this->_casadi_model );
+
+      return get_inverse_dynamics( this->_casadi_model, casadi_data );
+  }
+  casadi::Function  Serial_Robot::forward_kinematics(std::string content, std::vector<std::string> frame_names)
+  {
+      CasadiData casadi_data( this->_casadi_model );
+
+      int        n_req_frames = frame_names.size();
+
+      std::vector<CasadiScalar> func_outputs;
+
+      CasadiScalar        q_sx = casadi::SX::sym("q", this->_casadi_model.nq);
+      ConfigVectorCasadi  q_casadi(this->_casadi_model.nq);
+      pinocchio::casadi::copy( q_sx, q_casadi );
+
+      // Call the forward kinematics function
+      pinocchio::forwardKinematics(     this->_casadi_model,   casadi_data,    q_casadi);
+      pinocchio::updateFramePlacements(this->_casadi_model,   casadi_data);
+
+      int frame_idx;
+
+      if (content.compare("position") == 0)
+      {
+          std::cout << "requesting FK position" << std::endl;
+
+          CasadiScalar  pos_sx(3,1);
+
+          for (int i = 0; i < n_req_frames; i++)
+          {
+              // get frame index
+              frame_idx = this->_casadi_model.getFrameId(frame_names[i]);
+              std::cout << "The frame with name: " << frame_names[i] << " has an index number: " << frame_idx << std::endl;
+
+              // get the result (translation vector) from FK
+              pinocchio::casadi::copy( casadi_data.oMf[frame_idx].translation(), pos_sx );
+
+              // fill the output vector of the function
+              func_outputs.insert(func_outputs.end(), pos_sx);
+          }
+
+          return casadi::Function( "fk_pos", casadi::SXVector {q_sx}, func_outputs );
+      }
+      else if (content.compare("rotation") == 0)
+      {
+          std::cout << "requesting FK rotation" << std::endl;
+
+          CasadiScalar rot_sx(3,3);
+
+          for (int i = 0; i < n_req_frames; i++)
+          {
+              // get frame index
+              frame_idx = this->_casadi_model.getFrameId(frame_names[i]);
+              std::cout << "The frame with name: " << frame_names[i] << " has an index number: " << frame_idx << std::endl;
+
+              // get the result (rotation matrix) from FK
+              for(Eigen::DenseIndex i = 0; i < 3; ++i)
+              {
+                for(Eigen::DenseIndex j = 0; j < 3; ++j)
+                {
+                  rot_sx(i,j) = casadi_data.oMf[frame_idx].rotation()(i,j);
+                }
+              }
+              // TODO: Create function in common.hpp to copy rotation matrix
+
+              // fill the output vector of the function
+              func_outputs.insert(func_outputs.end(), rot_sx);
+          }
+
+          return casadi::Function( "fk_rot", casadi::SXVector {q_sx}, func_outputs );
+
+      }
+      else if (content.compare("transformation") == 0)
+      {
+          std::cout << "requesting FK full" << std::endl;
+
+          CasadiScalar T_sx(4,4);
+
+          for (int i = 0; i < n_req_frames; i++)
+          {
+              // get frame index
+              frame_idx = this->_casadi_model.getFrameId(frame_names[i]);
+              std::cout << "The frame with name: " << frame_names[i] << " has an index number: " << frame_idx << std::endl;
+
+              // get the result (transformation matrix) from FK
+              for(Eigen::DenseIndex i = 0; i < 3; ++i)
+              {
+                for(Eigen::DenseIndex j = 0; j < 3; ++j)
+                {
+                  T_sx(i,j) = casadi_data.oMf[frame_idx].rotation()(i,j);
+                }
+              }
+              T_sx(0,3) = casadi_data.oMf[frame_idx].translation()(0);
+              T_sx(1,3) = casadi_data.oMf[frame_idx].translation()(1);
+              T_sx(2,3) = casadi_data.oMf[frame_idx].translation()(2);
+              T_sx(3,0) = 0;
+              T_sx(3,1) = 0;
+              T_sx(3,2) = 0;
+              T_sx(3,3) = 1;
+
+              // fill the output vector of the function
+              func_outputs.insert(func_outputs.end(), T_sx);
+          }
+
+          return casadi::Function( "fk_T", casadi::SXVector {q_sx}, func_outputs );
+      }
+      else
+      {
+          throw std::invalid_argument("There is no option \'" + content + "\' for type of forward kinematics");
+      }
+
+  }
 }
 //       // Copy Casadi to EIGEN
 //       // casadi::SX cs_mat = casadi::SX::sym("A", 3, 4);

@@ -1,7 +1,5 @@
 #include "forward_kinematics.hpp"
 
-// TODO: Allow the user to request a fk function with all desired outputs (where the user must input an array of strings containing the frame names)
-
 namespace mecali
 {
   casadi::Function get_forward_kinematics_position(CasadiModel &cas_model, CasadiData &cas_data, std::string frame_name)

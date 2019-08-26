@@ -44,12 +44,14 @@ BOOST_AUTO_TEST_CASE(FK_pinocchio_casadi)
     std::vector<double> q_vec((size_t)model.nq);
     Eigen::Map<mecali::ConfigVector>( q_vec.data(), model.nq, 1 ) = q_home;
 
-    casadi::DM pos_res = robot_model.fk_pos(casadi::DMVector {q_vec})[0];
-    casadi::DM rot_res = robot_model.fk_rot(casadi::DMVector {q_vec})[0];
+    casadi::Function fk_pos = robot_model.forward_kinematics("position","EndEffector_Link");
+    casadi::Function fk_rot = robot_model.forward_kinematics("rotation","EndEffector_Link");
+
+    casadi::DM pos_res = fk_pos(casadi::DMVector {q_vec})[0];
+    casadi::DM rot_res = fk_rot(casadi::DMVector {q_vec})[0];
 
     mecali::Data::TangentVectorType pos_mat = Eigen::Map<mecali::Data::TangentVectorType>(static_cast< std::vector<double> >(pos_res).data(), 3,1);
     Eigen::MatrixXd                 rot_mat = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(rot_res).data(), 3,3);
-
 
   // Check
     BOOST_CHECK(pos_mat.isApprox(data.oMf[EE_idx].translation()));
@@ -58,7 +60,7 @@ BOOST_AUTO_TEST_CASE(FK_pinocchio_casadi)
 
 BOOST_AUTO_TEST_CASE(ABA_pinocchio_casadi)
 {
-// Instantiate model and data objects
+  // Instantiate model and data objects
     mecali::Model         model;                                        // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1ModelTpl.html
     mecali::Data          data = pinocchio::Data(model);                // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1DataTpl.html
 
@@ -89,7 +91,9 @@ BOOST_AUTO_TEST_CASE(ABA_pinocchio_casadi)
     std::vector<double> tau_vec((size_t)model.nv);
     Eigen::Map<mecali::TangentVector>(tau_vec.data(),model.nv,1) = tau_home;
 
-    casadi::DM ddq_res = robot_model.aba(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
+    casadi::Function aba = robot_model.forward_dynamics();
+
+    casadi::DM ddq_res = aba(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
 
     mecali::Data::TangentVectorType ddq_mat = Eigen::Map<mecali::Data::TangentVectorType>(static_cast< std::vector<double> >(ddq_res).data(), model.nv,1);
 
@@ -99,7 +103,7 @@ BOOST_AUTO_TEST_CASE(ABA_pinocchio_casadi)
 
 BOOST_AUTO_TEST_CASE(RNEA_pinocchio_casadi)
 {
-// Instantiate model and data objects
+  // Instantiate model and data objects
     mecali::Model         model;                                        // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1ModelTpl.html
     mecali::Data          data = pinocchio::Data(model);                // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1DataTpl.html
 
@@ -109,7 +113,7 @@ BOOST_AUTO_TEST_CASE(RNEA_pinocchio_casadi)
   // initialize the data structure for the model
     data = pinocchio::Data(model);
 
-// Recursive Newton-Euler algorithm (inverse dynamics) test with robot's home configuration
+  // Recursive Newton-Euler algorithm (inverse dynamics) test with robot's home configuration
   // Pinocchio
     mecali::ConfigVector  q_home = pinocchio::neutral(model);  // pinocchio::randomConfiguration(model);
     mecali::TangentVector v_home(Eigen::VectorXd::Zero(model.nv));
@@ -130,7 +134,9 @@ BOOST_AUTO_TEST_CASE(RNEA_pinocchio_casadi)
     std::vector<double> a_vec((size_t)model.nv);
     Eigen::Map<mecali::TangentVector>(a_vec.data(),model.nv,1) = a_home;
 
-    casadi::DM tau_res = robot_model.rnea(casadi::DMVector {q_vec, v_vec, a_vec})[0];
+    casadi::Function rnea = robot_model.inverse_dynamics();
+
+    casadi::DM tau_res = rnea(casadi::DMVector {q_vec, v_vec, a_vec})[0];
 
     mecali::Data::TangentVectorType tau_mat = Eigen::Map<mecali::Data::TangentVectorType>(static_cast< std::vector<double> >(tau_res).data(),model.nv,1);
 

@@ -24,7 +24,7 @@
 
 /*
 TODO Check how to include code_generation as a public method in class Serial_Robot: follow the save example https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp
-TODO Add rotation matrix, jacobians, and derivatives to Serial_Robot
+TODO Add jacobians and derivatives to Serial_Robot
 */
 
 namespace mecali

@@ -7,8 +7,8 @@
 int main(int argc, char ** argv)
 {
     // Example with robot urdf passed as argument, or Kinova Gen3 by default.
-      //std::string urdf_filename = (argc<=1) ? "../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf" : argv[1];
-      std::string urdf_filename = "../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf";
+      std::string urdf_filename = (argc<=1) ? "../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf" : argv[1];
+      // std::string urdf_filename = "../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf";
         // ../urdf2model/models/kortex_description/urdf/JACO3_URDF_V10rev.urdf
         // ../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf
         // ../urdf2model/models/iiwa_description/urdf/iiwa14.urdf

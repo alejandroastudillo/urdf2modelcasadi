@@ -1,10 +1,6 @@
 #include <casadi/casadi.hpp>
 #include "model_interface.hpp"
-#include "utils/debug_functions.hpp"
 
-/*  NOTE: With the following code, you can look for any file containint "text" in ../ : grep -inr "text" ../
-    TODO: Create more examples (let this be a really simple one)
-*/
 int main(int argc, char ** argv)
 {
     // Example with Kinova Gen3 URDF.
@@ -41,7 +37,12 @@ int main(int argc, char ** argv)
       casadi::Function fk_pos_oneframe_by_index  = robot_model.forward_kinematics("position", 18);
 
     // Test a function with numerical values
-      // Create a std::vector<double> of size robot_model.n_q (take care in case there are continuous joints in your model)
+      /* Create a std::vector<double> of size robot_model.n_q (take care in case there are continuous joints in your model)
+
+         For the Kinova Gen3 robot n_dof = 7, but n_q = 11, since {q1. q3. q5. q7} are continuous (unbounded) joints.
+         Continuous joints are not represented just by q_i, but by [cos(q_i), sin(q_i)].
+         The configuration vector is then set as: [cos(q1), sin(q1), q2, cos(q3), sin(q3), q4, cos(q5), sin(q5), q6, cos(q7), sin(q7)]
+      */
       std::vector<double> q_vec = {0.86602540378, 0.5, 0, 1, 0, -0.45, 1, 0, 0, 1, 0};
       // Evaluate the function with a casadi::DMVector containing q_vec as input
       casadi::DM pos_res = fk_pos_oneframe_by_name(casadi::DMVector {q_vec})[0];
@@ -61,9 +62,9 @@ int main(int argc, char ** argv)
       std::cout << "Function result with q_vec_random input : " << pos_random  << std::endl;
 
     // Code-generate or save a function
-      // If not setting options, function fk_T_1 (or any function) will only be c-code-generated as "first_function.c" (or any other name you set)
+      // If not setting options, function fk_T_1 (or any function) will only be C-code-generated as "first_function.c" (or any other name you set)
       mecali::generate_code(fk_T_1, "first_function");
-      // If you use options, you can set if you want to C-code-generate the function, or just save it as "my_function_T.casadi" (which can be loaded afterwards using casadi::Function::load("my_function_T.casadi"))
+      // If you use options, you can set if you want to C-code-generate the function, or just save it as "second_function.casadi" (which can be loaded afterwards using casadi::Function::load("second_function.casadi"))
       mecali::Dictionary codegen_options;
       codegen_options["c"]=false;
       codegen_options["save"]=true;

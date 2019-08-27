@@ -279,6 +279,7 @@ namespace mecali
       {
           std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << _model.frames[k].name << std::setw(10) << _data.oMf[k].translation().transpose() << std::endl;
       }
+      std::cout << std::endl;
   }
 
 }

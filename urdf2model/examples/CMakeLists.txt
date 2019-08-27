@@ -10,6 +10,7 @@ include_directories(${CASADI_DIR}/include)
 include_directories(${SRC_DIR})
 
 # Adds an executable target to be built from the source files listed after it
+# Basic example
 add_executable( basic_example
                 basic_example.cpp
               )
@@ -18,3 +19,12 @@ target_link_libraries( basic_example
                        ${PROJECT_NAME}
                        ${CASADI_LIB}
                      )
+# Complete example
+add_executable( complete_example
+               complete_example.cpp
+             )
+target_link_libraries( complete_example
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                    )

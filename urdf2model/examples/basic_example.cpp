@@ -2,119 +2,71 @@
 #include "model_interface.hpp"
 #include "utils/debug_functions.hpp"
 
-// NOTE: With the following code, you can look for any file containint "text" in ../ : grep -inr "text" ../
-
+/*  NOTE: With the following code, you can look for any file containint "text" in ../ : grep -inr "text" ../
+    TODO: Create more examples (let this be a really simple one)
+*/
 int main(int argc, char ** argv)
 {
-    // Example with robot urdf passed as argument, or Kinova Gen3 by default.
-      std::string urdf_filename = (argc<=1) ? "../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf" : argv[1];
-      // std::string urdf_filename = "../urdf2model/models/yumi/urdf/yumi.urdf";
-        // ../urdf2model/models/kortex_description/urdf/JACO3_URDF_V10rev.urdf
-        // ../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf
-        // ../urdf2model/models/iiwa_description/urdf/iiwa14.urdf
-        // ../urdf2model/models/abb_common/urdf/irb120.urdf
-        // ../urdf2model/models/yumi/urdf/yumi.urdf
+    // Example with Kinova Gen3 URDF.
+      std::string urdf_filename = "../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf";
 
+    // Instantiate a Serial_Robot object called robot_model
       mecali::Serial_Robot robot_model;
+    // Create the model based on a URDF file
       robot_model.import_model(urdf_filename);
 
-      std::cout << "robot_model name: " << robot_model.name << std::endl;
-
-
-      // #ifdef DEBUG
+    // Print some information related to the imported model (boundaries, frames, DoF, etc)
       robot_model.print_model_data();
-      // #endif
 
-      // Set functions
-        casadi::Function aba    = robot_model.forward_dynamics();
-        casadi::Function rnea   = robot_model.inverse_dynamics();
-        // casadi::Function fk_pos = robot_model.forward_kinematics("position","EndEffector_Link");
-        casadi::Function fk_pos = robot_model.forward_kinematics("position",robot_model.n_frames-1);
-        casadi::Function fk_rot = robot_model.forward_kinematics("rotation",robot_model.n_frames-1);
-        casadi::Function fk_T   = robot_model.forward_kinematics("transformation");
+    // Set function for forward dynamics
+      casadi::Function fwd_dynamics = robot_model.forward_dynamics();
+    // Set function for inverse dynamics
+      casadi::Function inv_dynamics = robot_model.inverse_dynamics();
+    // Set function for forward kinematics
+      // The forward kinematics function can be set in multiple ways
+      // Calling forward_kinematics without any argument generates a function which outputs a transformation matrix for each frame in the robot.
+      casadi::Function fk_T_1 = robot_model.forward_kinematics();
+      // The first optional argument refers to the content of the output function: it can be set to be "position", "rotation", or "transformation"
+      // Setting the first argument as "transformation" is just the same as not including any argument: outputs a 4x4 T matrix for each frame.
+      casadi::Function fk_T_2 = robot_model.forward_kinematics("transformation");
+      // Setting the first argument as "position" means that the function is going to output a 3x1 position vector for each frame.
+      casadi::Function fk_pos = robot_model.forward_kinematics("position");
+      // Setting the first argument as "rotation" means that the function is going to output a 3x3 rotation matrix for each frame.
+      casadi::Function fk_rot = robot_model.forward_kinematics("rotation");
 
-        // casadi::Function fk_pos_multiFrames_byString  = robot_model.forward_kinematics("position",std::vector<std::string>{"EndEffector_Link", "Actuator5", "Actuator2"});
-        // casadi::Function fk_pos_multiFrames_byInt     = robot_model.forward_kinematics("position",std::vector<int>{18, 11, 5});
+      // You can also generate a F.K. function for specific frames (using the frame name or index, which you can see after executing "robot_model.print_model_data()"" )
+      casadi::Function fk_T_multiframes_by_name  = robot_model.forward_kinematics("transformation", std::vector<std::string>{"EndEffector_Link", "Actuator5", "Shoulder_Link"});
+      casadi::Function fk_T_multiframes_by_index = robot_model.forward_kinematics("transformation", std::vector<int>{18, 11, 4});
+      casadi::Function fk_pos_oneframe_by_name   = robot_model.forward_kinematics("position", "EndEffector_Link");
+      casadi::Function fk_pos_oneframe_by_index  = robot_model.forward_kinematics("position", 18);
 
-        casadi::Function fk_pos_allframes = robot_model.forward_kinematics("position");
-        casadi::Function fk_rot_allframes = robot_model.forward_kinematics("rotation");
-        casadi::Function fk_T_allframes   = robot_model.forward_kinematics("transformation");
-        // std::vector<std::string> required_Frames = {"yumi_body",
-        //     "yumi_link_1_l", "yumi_link_2_l", "yumi_link_3_l", "yumi_link_4_l", "yumi_link_5_l", "yumi_link_6_l", "yumi_link_7_l",
-        //     "gripper_l_base", "gripper_l_finger_r", "gripper_l_finger_l",
-        //     "yumi_link_1_r", "yumi_link_2_r", "yumi_link_3_r", "yumi_link_4_r", "yumi_link_5_r", "yumi_link_6_r", "yumi_link_7_r",
-        //     "gripper_r_base", "gripper_r_finger_r", "gripper_r_finger_l" };
-        //
-        // casadi::Function fk_pos_allframes = robot_model.forward_kinematics("position", required_Frames);
-        // casadi::Function fk_rot_allframes = robot_model.forward_kinematics("rotation", required_Frames);
-        // casadi::Function fk_T_allframes   = robot_model.forward_kinematics("transformation", required_Frames);
+    // Test a function with numerical values
+      // Create a std::vector<double> of size robot_model.n_q (take care in case there are continuous joints in your model)
+      std::vector<double> q_vec = {0.86602540378, 0.5, 0, 1, 0, -0.45, 1, 0, 0, 1, 0};
+      // Evaluate the function with a casadi::DMVector containing q_vec as input
+      casadi::DM pos_res = fk_pos_oneframe_by_name(casadi::DMVector {q_vec})[0];
+      std::cout << "Function result with q_vec input        : " << pos_res << std::endl;
 
-        std::cout << "Position all frames: \n" << fk_pos_allframes << std::endl;
+      // You can also use robot's neutral configuration or any random configuration as input
+      std::vector<double> q_vec_neutral((size_t)robot_model.n_q);
+      Eigen::Map<mecali::ConfigVector>( q_vec_neutral.data(), robot_model.n_q, 1 ) = robot_model.neutral_configuration; // Populate q_vec_neutral with the robot's neutral configuration
 
-      // Test functions
-        std::vector<double> q_vec((size_t)robot_model.n_q);
-        Eigen::Map<mecali::ConfigVector>( q_vec.data(), robot_model.n_q, 1 ) = robot_model.neutral_configuration; // Populate q_vec with the robot's neutral configuration
-        // std::vector<double> q_vec = {0.86602540378, 0.5, 0, 1, 0, -0.45, 1, 0, 0, 1, 0};
-        std::vector<double> v_vec((size_t)robot_model.n_dof);
-        Eigen::Map<mecali::TangentVector>(v_vec.data(),robot_model.n_dof,1) = Eigen::VectorXd::Zero(robot_model.n_dof);
-        // std::vector<double> v_vec = {0, 0, 0, 0, 0, 0, 0};
-        std::vector<double> a_vec((size_t)robot_model.n_dof);
-        Eigen::Map<mecali::TangentVector>(a_vec.data(),robot_model.n_dof,1) = Eigen::VectorXd::Zero(robot_model.n_dof);
-        // std::vector<double> a_vec = {0, 0, 0, 0, 0, 0, 0};
-        std::vector<double> tau_vec((size_t)robot_model.n_dof);
-        Eigen::Map<mecali::TangentVector>(tau_vec.data(),robot_model.n_dof,1) = Eigen::VectorXd::Zero(robot_model.n_dof);
-        // std::vector<double> tau_vec = {0, 0, 0, 0, 0, 0, 0};
+      std::vector<double> q_vec_random((size_t)robot_model.n_q);
+      Eigen::Map<mecali::ConfigVector>( q_vec_random.data(), robot_model.n_q, 1 ) = robot_model.randomConfiguration(); // Populate q_vec_neutral with a random configuration
 
-        casadi::DM ddq_res = aba(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
-        casadi::DM tau_res = rnea(casadi::DMVector {q_vec, v_vec, a_vec})[0];
-        casadi::DM pos_res = fk_pos(casadi::DMVector {q_vec})[0];
-        casadi::DM rot_res = fk_rot(casadi::DMVector {q_vec})[0];
+      casadi::DM pos_neutral = fk_pos_oneframe_by_name(casadi::DMVector {q_vec_neutral})[0];
+      casadi::DM pos_random  = fk_pos_oneframe_by_name(casadi::DMVector {q_vec_random})[0];
 
-        std::cout << "ddq: " << ddq_res << std::endl;
-        std::cout << "tau: " << tau_res << std::endl;
-        std::cout << "EE_pos: " << pos_res << std::endl;
-        std::cout << "EE_rot: " << rot_res << std::endl;
-        std::cout << std::endl;
+      std::cout << "Function result with q_vec_neutral input: " << pos_neutral << std::endl;
+      std::cout << "Function result with q_vec_random input : " << pos_random  << std::endl;
 
-      // Generate random configurations
-        mecali::print_indent("Neutral configuration = ",            robot_model.neutral_configuration, 38);
-        mecali::print_indent("Random configuration = ",             robot_model.randomConfiguration(),  38);
-        mecali::print_indent("Random config. w/ custom bounds = ",  robot_model.randomConfiguration(-0.94159*Eigen::VectorXd::Ones(robot_model.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model.n_dof)), 38);
-
-      mecali::Dictionary opts1;
-      opts1["c"]=false;
-      opts1["save"]=true;
-      // mecali::generate_code(aba,"kin3_aba",opts1);
-      // mecali::generate_code(rnea,"kin3_rnea",opts1);
-      // mecali::generate_code(fk_pos,"kin3_fk_pos",opts1);
-      mecali::generate_code(fk_pos_allframes,robot_model.name+"_fk_pos",opts1);
-      mecali::generate_code(fk_rot_allframes,robot_model.name+"_fk_rot",opts1);
-      mecali::generate_code(fk_T_allframes,robot_model.name+"_fk_T",opts1);
-
-
-    // // Example with another robot (ABB irb120)
-    //   mecali::Serial_Robot robot_model_abb;
-    //   robot_model_abb.import_model("../urdf2model/models/abb_common/urdf/irb120.urdf");
-    //
-    //   robot_model_abb.print_model_data();
-    //
-    //   mecali::print_indent("Neutral configuration = ",            robot_model_abb.neutral_configuration, 38);
-    //   mecali::print_indent("Random configuration = ",             robot_model_abb.randomConfiguration(),  38);
-    //   mecali::print_indent("Random config. w/ custom bounds = ",  robot_model_abb.randomConfiguration(-0.94159*Eigen::VectorXd::Ones(robot_model_abb.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model_abb.n_dof)),       38);
-    //   mecali::print_indent("Random config. w/ vector bounds = ",  robot_model_abb.randomConfiguration(std::vector<double>{-2, -2.2, -3.0, -2.4, -2.5, -2.6}, std::vector<double>{2.1, 2.2, 2.3, 2.4, 2.5, 2.6}), 38);
-    //
-    //   casadi::Function irb120_forward_dynamics = robot_model_abb.aba;
-    //   std::cout << "irb120 forward dynamics function: " << irb120_forward_dynamics << std::endl;
-    //
-    //   // mecali::Dictionary opts;
-    //   // opts["c"]=true;
-    //   // opts["save"]=true;
-    //   // mecali::generate_code(irb120_forward_dynamics,"abb_fd_ext",opts);
-    //   //
-    //   // std::cout << "irb120 forward dynamics function loaded: " << casadi::Function::load("abb_fd_ext.casadi") << std::endl;
-    //   std::cout << "#########################################################" << std::endl;
-    //   mecali::Serial_Robot robot_model_abb_2;
-    //   robot_model_abb_2.import_model("../urdf2model/models/abb_common/urdf/irb120.urdf",true);
-
+    // Code-generate or save a function
+      // If not setting options, function fk_T_1 (or any function) will only be c-code-generated as "first_function.c" (or any other name you set)
+      mecali::generate_code(fk_T_1, "first_function");
+      // If you use options, you can set if you want to C-code-generate the function, or just save it as "my_function_T.casadi" (which can be loaded afterwards using casadi::Function::load("my_function_T.casadi"))
+      mecali::Dictionary codegen_options;
+      codegen_options["c"]=false;
+      codegen_options["save"]=true;
+      mecali::generate_code(fk_T_multiframes_by_name, "second_function", codegen_options);
 
 }

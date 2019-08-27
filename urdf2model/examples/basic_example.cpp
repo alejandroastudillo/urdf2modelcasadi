@@ -1,7 +1,7 @@
 #include <casadi/casadi.hpp>
 #include "model_interface.hpp"
 
-int main(int argc, char ** argv)
+int main()
 {
     // Example with Kinova Gen3 URDF.
       std::string urdf_filename = "../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf";

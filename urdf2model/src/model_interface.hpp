@@ -25,6 +25,7 @@
 /*
 TODO Check how to include code_generation as a public method in class Serial_Robot: follow the save example https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp
 TODO Add jacobians and derivatives to Serial_Robot
+QUESTION Should the Serial_Robot class be renamed as Robot, Rigid_Body_Chain, Robot_Model? (It is not just for serial robots anymore)
 */
 
 namespace mecali

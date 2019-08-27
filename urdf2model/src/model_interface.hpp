@@ -22,38 +22,62 @@
 #include "functions/code_generation.hpp"
 #include "functions/common.hpp"
 
+/*
+TODO Check how to include code_generation as a public method in class Serial_Robot: follow the save example https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp
+TODO Add jacobians and derivatives to Serial_Robot
+QUESTION Should the Serial_Robot class be renamed as Robot, Rigid_Body_Chain, Robot_Model? (It is not just for serial robots anymore)
+*/
+
 namespace mecali
 {
+  class Serial_Robot {
 
-  struct Serial_Robot {
-     std::string              name;
-     int                      n_q;
-     int                      n_joints;
-     int                      n_dof;
-     int                      n_bodies;
-     int                      n_frames;
-     std::vector<std::string> joint_names;
-     Eigen::VectorXd          gravity;          // Eigen::Vector3d
-     Eigen::VectorXd          joint_torque_limit;
-     Eigen::VectorXd          joint_pos_ub;
-     Eigen::VectorXd          joint_pos_lb;
-     Eigen::VectorXd          joint_vel_limit;
-     Eigen::VectorXd          neutral_configuration;
-     std::vector<std::string> joint_types;
-     casadi::Function         aba;
-     casadi::Function         rnea;
-     casadi::Function         fk_pos;
-     casadi::Function         fk_rot;
-     // TODO: Add rotation matrix, jacobians, and derivatives
+    public:
+      // VARIABLES
+      // data variables
+      std::string              name;
+      int                      n_q;
+      int                      n_joints;
+      int                      n_dof;
+      int                      n_frames;
+
+      std::vector<std::string> joint_names;
+      std::vector<std::string> joint_types;
+      Eigen::VectorXd          gravity;          // Eigen::Vector3d
+      Eigen::VectorXd          joint_torque_limit;
+      Eigen::VectorXd          joint_pos_ub;
+      Eigen::VectorXd          joint_pos_lb;
+      Eigen::VectorXd          joint_vel_limit;
+      Eigen::VectorXd          neutral_configuration;
+
+      // METHODS
+      void                     import_model(std::string filename);
+      void                     import_model(std::string filename, bool verbose);
+
+      // random configuration methods
+      Eigen::VectorXd          randomConfiguration();
+      Eigen::VectorXd          randomConfiguration(Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds);
+      Eigen::VectorXd          randomConfiguration(std::vector<double> lower_bounds_v, std::vector<double> upper_bounds_v);
+
+      // function methods
+      casadi::Function         forward_dynamics();
+      casadi::Function         inverse_dynamics();
+      casadi::Function         forward_kinematics(std::string content, std::vector<std::string> frame_names);
+      casadi::Function         forward_kinematics(std::string content, std::vector<int> frame_indices);
+      casadi::Function         forward_kinematics(std::string content, std::string frame_name);
+      casadi::Function         forward_kinematics(std::string content, int frame_index);
+      casadi::Function         forward_kinematics(std::string content);
+      casadi::Function         forward_kinematics();
+
+      // debug methods
+      void                     print_model_data();
+
+   private:
+      // data variables
+      int                      _n_bodies;
+      Model                    _model;
+      CasadiModel              _casadi_model;
   };
-
-  Serial_Robot generate_model(std::string filename);
-
-  Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model);
-  Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model, Eigen::VectorXd lower_bounds, Eigen::VectorXd upper_bounds);
-  Eigen::VectorXd randomConfiguration(Serial_Robot& rob_model, std::vector<double> lower_bounds_v, std::vector<double> upper_bounds_v);
-
-  void print_model_data(Serial_Robot robot_info);
 
 }
 

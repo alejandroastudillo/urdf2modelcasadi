@@ -17,6 +17,7 @@
       # ls | grep -v configure.sh | xargs rm -r # deletes everything, except configure.sh
       #rm -rf CMakeFiles
       #rm *.so Makefile urdf2model_casadi *.cmake
+      printf "   CMakeCache.txt removed\n"
   fi
 
 # Execute the cmake command, assigning the variable reference values (CASADI_DIR, PINOCCHIO_INC, EIGEN_INC).

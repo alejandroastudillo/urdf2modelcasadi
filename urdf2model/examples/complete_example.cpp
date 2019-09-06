@@ -35,7 +35,7 @@ int main(int argc, char ** argv)
         casadi::Function fk_rot = robot_model.forward_kinematics("rotation",robot_model.n_frames-1);
         casadi::Function fk_T   = robot_model.forward_kinematics("transformation");
 
-        casadi::Function fk_pos_multiFrames_byString  = robot_model.forward_kinematics("transformation",std::vector<std::string>{"EndEffector_Link", "Actuator5", "Actuator2"});
+        // casadi::Function fk_pos_multiFrames_byString  = robot_model.forward_kinematics("transformation",std::vector<std::string>{"EndEffector_Link", "Actuator5", "Actuator2"});
         // casadi::Function fk_pos_multiFrames_byInt     = robot_model.forward_kinematics("position",std::vector<int>{18, 11, 5});
 
         casadi::Function fk_pos_allframes = robot_model.forward_kinematics("position");
@@ -72,50 +72,11 @@ int main(int argc, char ** argv)
         casadi::DM pos_res = fk_pos(casadi::DMVector {q_vec})[0];
         casadi::DM rot_res = fk_rot(casadi::DMVector {q_vec})[0];
 
-        std::cout << "ddq: " << ddq_res << std::endl;
-        std::cout << "tau: " << tau_res << std::endl;
-        std::cout << "EE_pos: " << pos_res << std::endl;
-        std::cout << "EE_rot: " << rot_res << std::endl;
-        std::cout << std::endl;
 
-      // Generate random configurations
-        mecali::print_indent("Neutral configuration = ",            robot_model.neutral_configuration, 38);
-        mecali::print_indent("Random configuration = ",             robot_model.randomConfiguration(), 38);
-        mecali::print_indent("Random config. w/ custom bounds = ",  robot_model.randomConfiguration(-0.94159*Eigen::VectorXd::Ones(robot_model.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model.n_dof)), 38);
 
-      mecali::Dictionary opts1;
-      opts1["c"]=false;
-      opts1["save"]=true;
-      // mecali::generate_code(aba,"kin3_aba",opts1);
-      // mecali::generate_code(rnea,"kin3_rnea",opts1);
-      // mecali::generate_code(fk_pos,"kin3_fk_pos",opts1);
-      mecali::generate_code(fk_pos_allframes,robot_model.name+"_fk_pos",opts1);
-      mecali::generate_code(fk_rot_allframes,robot_model.name+"_fk_rot",opts1);
-      mecali::generate_code(fk_T_allframes,robot_model.name+"_fk_T",opts1);
 
-    // // Example with another robot (ABB irb120)
-    //   mecali::Serial_Robot robot_model_abb;
-    //   robot_model_abb.import_model("../urdf2model/models/abb_common/urdf/irb120.urdf");
-    //
-    //   robot_model_abb.print_model_data();
-    //
-    //   mecali::print_indent("Neutral configuration = ",            robot_model_abb.neutral_configuration, 38);
-    //   mecali::print_indent("Random configuration = ",             robot_model_abb.randomConfiguration(),  38);
-    //   mecali::print_indent("Random config. w/ custom bounds = ",  robot_model_abb.randomConfiguration(-0.94159*Eigen::VectorXd::Ones(robot_model_abb.n_dof), 0.94159*Eigen::VectorXd::Ones(robot_model_abb.n_dof)),       38);
-    //   mecali::print_indent("Random config. w/ vector bounds = ",  robot_model_abb.randomConfiguration(std::vector<double>{-2, -2.2, -3.0, -2.4, -2.5, -2.6}, std::vector<double>{2.1, 2.2, 2.3, 2.4, 2.5, 2.6}), 38);
-    //
-    //   casadi::Function irb120_forward_dynamics = robot_model_abb.aba;
-    //   std::cout << "irb120 forward dynamics function: " << irb120_forward_dynamics << std::endl;
-    //
-    //   // mecali::Dictionary opts;
-    //   // opts["c"]=true;
-    //   // opts["save"]=true;
-    //   // mecali::generate_code(irb120_forward_dynamics,"abb_fd_ext",opts);
-    //   //
-    //   // std::cout << "irb120 forward dynamics function loaded: " << casadi::Function::load("abb_fd_ext.casadi") << std::endl;
-    //   std::cout << "#########################################################" << std::endl;
-    //   mecali::Serial_Robot robot_model_abb_2;
-    //   robot_model_abb_2.import_model("../urdf2model/models/abb_common/urdf/irb120.urdf",true);
+
+
 
 
 }

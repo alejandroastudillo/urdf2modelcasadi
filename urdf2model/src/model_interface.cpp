@@ -259,7 +259,7 @@ namespace mecali
       std::cout << std::endl;
 
       // std::cout << "\n----- Placement of each joint in the model: " << std::endl;
-      std::cout << "\n-----Name of each joint in the model: " << std::endl;
+      std::cout << "-----Name of each joint in the model: " << std::endl;
       for (int k=0 ; k<this->n_joints ; ++k)
       {
           std::cout << std::setprecision(3) << std::left << std::setw(5) <<  k  << std::setw(20) << this->joint_names[k] << std::setw(10) << std::endl; // << data.oMi[k].translation().transpose()

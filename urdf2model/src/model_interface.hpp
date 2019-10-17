@@ -33,6 +33,9 @@ namespace mecali
   class Serial_Robot {
 
     public:
+      // Constructor
+      Serial_Robot();
+      
       // VARIABLES
       // data variables
       std::string              name;
@@ -79,6 +82,13 @@ namespace mecali
       CasadiModel              _casadi_model;
   };
 
+}
+
+extern "C" {
+    mecali::Serial_Robot* Serial_Robot_new();
+    // void SR_import_model(Serial_Robot* robot_model);
+    void import_model_new(mecali::Serial_Robot* robot_model, std::string filename);
+    std::string name_new(mecali::Serial_Robot* robot_model);
 }
 
 #endif // PINOCCHIO_INTERFACE_H_INCLUDED

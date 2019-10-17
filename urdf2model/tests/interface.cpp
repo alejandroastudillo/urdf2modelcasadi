@@ -142,4 +142,27 @@ BOOST_AUTO_TEST_CASE(RNEA_pinocchio_casadi)
 
   // Check
     BOOST_CHECK(tau_mat.isApprox(data.tau));
+
+  // -----------------------------------------------------------------------
+  // Joint torque regressor test with robot's home configuration -----------
+  // -----------------------------------------------------------------------
+  // Pinocchio
+    mecali::Data          data_jtr = pinocchio::Data(model);
+    pinocchio::computeJointTorqueRegressor(model,data_jtr,q_home,v_home,a_home);
+
+  // Interface
+    casadi::Function regressor = robot_model.joint_torque_regressor();
+    casadi::DM reg_res = regressor(casadi::DMVector {q_vec, v_vec, a_vec})[0];
+    Eigen::MatrixXd reg_mat = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(reg_res).data(),robot_model.n_dof,10*robot_model.n_dof);
+
+    Eigen::VectorXd tau_regressor_mat = reg_mat * robot_model.barycentric_params;
+  // Check
+    BOOST_CHECK(reg_mat.isApprox(data_jtr.jointTorqueRegressor));
+    BOOST_CHECK(tau_regressor_mat.isApprox(data.tau));
+
+  // -----------------------------------------------------------------------
+  // Naive inverse dynamics test with robot's home configuration -----------
+  // -----------------------------------------------------------------------
+  // TODO : Implement this test
+
 }

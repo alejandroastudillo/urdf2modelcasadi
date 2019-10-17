@@ -30,7 +30,9 @@ int main()
 
       casadi::Function coriolis = robot_model.coriolis_matrix();
 
-      casadi::Function mass = robot_model.mass_inverse_matrix();
+      casadi::Function mass_inverse = robot_model.mass_inverse_matrix();
+
+      casadi::Function regressor = robot_model.joint_torque_regressor();
 
       // Test functions
       std::vector<double> q_vec((size_t)robot_model.n_q);
@@ -43,36 +45,34 @@ int main()
       Eigen::Map<mecali::TangentVector>(a_vec.data(),robot_model.n_dof,1) = Eigen::VectorXd::Zero(robot_model.n_dof);
 
 
-        casadi::DM tau_res = inv_dynamics(casadi::DMVector {q_vec, v_vec, a_vec})[0];
-        casadi::DM g_res = gravity(casadi::DMVector {q_vec})[0];
-        casadi::DM Minv_res = mass(casadi::DMVector {q_vec})[0];
-        casadi::DM cor_res = coriolis(casadi::DMVector {q_vec, v_vec})[0];
+      casadi::DM tau_res = inv_dynamics(casadi::DMVector {q_vec, v_vec, a_vec})[0];
+      casadi::DM g_res = gravity(casadi::DMVector {q_vec})[0];
+      casadi::DM Minv_res = mass_inverse(casadi::DMVector {q_vec})[0];
+      casadi::DM cor_res = coriolis(casadi::DMVector {q_vec, v_vec})[0];
+      casadi::DM reg_res = regressor(casadi::DMVector {q_vec, v_vec, a_vec})[0];
 
 
-        std::cout << "Tau: " << tau_res << std::endl;
-        std::cout << "g: " << g_res << std::endl;
-        std::cout << "Minv: " << Minv_res << std::endl;
-        std::cout << "cor: " << cor_res << std::endl;
+      std::cout << "Tau: " << tau_res << std::endl;
+      std::cout << "g: " << g_res << std::endl;
+      std::cout << "Minv: " << Minv_res << std::endl;
+      std::cout << "cor: " << cor_res << std::endl;
+      std::cout << "reg: " << reg_res << std::endl;
 
 
-        // CasadiScalar        q_sx = casadi::SX::sym("q", robot_model.n_q);
-        // CasadiScalar        v_sx = casadi::SX::sym("v", robot_model.n_dof);
-        // CasadiScalar        a_sx = casadi::SX::sym("a", robot_model.n_dof);
-        //
-        // CasadiScalar        taures_sx(robot_model.n_dof, 1);
-        // taures_sx = 1*a_sx;
-        //
-        // casadi::Function    inv_full ("inv_full", casadi::SXVector {q_sx, v_sx, a_sx}, casadi::SXVector {taures_sx});
     // ---------------------------------------------------------------------
     // Generate (or save) a function
     // ---------------------------------------------------------------------
     // Code-generate or save a function
       // If you use options, you can set if you want to C-code-generate the function, or just save it as "second_function.casadi" (which can be loaded afterwards using casadi::Function::load("second_function.casadi"))
-      // mecali::Dictionary codegen_options;
-      // codegen_options["c"]=false;
-      // codegen_options["save"]=true;
-      // mecali::generate_code(fwd_dynamics, "kin3_fd", codegen_options);
-      // mecali::generate_code(inv_dynamics, "kin3_id", codegen_options);
+      mecali::Dictionary codegen_options;
+      codegen_options["c"]=false;
+      codegen_options["save"]=true;
+      mecali::generate_code(inv_dynamics, "kin3_inverse_dyn", codegen_options);
+      mecali::generate_code(gravity, "kin3_gravity", codegen_options);
+      mecali::generate_code(mass_inverse, "kin3_mass_inv", codegen_options);
+      mecali::generate_code(coriolis, "kin3_coriolis", codegen_options);
+      mecali::generate_code(regressor, "kin3_regressor", codegen_options);
+
 
 
 }

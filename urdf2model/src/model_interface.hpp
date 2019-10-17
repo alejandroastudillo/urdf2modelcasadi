@@ -52,6 +52,7 @@ namespace mecali
       Eigen::VectorXd          joint_pos_lb;
       Eigen::VectorXd          joint_vel_limit;
       Eigen::VectorXd          neutral_configuration;
+      Eigen::VectorXd          barycentric_params;
 
       // METHODS
       void                     import_model(std::string filename);
@@ -68,6 +69,7 @@ namespace mecali
       casadi::Function         generalized_gravity();
       casadi::Function         coriolis_matrix();
       casadi::Function         mass_inverse_matrix();
+      casadi::Function         joint_torque_regressor();
       casadi::Function         forward_kinematics(std::string content, std::vector<std::string> frame_names);
       casadi::Function         forward_kinematics(std::string content, std::vector<int> frame_indices);
       casadi::Function         forward_kinematics(std::string content, std::string frame_name);

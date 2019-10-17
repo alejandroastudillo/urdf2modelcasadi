@@ -63,6 +63,10 @@ namespace mecali
       for (int i = 1; i < this->n_joints; i++){ joint_types[i-1] = model.joints[i].shortname(); }
       this->joint_types           = joint_types;
 
+      Eigen::VectorXd params(10*(this->n_dof));
+      for(pinocchio::Model::JointIndex i=1; i<(pinocchio::Model::JointIndex)model.njoints; ++i){ params.segment<10>((int)((i-1)*10)) = model.inertias[i].toDynamicParameters(); }
+      this->barycentric_params    = params;
+
     // Casadi model
       CasadiModel casadi_model = model.cast<CasadiScalar>();
       CasadiData casadi_data( casadi_model );
@@ -225,6 +229,12 @@ namespace mecali
 
       return get_mass_inverse( this->_casadi_model, casadi_data );
   }
+  casadi::Function  Serial_Robot::joint_torque_regressor()
+  {
+      CasadiData casadi_data( this->_casadi_model );
+
+      return get_joint_torque_regressor( this->_casadi_model, casadi_data );
+  }
 
   casadi::Function  Serial_Robot::forward_kinematics(std::string content, std::vector<std::string> frame_names)
   {
@@ -279,6 +289,7 @@ namespace mecali
       print_indent("Joint configuration upper bounds = ",   this->joint_pos_ub,       38);
       print_indent("Joint configuration lower bounds = ",   this->joint_pos_lb,       38);
       print_indent("Joint velocity bounds = ",              this->joint_vel_limit,    38);
+      print_indent("Barycentric parameters = ",             this->barycentric_params, 45);
       std::cout << std::endl;
 
       // std::cout << "\n----- Placement of each joint in the model: " << std::endl;

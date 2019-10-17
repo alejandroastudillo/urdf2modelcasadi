@@ -104,16 +104,12 @@ namespace mecali
     pinocchio::casadi::copy( a_sx, a_casadi );
 
     // Call the Recursive Newton-Euler algorithm
-    // pinocchio::rnea( cas_model, cas_data, q_casadi, v_casadi, a_casadi );
-    // pinocchio::computeJointTorqueRegressor(cas_model, cas_data, q_casadi, v_casadi, a_casadi);
-
-    // Eigen::VectorXd params(10*(cas_model.njoints-1));
-    // for(int i=1; i<cas_model.njoints; ++i)
-    //   params.segment<10>((int)((i-1)*10)) = cas_model.inertias[i].toDynamicParameters();
+    pinocchio::rnea( cas_model, cas_data, q_casadi, v_casadi, a_casadi );
+    pinocchio::computeJointTorqueRegressor(cas_model, cas_data, q_casadi, v_casadi, a_casadi);
 
     // Get the result from ABA into an SX
-    casadi::SX          JTR_sx( cas_model.nv, cas_model.nv);
-    // pinocchio::casadi::copy( cas_data.jointTorqueRegressor, JTR_sx );
+    casadi::SX          JTR_sx( cas_model.nv, 10*(cas_model.nv));
+    pinocchio::casadi::copy( cas_data.jointTorqueRegressor, JTR_sx );
 
     // Create the RNEA function
     casadi::Function    joint_torque_regressor("joint_torque_reg", casadi::SXVector {q_sx, v_sx, a_sx}, casadi::SXVector {JTR_sx});

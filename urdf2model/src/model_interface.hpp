@@ -35,7 +35,7 @@ namespace mecali
     public:
       // Constructor
       Serial_Robot();
-      
+
       // VARIABLES
       // data variables
       std::string              name;
@@ -65,6 +65,9 @@ namespace mecali
       // function methods
       casadi::Function         forward_dynamics();
       casadi::Function         inverse_dynamics();
+      casadi::Function         generalized_gravity();
+      casadi::Function         coriolis_matrix();
+      casadi::Function         mass_inverse_matrix();
       casadi::Function         forward_kinematics(std::string content, std::vector<std::string> frame_names);
       casadi::Function         forward_kinematics(std::string content, std::vector<int> frame_indices);
       casadi::Function         forward_kinematics(std::string content, std::string frame_name);

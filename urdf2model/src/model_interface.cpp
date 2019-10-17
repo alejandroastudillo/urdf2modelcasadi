@@ -207,6 +207,24 @@ namespace mecali
 
       return get_inverse_dynamics( this->_casadi_model, casadi_data );
   }
+  casadi::Function  Serial_Robot::generalized_gravity()
+  {
+      CasadiData casadi_data( this->_casadi_model );
+
+      return get_generalized_gravity( this->_casadi_model, casadi_data );
+  }
+  casadi::Function  Serial_Robot::coriolis_matrix()
+  {
+      CasadiData casadi_data( this->_casadi_model );
+
+      return get_coriolis( this->_casadi_model, casadi_data );
+  }
+  casadi::Function  Serial_Robot::mass_inverse_matrix()
+  {
+      CasadiData casadi_data( this->_casadi_model );
+
+      return get_mass_inverse( this->_casadi_model, casadi_data );
+  }
 
   casadi::Function  Serial_Robot::forward_kinematics(std::string content, std::vector<std::string> frame_names)
   {

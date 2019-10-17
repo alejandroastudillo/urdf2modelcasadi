@@ -26,6 +26,11 @@ namespace mecali
 {
   const double PI = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862;
 
+  Serial_Robot::Serial_Robot(void)
+  {
+    name = "NOT_SET";
+  }
+
   void              Serial_Robot::import_model(std::string filename, bool verbose)
   {
     // Pinocchio model
@@ -282,6 +287,13 @@ namespace mecali
       std::cout << std::endl;
   }
 
+}
+
+extern "C" {
+    mecali::Serial_Robot* Serial_Robot_new(){ return new mecali::Serial_Robot; }
+    void import_model_new(mecali::Serial_Robot* robot_model, std::string filename){ robot_model->import_model(filename);}
+    // void SR_import_model(Serial_Robot* robot_model){ robot_model->import_model(); }
+    std::string name_new(mecali::Serial_Robot* robot_model){ return robot_model->name; }
 }
 //       // Copy Casadi to EIGEN
 //       // casadi::SX cs_mat = casadi::SX::sym("A", 3, 4);

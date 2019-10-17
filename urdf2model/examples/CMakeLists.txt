@@ -28,3 +28,33 @@ target_link_libraries( complete_example
                       ${PROJECT_NAME}
                       ${CASADI_LIB}
                     )
+
+# Kinova example
+add_executable( kinova_example
+                kinova_example.cpp
+              )
+target_link_libraries( kinova_example
+
+                       ${PROJECT_NAME}
+                       ${CASADI_LIB}
+                     )
+
+# UR10 example
+add_executable( ur10_example
+               ur10_example.cpp
+             )
+target_link_libraries( ur10_example
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                    )
+
+# Yumi example
+add_executable( yumi_example
+               yumi_example.cpp
+             )
+target_link_libraries( yumi_example
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                    )

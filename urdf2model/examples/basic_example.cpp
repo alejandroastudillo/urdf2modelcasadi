@@ -41,6 +41,17 @@ int main()
       casadi::Function fwd_dynamics = robot_model.forward_dynamics();
     // Set function for inverse dynamics
       casadi::Function inv_dynamics = robot_model.inverse_dynamics();
+
+    // Set functions for mass_inverse matrix, coriolis matrix, and generalized gravity vector
+      casadi::Function gen_gravity = robot_model.generalized_gravity();
+
+      casadi::Function coriolis = robot_model.coriolis_matrix();
+
+      casadi::Function mass_inverse = robot_model.mass_inverse_matrix();
+
+    // Set function for joint torque regressor: regressor(q, dq, ddq)*barycentric_params = tau
+      casadi::Function regressor = robot_model.joint_torque_regressor();
+
     // Set function for forward kinematics
       // The forward kinematics function can be set in multiple ways
       // Calling forward_kinematics without any argument generates a function which outputs a transformation matrix for each frame in the robot.
@@ -111,5 +122,4 @@ int main()
       codegen_options["c"]=false;
       codegen_options["save"]=true;
       mecali::generate_code(fk_T_multiframes_by_name, "second_function", codegen_options);
-
 }

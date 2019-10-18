@@ -39,14 +39,14 @@ target_link_libraries( kinova_example
                        ${CASADI_LIB}
                      )
 
-add_executable( kinova_2dof_example
-               kinova_2dof_example.cpp
-             )
-target_link_libraries( kinova_2dof_example
-
-                      ${PROJECT_NAME}
-                      ${CASADI_LIB}
-                    )
+# add_executable( kinova_2dof_example
+#                kinova_2dof_example.cpp
+#              )
+# target_link_libraries( kinova_2dof_example
+#
+#                       ${PROJECT_NAME}
+#                       ${CASADI_LIB}
+#                     )
 
 # # UR10 example
 # add_executable( ur10_example

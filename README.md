@@ -82,7 +82,7 @@ int main()
       casadi::Function inv_dynamics = robot_model.inverse_dynamics();
       
     // Set functions for mass_inverse matrix, coriolis matrix, and generalized gravity vector
-      casadi::Function gravity = robot_model.generalized_gravity();
+      casadi::Function gen_gravity = robot_model.generalized_gravity();
       
       casadi::Function coriolis = robot_model.coriolis_matrix();
       
@@ -161,4 +161,5 @@ int main()
       codegen_options["c"]=false;
       codegen_options["save"]=true;
       mecali::generate_code(fk_T_multiframes_by_name, "second_function", codegen_options);
+}
 ```

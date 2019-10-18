@@ -163,6 +163,38 @@ BOOST_AUTO_TEST_CASE(RNEA_pinocchio_casadi)
   // -----------------------------------------------------------------------
   // Naive inverse dynamics test with robot's home configuration -----------
   // -----------------------------------------------------------------------
-  // TODO : Implement this test
+  // Pinocchio
+    mecali::Data          data_nt = pinocchio::Data(model);
+    pinocchio::computeGeneralizedGravity(model,data_nt,q_home);
+    Eigen::VectorXd data_gravity = data_nt.g;
+    pinocchio::computeCoriolisMatrix(model,data_nt,q_home,v_home);
+    Eigen::MatrixXd data_coriolis = data_nt.C;
+    pinocchio::computeMinverse(model,data_nt,q_home);
+    Eigen::MatrixXd data_minv = data_nt.Minv;
 
+    // M(q)*ddq + C(q, dq)*dq + g(q) = tau
+    Eigen::VectorXd tau_naive_nt = data_minv.inverse()*a_home + data_coriolis*v_home + data_gravity;
+
+    BOOST_CHECK(tau_naive_nt.isApprox(data.tau));
+
+    casadi::Function gravity = robot_model.generalized_gravity();
+    casadi::Function coriolis = robot_model.coriolis_matrix();
+    casadi::Function mass_inverse = robot_model.mass_inverse_matrix();
+
+    casadi::DM gravity_res = gravity(casadi::DMVector {q_vec})[0];
+    casadi::DM coriolis_res = coriolis(casadi::DMVector {q_vec, v_vec})[0];
+    casadi::DM mass_inverse_res = mass_inverse(casadi::DMVector {q_vec})[0];
+
+    Eigen::VectorXd gravity_mat = Eigen::Map<Eigen::VectorXd>(static_cast< std::vector<double> >(gravity_res).data(),robot_model.n_dof,1);
+    Eigen::MatrixXd coriolis_mat = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(coriolis_res).data(),robot_model.n_dof,robot_model.n_dof);
+    Eigen::MatrixXd mass_inverse_mat = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(mass_inverse_res).data(),robot_model.n_dof,robot_model.n_dof);
+
+    // M(q)*ddq + C(q, dq)*dq + g(q) = tau
+    Eigen::VectorXd tau_naive_cas = mass_inverse_mat.inverse()*a_home + coriolis_mat*v_home + gravity_mat;
+
+    BOOST_CHECK(gravity_mat.isApprox(data_gravity));
+    BOOST_CHECK(coriolis_mat.isApprox(data_coriolis));
+    BOOST_CHECK(mass_inverse_mat.isApprox(data_minv));
+    BOOST_CHECK(tau_naive_cas.isApprox(data.tau));
+    
 }

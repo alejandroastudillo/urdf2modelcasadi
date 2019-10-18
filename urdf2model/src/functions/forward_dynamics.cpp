@@ -31,4 +31,32 @@ namespace mecali
     return aba;
   }
 
+  casadi::Function get_mass_inverse(CasadiModel &cas_model, CasadiData &cas_data)
+  {
+    // Set variables
+    CasadiScalar        q_sx = casadi::SX::sym("q", cas_model.nq);
+    ConfigVectorCasadi  q_casadi(cas_model.nq);
+    pinocchio::casadi::copy( q_sx, q_casadi ); // q_casadi = Eigen::Map<ConfigVectorCasadi>(static_cast< std::vector<CasadiScalar> >(q_sx).data(),model.nq,1);
+
+    CasadiScalar        v_sx = casadi::SX::sym("v", cas_model.nv);
+    TangentVectorCasadi v_casadi(cas_model.nv);
+    pinocchio::casadi::copy( v_sx, v_casadi ); // v_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(v_sx).data(),model.nv,1);
+
+    CasadiScalar        tau_sx = casadi::SX::sym("tau", cas_model.nv);
+    TangentVectorCasadi tau_casadi(cas_model.nv);
+    pinocchio::casadi::copy( tau_sx, tau_casadi ); // tau_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(tau_sx).data(),model.nv,1);
+
+    // Call the Articulated-body algorithm
+    pinocchio::aba(cas_model, cas_data, q_casadi, v_casadi, tau_casadi);
+    pinocchio::computeMinverse(cas_model, cas_data, q_casadi);
+    // Get the result from ABA into an SX
+    CasadiScalar        Minv_sx(cas_model.nv, cas_model.nv);
+    pinocchio::casadi::copy( cas_data.Minv, Minv_sx );
+
+    // Create the ABA function
+    casadi::Function    mass_inverse("Minv", casadi::SXVector {q_sx}, casadi::SXVector {Minv_sx});
+
+    return mass_inverse;
+  }
+
 }

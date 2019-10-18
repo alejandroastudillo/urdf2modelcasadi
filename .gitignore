@@ -1,3 +1,4 @@
 /build/*
 !/build/configure.sh
 /working_Example
+/urdf2model/models/kortex_2dof/*

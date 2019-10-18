@@ -58,6 +58,12 @@ int main()
       std::cout << "cor: " << cor_res << std::endl;
       std::cout << "reg: " << reg_res << std::endl;
 
+      Eigen::MatrixXd reg_mat = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(reg_res).data(),robot_model.n_dof,10*robot_model.n_dof);
+
+      Eigen::VectorXd tau_regressor = reg_mat * robot_model.barycentric_params;
+
+      std::cout << "tau_reg = " << tau_regressor << std::endl;
+
 
     // ---------------------------------------------------------------------
     // Generate (or save) a function

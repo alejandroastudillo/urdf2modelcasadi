@@ -25,6 +25,12 @@ int main()
       casadi::Function fwd_dynamics = robot_model.forward_dynamics();
     // Set function for inverse dynamics
       casadi::Function inv_dynamics = robot_model.inverse_dynamics();
+    // Set functions for mass_inverse matrix, coriolis matrix, and generalized gravity vector
+      casadi::Function gravity = robot_model.generalized_gravity();
+      casadi::Function coriolis = robot_model.coriolis_matrix();
+      casadi::Function mass_inverse = robot_model.mass_inverse_matrix();
+    // Set function for joint torque regressor: regressor(q, dq, ddq)*barycentric_params = tau
+      casadi::Function regressor = robot_model.joint_torque_regressor();
     // Set function for forward kinematics
       // Setting the first argument as "position" means that the function is going to output a 3x1 position vector for each frame.
       casadi::Function fk_pos = robot_model.forward_kinematics("position", "EndEffector_Link");
@@ -42,8 +48,15 @@ int main()
       codegen_options["save"]=true;
       mecali::generate_code(fwd_dynamics, "kin3_fd", codegen_options);
       mecali::generate_code(inv_dynamics, "kin3_id", codegen_options);
+      
       mecali::generate_code(fk_pos, "kin3_fkpos", codegen_options);
       mecali::generate_code(fk_rot, "kin3_fkrot", codegen_options);
+
+      mecali::generate_code(regressor, "kin3_regressor", codegen_options);
+
+      mecali::generate_code(mass_inverse, "kin3_mass_inverse", codegen_options);
+      mecali::generate_code(coriolis, "kin3_coriolis", codegen_options);
+      mecali::generate_code(gravity, "kin3_gravity", codegen_options);
 
 
 }

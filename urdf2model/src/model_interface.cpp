@@ -16,6 +16,7 @@ Eigen::Vector3d = Eigen::Matrix<double, 3, 1> = pinocchio::ModelTpl<double>::Vec
 
 /* TODO Handle (print error or warning) when the torque, position, or velocity limits are zero.
    TODO Add some option to simplify the input of the functions (for instance instead of q[11] use q[7] for Kinova)
+   TODO Try to export robot data structure (ndof, nq, bary_params, etc), to be able to import it from Python or Matlab
 */
 
 #include "model_interface.hpp"

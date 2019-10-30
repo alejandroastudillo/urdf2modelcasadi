@@ -37,6 +37,8 @@ int main()
       // Setting the first argument as "rotation" means that the function is going to output a 3x3 rotation matrix for each frame.
       casadi::Function fk_rot = robot_model.forward_kinematics("rotation", "EndEffector_Link");
 
+      casadi::Function expressions = robot_model.robot_expressions(std::vector<std::string>{"EndEffector_Link"});
+
 
     // ---------------------------------------------------------------------
     // Generate (or save) a function
@@ -46,17 +48,19 @@ int main()
       mecali::Dictionary codegen_options;
       codegen_options["c"]=false;
       codegen_options["save"]=true;
-      mecali::generate_code(fwd_dynamics, "kin3_fd", codegen_options);
-      mecali::generate_code(inv_dynamics, "kin3_id", codegen_options);
-      
-      mecali::generate_code(fk_pos, "kin3_fkpos", codegen_options);
-      mecali::generate_code(fk_rot, "kin3_fkrot", codegen_options);
+      // mecali::generate_code(fwd_dynamics, "kin3_fd", codegen_options);
+      // mecali::generate_code(inv_dynamics, "kin3_id", codegen_options);
+      //
+      // mecali::generate_code(fk_pos, "kin3_fkpos", codegen_options);
+      // mecali::generate_code(fk_rot, "kin3_fkrot", codegen_options);
+      //
+      // mecali::generate_code(regressor, "kin3_regressor", codegen_options);
+      //
+      // mecali::generate_code(mass_inverse, "kin3_mass_inverse", codegen_options);
+      // mecali::generate_code(coriolis, "kin3_coriolis", codegen_options);
+      // mecali::generate_code(gravity, "kin3_gravity", codegen_options);
 
-      mecali::generate_code(regressor, "kin3_regressor", codegen_options);
-
-      mecali::generate_code(mass_inverse, "kin3_mass_inverse", codegen_options);
-      mecali::generate_code(coriolis, "kin3_coriolis", codegen_options);
-      mecali::generate_code(gravity, "kin3_gravity", codegen_options);
+      std::cout << "Function expressions: " << expressions << std::endl;
 
 
 }

@@ -78,7 +78,7 @@ namespace mecali
       casadi::Function         forward_kinematics(std::string content);
       casadi::Function         forward_kinematics();
 
-      casadi::Function         robot_expressions(std::vector<std::string> frame_names);
+      casadi::Function         robot_expressions(std::vector<std::string> frame_names, bool AUGMENT_ODE);
 
       // debug methods
       void                     print_model_data();

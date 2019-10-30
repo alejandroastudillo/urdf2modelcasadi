@@ -276,12 +276,12 @@ namespace mecali
       return this->forward_kinematics("transformation");
   }
 
-  casadi::Function  Serial_Robot::robot_expressions(std::vector<std::string> frame_names)
+  casadi::Function  Serial_Robot::robot_expressions(std::vector<std::string> frame_names, bool AUGMENT_ODE)
   {
     // ode_aug (fd), fk_eeT (pos, rot)
     CasadiData casadi_data( this->_casadi_model );
 
-    return get_robot_expressions( this->_casadi_model, casadi_data, frame_names );
+    return get_robot_expressions( this->_casadi_model, casadi_data, frame_names, AUGMENT_ODE );
 
   }
 

@@ -11,7 +11,7 @@
 
 namespace mecali
 {
-  casadi::Function get_robot_expressions(CasadiModel &cas_model, CasadiData &cas_data, std::vector<std::string> frame_names);
+  casadi::Function get_robot_expressions(CasadiModel &cas_model, CasadiData &cas_data, std::vector<std::string> frame_names, bool AUGMENT_ODE);
 }
 
 #endif // FUN_ROBOT_EXPRESSIONS_H_INCLUDED

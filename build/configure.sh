@@ -34,7 +34,7 @@
   print_title "########## Executing unit tests ##########"
   # export BOOST_TEST_LOG_LEVEL="message"
   # # ctest -V
-  make test ARGS="-j3" # -V
+  make test ARGS="-j3 -V" # -V
 
 # Execute the make install command
   print_title "########## Installing the library ##########"

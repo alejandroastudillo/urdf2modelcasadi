@@ -34,22 +34,23 @@ namespace mecali
 
     int n_path_states = 2;
     int n_path_inputs = 1;
+    int nxq = cas_model.nq + cas_model.nv + n_path_states;
     int nx = 2*cas_model.nv + n_path_states;
     int nu = cas_model.nv + n_path_inputs;
-    CasadiScalar aug_state_sx = casadi::SX::sym("aug_state", nx);
-    CasadiScalar aug_input_sx = casadi::SX::sym("aug_input", nu);
+
+    CasadiScalar aug_state_sx  = casadi::SX::sym("aug_state", nxq);
+    CasadiScalar aug_input_sx  = casadi::SX::sym("aug_input", nu);
     CasadiScalar aug_output_sx = casadi::SX::sym("aug_output", nx);
+    CasadiScalar     vp_sx     = casadi::SX::sym("vp", n_path_states);
+    CasadiScalar     wp_sx     = casadi::SX::sym("wp", n_path_inputs);
+    CasadiScalar     outp_sx   = casadi::SX::sym("outp", n_path_states);
 
     if (AUGMENT_ODE)
     {
       // Path dynamics definition
-
-      CasadiScalar     vp_sx    = casadi::SX::sym("vp", n_path_states);
-      CasadiScalar     wp_sx    = casadi::SX::sym("wp", n_path_inputs);
-      CasadiScalar     outp_sx  = casadi::SX::sym("outp", n_path_states);
       outp_sx(0) = vp_sx(1);
       outp_sx(1) = wp_sx;
-      casadi::Function path_dyn = casadi::Function("path_dyn", casadi::SXVector {vp_sx, wp_sx}, casadi::SXVector {outp_sx});
+      // casadi::Function path_dyn = casadi::Function("path_dyn", casadi::SXVector {vp_sx, wp_sx}, casadi::SXVector {outp_sx});
       // std::cout << path_dyn(casadi::DMVector {std::vector<double>{1,2},3})[0] << std::endl;
 
       // Augmented dynamics
@@ -60,12 +61,12 @@ namespace mecali
 
 
 
-      for(int j = 0; j < cas_model.nv; ++j)             { aug_state_sx(j) = q_sx(j); }
-      for(int j = cas_model.nv; j < 2*cas_model.nv; ++j){ aug_state_sx(j) = v_sx(j-cas_model.nv); }
-      for(int j = 2*cas_model.nv; j < nx; ++j)          { aug_state_sx(j) = vp_sx(j-(2*cas_model.nv)); }
-
-      for(int j = 0; j < cas_model.nv; ++j)             { aug_input_sx(j) = tau_sx(j); }
-      for(int j = cas_model.nv; j < nu; ++j)            { aug_input_sx(j) = wp_sx(j-cas_model.nv); }
+      // for(int j = 0; j < cas_model.nq; ++j)                            { aug_state_sx(j) = q_sx(j); }
+      // for(int j = cas_model.nq; j < (cas_model.nq + cas_model.nv); ++j){ aug_state_sx(j) = v_sx(j-cas_model.nv); }
+      // for(int j = (cas_model.nq + cas_model.nv); j < nxq; ++j)          { aug_state_sx(j) = vp_sx(j-(2*cas_model.nv)); }
+      //
+      // for(int j = 0; j < cas_model.nv; ++j)             { aug_input_sx(j) = tau_sx(j); }
+      // for(int j = cas_model.nv; j < nu; ++j)            { aug_input_sx(j) = wp_sx(j-cas_model.nv); }
       // std::cout << aug_state_sx << std::endl;
       // std::cout << aug_input_sx << std::endl;
 
@@ -96,46 +97,82 @@ namespace mecali
     pinocchio::forwardKinematics(    cas_model,   cas_data,    q_casadi);
     pinocchio::updateFramePlacements(cas_model,   cas_data);
 
-
-
-    CasadiScalar T_sx(4,4);
+    CasadiScalar pos_sx(3,1);
+    CasadiScalar rot_n_sx(3,1);
+    CasadiScalar rot_s_sx(3,1);
+    CasadiScalar rot_a_sx(3,1);
 
     for (int i = 0; i < n_req_frames; i++) // Add T for all requested frames
     {
         // get frame index
         frame_idx = cas_model.getFrameId(frame_names[i]);
 
-        // get the result (transformation matrix) from FK
-        for(Eigen::DenseIndex i = 0; i < 3; ++i)
-        {
-          for(Eigen::DenseIndex j = 0; j < 3; ++j)
-          {
-            T_sx(i,j) = cas_data.oMf[frame_idx].rotation()(i,j);
-          }
-        }
-        T_sx(0,3) = cas_data.oMf[frame_idx].translation()(0);
-        T_sx(1,3) = cas_data.oMf[frame_idx].translation()(1);
-        T_sx(2,3) = cas_data.oMf[frame_idx].translation()(2);
-        T_sx(3,0) = 0;
-        T_sx(3,1) = 0;
-        T_sx(3,2) = 0;
-        T_sx(3,3) = 1;
+        pos_sx(0,0) = cas_data.oMf[frame_idx].translation()(0);
+        pos_sx(1,0) = cas_data.oMf[frame_idx].translation()(1);
+        pos_sx(2,0) = cas_data.oMf[frame_idx].translation()(2);
+        // fill output vector of the function
+        func_outputs.insert(func_outputs.end(), pos_sx);
+        // fill output names vector
+        output_names.insert(output_names.end(), "pos_"+cas_model.frames[frame_idx].name);
+
+        rot_n_sx(0,0) = cas_data.oMf[frame_idx].rotation()(0,0);
+        rot_n_sx(1,0) = cas_data.oMf[frame_idx].rotation()(1,0);
+        rot_n_sx(2,0) = cas_data.oMf[frame_idx].rotation()(2,0);
+
+        rot_s_sx(0,0) = cas_data.oMf[frame_idx].rotation()(0,1);
+        rot_s_sx(1,0) = cas_data.oMf[frame_idx].rotation()(1,1);
+        rot_s_sx(2,0) = cas_data.oMf[frame_idx].rotation()(2,1);
+
+        rot_a_sx(0,0) = cas_data.oMf[frame_idx].rotation()(0,2);
+        rot_a_sx(1,0) = cas_data.oMf[frame_idx].rotation()(1,2);
+        rot_a_sx(2,0) = cas_data.oMf[frame_idx].rotation()(2,2);
 
         // fill output vector of the function
-        func_outputs.insert(func_outputs.end(), T_sx);
-        // fill output names vector
-        output_names.insert(output_names.end(), "T_"+cas_model.frames[frame_idx].name);
-    }
+        func_outputs.insert(func_outputs.end(), rot_n_sx);
+        output_names.insert(output_names.end(), "rot_n_"+cas_model.frames[frame_idx].name);
+        func_outputs.insert(func_outputs.end(), rot_s_sx);
+        output_names.insert(output_names.end(), "rot_s_"+cas_model.frames[frame_idx].name);
+        func_outputs.insert(func_outputs.end(), rot_a_sx);
+        output_names.insert(output_names.end(), "rot_a_"+cas_model.frames[frame_idx].name);
 
+        // CasadiScalar T_sx(4,4);
+        //
+        // for (int i = 0; i < n_req_frames; i++)
+        // {
+        //     // get frame index
+        //     frame_idx = cas_model.getFrameId(frame_names[i]);
+        //
+        //     // get the result (transformation matrix) from FK
+        //     for(Eigen::DenseIndex i = 0; i < 3; ++i)
+        //     {
+        //       for(Eigen::DenseIndex j = 0; j < 3; ++j)
+        //       {
+        //         T_sx(i,j) = cas_data.oMf[frame_idx].rotation()(i,j);
+        //       }
+        //     }
+        //     T_sx(0,3) = cas_data.oMf[frame_idx].translation()(0);
+        //     T_sx(1,3) = cas_data.oMf[frame_idx].translation()(1);
+        //     T_sx(2,3) = cas_data.oMf[frame_idx].translation()(2);
+        //     T_sx(3,0) = 0;
+        //     T_sx(3,1) = 0;
+        //     T_sx(3,2) = 0;
+        //     T_sx(3,3) = 1;
+        //
+        // // fill output vector of the function
+        // func_outputs.insert(func_outputs.end(), T_sx);
+        // // fill output names vector
+        // output_names.insert(output_names.end(), "T_"+cas_model.frames[frame_idx].name);
+    }
 
     if (AUGMENT_ODE)
     {
-      casadi::Function    expressions("expressions", casadi::SXVector {aug_state_sx, aug_input_sx}, func_outputs, std::vector<std::string>{"aug_state", "aug_input"}, output_names);
-      return expressions;
+      return casadi::Function("expressions", casadi::SXVector {q_sx, v_sx, tau_sx, vp_sx, wp_sx}, func_outputs, std::vector<std::string>{"q_sx", "v_sx", "tau_sx", "vp_sx", "wp_sx"}, output_names);
+      // return casadi::Function("expressions", casadi::SXVector {aug_state_sx, aug_input_sx}, func_outputs, std::vector<std::string>{"aug_state", "aug_input"}, output_names);
+      // return expressions;
     } else
     {
-      casadi::Function    expressions("expressions", casadi::SXVector {q_sx, v_sx, tau_sx}, func_outputs, std::vector<std::string>{"q", "dq", "tau"}, output_names);
-      return expressions;
+      return casadi::Function("expressions", casadi::SXVector {q_sx, v_sx, tau_sx}, func_outputs, std::vector<std::string>{"q", "dq", "tau"}, output_names);
+      // return expressions;
     }
 
 

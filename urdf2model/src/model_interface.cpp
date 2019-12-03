@@ -40,6 +40,7 @@ namespace mecali
       pinocchio::urdf::buildModel(filename,model,verbose);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
     // Set the gravity applied to the model
       model.gravity.linear(pinocchio::Model::gravity981);
+      // model.gravity.setZero();
     // Initialize the data structure for the model
       Data          data = pinocchio::Data(model);
 

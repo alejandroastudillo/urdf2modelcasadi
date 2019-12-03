@@ -14,7 +14,7 @@ sudo apt-get install libboost-all-dev
 ```
 sudo apt-get install liburdfdom-dev
 ```
-* CASADI >= 3.4.4 (with pkg-config support)
+* CASADI >= 3.5.1 (with pkg-config support)
 
 * Pinocchio (with Casadi interface - needs pkg-config support) from branch 'devel' - commit 607bab825ae37749034f2da11d16e3b883670f0b
 ```
@@ -22,9 +22,20 @@ sudo apt-get install liburdfdom-dev
 git clone -b devel https://github.com/stack-of-tasks/pinocchio.git
 # Checkout the commit I have been using
 cd pinocchio
-git checkout 607bab825ae37749034f2da11d16e3b883670f0b
+git checkout e5479944569c4305479be2c8c63a25ebaaa30ff8
 # Build from source
-...
+cd pinocchio
+mkdir build 
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/openrobots -DBUILD_PYTHON_INTERFACE=OFF -DBUILD_WITH_CASADI_SUPPORT=ON -DBUILD_UNIT_TESTS=ON
+sudo make -j3
+sudo make install
+
+# Copy the following three lines in .bashrc
+export PATH=/usr/local/bin:$PATH
+export PKG_CONFIG_PATH =/opt/openrobots/lib/pkgconfig:$PKG_CONFIG_PATH
+export LD_LIBRARY_PATH=/opt/openrobots/lib:$LD_LIBRARY_PATH
+
 ```
 * C++11 (for randomConfiguration)
 

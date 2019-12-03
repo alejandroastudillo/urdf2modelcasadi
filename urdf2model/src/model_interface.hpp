@@ -21,6 +21,7 @@
 #include "functions/forward_kinematics.hpp"
 #include "functions/code_generation.hpp"
 #include "functions/common.hpp"
+#include "functions/robot_expressions.hpp"
 
 /*
 TODO Check how to include code_generation as a public method in class Serial_Robot: follow the save example https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp
@@ -76,6 +77,8 @@ namespace mecali
       casadi::Function         forward_kinematics(std::string content, int frame_index);
       casadi::Function         forward_kinematics(std::string content);
       casadi::Function         forward_kinematics();
+
+      casadi::Function         robot_expressions(std::vector<std::string> frame_names, bool AUGMENT_ODE);
 
       // debug methods
       void                     print_model_data();

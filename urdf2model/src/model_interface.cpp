@@ -40,6 +40,7 @@ namespace mecali
       pinocchio::urdf::buildModel(filename,model,verbose);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
     // Set the gravity applied to the model
       model.gravity.linear(pinocchio::Model::gravity981);
+      // model.gravity.setZero();
     // Initialize the data structure for the model
       Data          data = pinocchio::Data(model);
 
@@ -274,6 +275,15 @@ namespace mecali
   casadi::Function  Serial_Robot::forward_kinematics()
   {
       return this->forward_kinematics("transformation");
+  }
+
+  casadi::Function  Serial_Robot::robot_expressions(std::vector<std::string> frame_names, bool AUGMENT_ODE)
+  {
+    // ode_aug (fd), fk_eeT (pos, rot)
+    CasadiData casadi_data( this->_casadi_model );
+
+    return get_robot_expressions( this->_casadi_model, casadi_data, frame_names, AUGMENT_ODE );
+
   }
 
   void              Serial_Robot::print_model_data()

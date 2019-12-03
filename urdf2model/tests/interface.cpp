@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(RNEA_pinocchio_casadi)
 
   // Recursive Newton-Euler algorithm (inverse dynamics) test with robot's home configuration
   // Pinocchio
-    mecali::ConfigVector  q_home = pinocchio::neutral(model);  // pinocchio::randomConfiguration(model);
+    mecali::ConfigVector  q_home = pinocchio::randomConfiguration(model);  // pinocchio::randomConfiguration(model); pinocchio::neutral(model);
     mecali::TangentVector v_home(Eigen::VectorXd::Zero(model.nv));
     mecali::TangentVector a_home(Eigen::VectorXd::Zero(model.nv));
 
@@ -196,5 +196,4 @@ BOOST_AUTO_TEST_CASE(RNEA_pinocchio_casadi)
     BOOST_CHECK(coriolis_mat.isApprox(data_coriolis));
     BOOST_CHECK(mass_inverse_mat.isApprox(data_minv));
     BOOST_CHECK(tau_naive_cas.isApprox(data.tau));
-    
 }

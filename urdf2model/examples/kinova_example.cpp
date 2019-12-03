@@ -37,6 +37,8 @@ int main()
       // Setting the first argument as "rotation" means that the function is going to output a 3x3 rotation matrix for each frame.
       casadi::Function fk_rot = robot_model.forward_kinematics("rotation", "EndEffector_Link");
 
+      casadi::Function expressions = robot_model.robot_expressions(std::vector<std::string>{"EndEffector_Link"}, true);
+
 
     // ---------------------------------------------------------------------
     // Generate (or save) a function
@@ -46,17 +48,32 @@ int main()
       mecali::Dictionary codegen_options;
       codegen_options["c"]=false;
       codegen_options["save"]=true;
-      mecali::generate_code(fwd_dynamics, "kin3_fd", codegen_options);
-      mecali::generate_code(inv_dynamics, "kin3_id", codegen_options);
-      
-      mecali::generate_code(fk_pos, "kin3_fkpos", codegen_options);
-      mecali::generate_code(fk_rot, "kin3_fkrot", codegen_options);
+      // mecali::generate_code(fwd_dynamics, "kin3_fd", codegen_options);
+      // mecali::generate_code(inv_dynamics, "kin3_id", codegen_options);
+      //
+      // mecali::generate_code(fk_pos, "kin3_fkpos", codegen_options);
+      // mecali::generate_code(fk_rot, "kin3_fkrot", codegen_options);
+      //
+      // mecali::generate_code(regressor, "kin3_regressor", codegen_options);
+      //
+      // mecali::generate_code(mass_inverse, "kin3_mass_inverse", codegen_options);
+      // mecali::generate_code(coriolis, "kin3_coriolis", codegen_options);
+      // mecali::generate_code(gravity, "kin3_gravity", codegen_options);
 
-      mecali::generate_code(regressor, "kin3_regressor", codegen_options);
+      mecali::generate_code(expressions, "kin3_expressions_noG", codegen_options);
 
-      mecali::generate_code(mass_inverse, "kin3_mass_inverse", codegen_options);
-      mecali::generate_code(coriolis, "kin3_coriolis", codegen_options);
-      mecali::generate_code(gravity, "kin3_gravity", codegen_options);
+      std::cout << "Function expressions: " << expressions << std::endl;
+      std::vector<double> q_vec = {0.86602540378, 0.5, 0, 1, 0, -0.45, 1, 0, 0, 1, 0};
+      std::vector<double> v_vec = {0, 0, 0, 0, 0, 0, 0};
+      std::vector<double> tau_vec = {0, 0, 0, 0, 0, 0, 0};
+      std::vector<double> vp_vec = {0, 0};
+      std::vector<double> wp_vec = {0};
 
+      casadi::DM ode_aug_res = expressions(casadi::DMVector {q_vec, v_vec, tau_vec, vp_vec, wp_vec})[0];
+      casadi::DM pos_res = expressions(casadi::DMVector {q_vec, v_vec, tau_vec, vp_vec, wp_vec})[1];
+      std::cout << "Ode_aug_res: " << ode_aug_res << std::endl;
+      std::cout << "pos_res: " << pos_res << std::endl;
+
+      // q_sx, v_sx, tau_sx, vp_sx, wp_sx
 
 }

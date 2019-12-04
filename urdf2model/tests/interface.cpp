@@ -4,6 +4,9 @@
 
 #include "model_interface.hpp"
 
+// #include <iostream>
+// #include <algorithm>
+
 #define MAKE_STR(x) _MAKE_STR(x)
 #define _MAKE_STR(x) #x
 
@@ -196,4 +199,49 @@ BOOST_AUTO_TEST_CASE(RNEA_pinocchio_casadi)
     BOOST_CHECK(coriolis_mat.isApprox(data_coriolis));
     BOOST_CHECK(mass_inverse_mat.isApprox(data_minv));
     BOOST_CHECK(tau_naive_cas.isApprox(data.tau));
+}
+
+BOOST_AUTO_TEST_CASE(Reduced_model)
+{
+  // Instantiate model and data objects
+    mecali::Model         model;                                        // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1ModelTpl.html
+    mecali::Data          data = pinocchio::Data(model);                // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1DataTpl.html
+
+    pinocchio::urdf::buildModel(filename,model);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
+  // Set the gravity applied to the model
+    model.gravity.linear(pinocchio::Model::gravity981);     // options: model.gravity.setZero(), model.gravity.linear( Eigen::Vector3d(0,0,-9.81));
+  // initialize the data structure for the model
+    data = pinocchio::Data(model);
+
+    std::vector<std::string> list_of_joints_to_lock_by_name;
+    list_of_joints_to_lock_by_name.push_back("Actuator2");
+    list_of_joints_to_lock_by_name.push_back("Actuator4"); // It can be in the wrong order
+    list_of_joints_to_lock_by_name.push_back("Actuator5");
+    list_of_joints_to_lock_by_name.push_back("blabla"); // Joint not in the model
+
+    // Print the list of joints to remove + retrieve the joint id
+    std::vector<mecali::Index> list_of_joints_to_lock_by_id;
+    for(std::vector<std::string>::const_iterator it = list_of_joints_to_lock_by_name.begin();
+        it != list_of_joints_to_lock_by_name.end(); ++it)
+    {
+      const std::string & joint_name = *it;
+      if(model.existJointName(joint_name)) // do not consider joint that are not in the model
+        list_of_joints_to_lock_by_id.push_back(model.getJointId(joint_name));
+      else
+        std::cout << "joint: " << joint_name << " does not belong to the model" << std::endl;
+    }
+
+    Eigen::VectorXd q_rand = pinocchio::randomConfiguration(model);
+    mecali::Model reduced_model = pinocchio::buildReducedModel(model,list_of_joints_to_lock_by_id,q_rand);
+
+    // Print the list of joints in the original model
+    std::cout << "List of joints in the original model:" << std::endl;
+    for(mecali::Index joint_id = 1; joint_id < model.joints.size(); ++joint_id)
+      std::cout << "\t- " << model.names[joint_id] << std::endl;
+
+    // Print the list of joints in the reduced model
+    std::cout << "List of joints in the reduced model:" << std::endl;
+    for(mecali::Index joint_id = 1; joint_id < reduced_model.joints.size(); ++joint_id)
+      std::cout << "\t- " << reduced_model.names[joint_id] << std::endl;
+
 }

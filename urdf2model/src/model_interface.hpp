@@ -10,6 +10,7 @@
 #include <pinocchio/multibody/model.hpp>
 #include <pinocchio/parsers/urdf.hpp>
 #include <pinocchio/algorithm/joint-configuration.hpp>
+#include <pinocchio/algorithm/model.hpp>
 
 // #include "pinocchio/algorithm/jacobian.hpp"
 // #include "pinocchio/algorithm/crba.hpp"

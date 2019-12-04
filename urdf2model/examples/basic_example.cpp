@@ -140,9 +140,12 @@ int main()
 
       Eigen::Vector3d gravity_vector(0,0,-9.81);
 
+      // reduced_robot_model.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_id);
       // reduced_robot_model.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_id, q_init, gravity_vector);
+      // reduced_robot_model.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_name);
       // reduced_robot_model.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_name, q_init, gravity_vector);
-      reduced_robot_model.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_idint, q_init, gravity_vector);
+      reduced_robot_model.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_idint);
+      // reduced_robot_model.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_idint, q_init, gravity_vector);
 
       reduced_robot_model.print_model_data();
 

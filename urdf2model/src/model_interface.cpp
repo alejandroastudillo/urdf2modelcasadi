@@ -128,6 +128,22 @@ namespace mecali
 
       this->_casadi_model         = casadi_model;
   }
+  void              Serial_Robot::import_reduced_model(std::string filename, std::vector<mecali::Index> joints_to_lock_by_index, Eigen::VectorXd robot_configuration)
+  {
+      this->import_reduced_model(filename, joints_to_lock_by_index, robot_configuration, pinocchio::Model::gravity981);
+  }
+  void              Serial_Robot::import_reduced_model(std::string filename, std::vector<mecali::Index> joints_to_lock_by_index)
+  {
+    // Pinocchio model
+      Model         model;
+    // Build the model using the URDF parser
+      pinocchio::urdf::buildModel(filename,model,false);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
+    // Set the gravity applied to the model
+      model.gravity.linear(pinocchio::Model::gravity981);
+
+      this->import_reduced_model(filename, joints_to_lock_by_index, pinocchio::neutral(model), pinocchio::Model::gravity981);
+  }
+
   void              Serial_Robot::import_reduced_model(std::string filename, std::vector<std::string> joints_to_lock_by_name, Eigen::VectorXd robot_configuration, Eigen::Vector3d gravity_vector)
   {
     // Pinocchio model
@@ -149,6 +165,22 @@ namespace mecali
 
       this->import_reduced_model(filename, list_of_joints_to_lock_by_id, robot_configuration, gravity_vector);
   }
+  void              Serial_Robot::import_reduced_model(std::string filename, std::vector<std::string> joints_to_lock_by_name, Eigen::VectorXd robot_configuration)
+  {
+      this->import_reduced_model(filename, joints_to_lock_by_name, robot_configuration, pinocchio::Model::gravity981);
+  }
+  void              Serial_Robot::import_reduced_model(std::string filename, std::vector<std::string> joints_to_lock_by_name)
+  {
+    // Pinocchio model
+      Model         model;
+    // Build the model using the URDF parser
+      pinocchio::urdf::buildModel(filename,model,false);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
+    // Set the gravity applied to the model
+      model.gravity.linear(pinocchio::Model::gravity981);
+
+      this->import_reduced_model(filename, joints_to_lock_by_name, pinocchio::neutral(model), pinocchio::Model::gravity981);
+  }
+
   void              Serial_Robot::import_reduced_model(std::string filename, std::vector<int> joints_to_lock_by_intid, Eigen::VectorXd robot_configuration, Eigen::Vector3d gravity_vector)
   {
       std::vector<mecali::Index> list_of_joints_to_lock_by_id;
@@ -158,6 +190,21 @@ namespace mecali
       }
 
       this->import_reduced_model(filename, list_of_joints_to_lock_by_id, robot_configuration, gravity_vector);
+  }
+  void              Serial_Robot::import_reduced_model(std::string filename, std::vector<int> joints_to_lock_by_intid, Eigen::VectorXd robot_configuration)
+  {
+      this->import_reduced_model(filename, joints_to_lock_by_intid, robot_configuration, pinocchio::Model::gravity981);
+  }
+  void              Serial_Robot::import_reduced_model(std::string filename, std::vector<int> joints_to_lock_by_intid)
+  {
+    // Pinocchio model
+      Model         model;
+    // Build the model using the URDF parser
+      pinocchio::urdf::buildModel(filename,model,false);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
+    // Set the gravity applied to the model
+      model.gravity.linear(pinocchio::Model::gravity981);
+
+      this->import_reduced_model(filename, joints_to_lock_by_intid, pinocchio::neutral(model), pinocchio::Model::gravity981);
   }
 
 

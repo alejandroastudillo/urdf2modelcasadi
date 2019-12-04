@@ -59,9 +59,19 @@ namespace mecali
       // METHODS
       void                     import_model(std::string filename);
       void                     import_model(std::string filename, bool verbose);
+      // void                     import_model(std::string filename, Eigen::Vector3d gravity_vector);
+      // void                     import_model(std::string filename, Eigen::Vector3d gravity_vector, bool verbose);
 
+      void                     import_reduced_model(std::string filename, std::vector<mecali::Index> joints_to_lock_by_index);
+      void                     import_reduced_model(std::string filename, std::vector<mecali::Index> joints_to_lock_by_index, Eigen::VectorXd robot_configuration);
       void                     import_reduced_model(std::string filename, std::vector<mecali::Index> joints_to_lock_by_index, Eigen::VectorXd robot_configuration, Eigen::Vector3d gravity_vector);
+
+      void                     import_reduced_model(std::string filename, std::vector<int> joints_to_lock_by_intid);
+      void                     import_reduced_model(std::string filename, std::vector<int> joints_to_lock_by_intid, Eigen::VectorXd robot_configuration);
       void                     import_reduced_model(std::string filename, std::vector<int> joints_to_lock_by_intid, Eigen::VectorXd robot_configuration, Eigen::Vector3d gravity_vector);
+
+      void                     import_reduced_model(std::string filename, std::vector<std::string> joints_to_lock_by_name);
+      void                     import_reduced_model(std::string filename, std::vector<std::string> joints_to_lock_by_name, Eigen::VectorXd robot_configuration);
       void                     import_reduced_model(std::string filename, std::vector<std::string> joints_to_lock_by_name, Eigen::VectorXd robot_configuration, Eigen::Vector3d gravity_vector);
 
 

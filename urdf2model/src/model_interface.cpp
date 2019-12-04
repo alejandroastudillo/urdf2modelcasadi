@@ -80,6 +80,87 @@ namespace mecali
     this->import_model(filename, false); // verbose can be omitted from the buildModel execution: <pinocchio::urdf::buildModel(filename,model)>
   }
 
+  void              Serial_Robot::import_reduced_model(std::string filename, std::vector<mecali::Index> joints_to_lock_by_index, Eigen::VectorXd robot_configuration, Eigen::Vector3d gravity_vector)
+  {
+    // Pinocchio model
+      Model         full_model;
+    // Build the model using the URDF parser
+      pinocchio::urdf::buildModel(filename,full_model,false);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
+    // Set the gravity applied to the model
+      // full_model.gravity.linear(pinocchio::Model::gravity981);
+      full_model.gravity.linear(gravity_vector);
+
+    // Get reduced model
+      mecali::Model reduced_model = pinocchio::buildReducedModel(full_model,joints_to_lock_by_index,robot_configuration);
+      // reduced_model.gravity.linear(gravity_vector);
+
+    // Initialize the data structure for the model
+      Data          data = pinocchio::Data(reduced_model);
+
+    // populate the data structure with some basic information about the robot
+      this->name                  = reduced_model.name;
+      this->n_joints              = reduced_model.njoints;  // data.oMi.size()
+      this->n_frames              = reduced_model.nframes;
+      this->n_q                   = reduced_model.nq;
+      this->n_dof                 = reduced_model.nv;
+      this->gravity               = reduced_model.gravity.linear_impl();
+      this->joint_torque_limit    = reduced_model.effortLimit;
+      this->joint_pos_ub          = reduced_model.upperPositionLimit;
+      this->joint_pos_lb          = reduced_model.lowerPositionLimit;
+      this->joint_vel_limit       = reduced_model.velocityLimit;
+      this->joint_names           = reduced_model.names;
+      this->neutral_configuration = pinocchio::neutral(reduced_model);
+
+      this->_n_bodies             = reduced_model.nbodies;
+      this->_model                = reduced_model;
+
+      std::vector<std::string> joint_types(this->n_dof);
+      for (int i = 1; i < this->n_joints; i++){ joint_types[i-1] = reduced_model.joints[i].shortname(); }
+      this->joint_types           = joint_types;
+
+      Eigen::VectorXd params(10*(this->n_dof));
+      for(pinocchio::Model::JointIndex i=1; i<(pinocchio::Model::JointIndex)reduced_model.njoints; ++i){ params.segment<10>((int)((i-1)*10)) = reduced_model.inertias[i].toDynamicParameters(); }
+      this->barycentric_params    = params;
+
+    // Casadi model
+      CasadiModel casadi_model = reduced_model.cast<CasadiScalar>();
+      CasadiData casadi_data( casadi_model );
+
+      this->_casadi_model         = casadi_model;
+  }
+  void              Serial_Robot::import_reduced_model(std::string filename, std::vector<std::string> joints_to_lock_by_name, Eigen::VectorXd robot_configuration, Eigen::Vector3d gravity_vector)
+  {
+    // Pinocchio model
+      Model         full_model;
+    // Build the model using the URDF parser
+      pinocchio::urdf::buildModel(filename,full_model,false);
+
+      // Print the list of joints to remove + retrieve the joint id
+      std::vector<mecali::Index> list_of_joints_to_lock_by_id;
+      for(std::vector<std::string>::const_iterator it = joints_to_lock_by_name.begin();
+          it != joints_to_lock_by_name.end(); ++it)
+      {
+        const std::string & joint_name = *it;
+        if(full_model.existJointName(joint_name)) // do not consider joint that are not in the model
+          list_of_joints_to_lock_by_id.push_back(full_model.getJointId(joint_name));
+        else
+          std::cout << "joint: " << joint_name << " does not belong to the model" << std::endl;
+      }
+
+      this->import_reduced_model(filename, list_of_joints_to_lock_by_id, robot_configuration, gravity_vector);
+  }
+  void              Serial_Robot::import_reduced_model(std::string filename, std::vector<int> joints_to_lock_by_intid, Eigen::VectorXd robot_configuration, Eigen::Vector3d gravity_vector)
+  {
+      std::vector<mecali::Index> list_of_joints_to_lock_by_id;
+
+      for(int i = 0; i < joints_to_lock_by_intid.size(); i++){
+      	list_of_joints_to_lock_by_id.push_back((size_t)joints_to_lock_by_intid[i]);
+      }
+
+      this->import_reduced_model(filename, list_of_joints_to_lock_by_id, robot_configuration, gravity_vector);
+  }
+
+
   Eigen::VectorXd   Serial_Robot::randomConfiguration()
   {
     Eigen::VectorXd lb_model = this->joint_pos_lb;

@@ -116,10 +116,36 @@ int main()
     // ---------------------------------------------------------------------
     // Code-generate or save a function
       // If not setting options, function fk_T_1 (or any function) will only be C-code-generated as "first_function.c" (or any other name you set)
-      mecali::generate_code(fk_T_1, "first_function");
+      // mecali::generate_code(fk_T_1, "first_function");
       // If you use options, you can set if you want to C-code-generate the function, or just save it as "second_function.casadi" (which can be loaded afterwards using casadi::Function::load("second_function.casadi"))
-      mecali::Dictionary codegen_options;
-      codegen_options["c"]=false;
-      codegen_options["save"]=true;
-      mecali::generate_code(fk_T_multiframes_by_name, "second_function", codegen_options);
+      // mecali::Dictionary codegen_options;
+      // codegen_options["c"]=false;
+      // codegen_options["save"]=true;
+      // mecali::generate_code(fk_T_multiframes_by_name, "second_function", codegen_options);
+
+    // ---------------------------------------------------------------------
+    // Create a reduced model based on a URDF file
+    // ---------------------------------------------------------------------
+    // Instantiate a Serial_Robot object called robot_model
+      mecali::Serial_Robot reduced_robot_model;
+    // Create the model based on a URDF file
+      Eigen::VectorXd q_init = robot_model.neutral_configuration;
+
+      // std::vector<double> q_init_vec = {0.86602540378, 0.5, 0, 1, 0, -0.45, 1, 0, 0.2, 1, 0};
+      // Eigen::Map<mecali::ConfigVector>( q_init_vec.data(), robot_model.n_q, 1 ) = q_init;
+
+      // std::vector<std::size_t> list_of_joints_to_lock_by_id = {1,3,5};
+      // std::vector<std::string> list_of_joints_to_lock_by_name = {"Actuator2","Actuator4","Actuator7","bla"};
+      std::vector<int> list_of_joints_to_lock_by_idint = {1,2,3};
+
+      Eigen::Vector3d gravity_vector(0,0,-9.81);
+
+      // reduced_robot_model.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_id, q_init, gravity_vector);
+      // reduced_robot_model.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_name, q_init, gravity_vector);
+      reduced_robot_model.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_idint, q_init, gravity_vector);
+
+      reduced_robot_model.print_model_data();
+
+
+      // std::cout << "vector " << q_init << std::endl;
 }

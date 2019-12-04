@@ -123,32 +123,44 @@ int main()
       // codegen_options["save"]=true;
       // mecali::generate_code(fk_T_multiframes_by_name, "second_function", codegen_options);
 
-    // ---------------------------------------------------------------------
-    // Create a reduced model based on a URDF file
-    // ---------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // Create a reduced model based on a URDF file and list of joints by name
+    // ------------------------------------------------------------------------
+
     // Instantiate a Serial_Robot object called robot_model
-      mecali::Serial_Robot reduced_robot_model;
+      mecali::Serial_Robot reduced_robot_model_1;
+    // Define list of joints to be locked (by name)
+      std::vector<std::string> list_of_joints_to_lock_by_name = {"Actuator2","Actuator4","Actuator7","bla"};
+    // Define (optinal) robot configuration where joints should be locked
+      Eigen::VectorXd q_init_1 = robot_model.neutral_configuration;
+    // Define (optinal) gravity vector to be used
+      Eigen::Vector3d gravity_vector_1(0,0,-9.81);
     // Create the model based on a URDF file
-      Eigen::VectorXd q_init = robot_model.neutral_configuration;
+      // reduced_robot_model_1.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_name);
+      // reduced_robot_model_1.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_name, q_init_1);
+      reduced_robot_model_1.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_name, q_init_1, gravity_vector_1);
 
-      // std::vector<double> q_init_vec = {0.86602540378, 0.5, 0, 1, 0, -0.45, 1, 0, 0.2, 1, 0};
-      // Eigen::Map<mecali::ConfigVector>( q_init_vec.data(), robot_model.n_q, 1 ) = q_init;
-
+    // ------------------------------------------------------------------------
+    // Create a reduced model based on a URDF file and list of joints by index
+    // ------------------------------------------------------------------------
+    // Instantiate a Serial_Robot object called robot_model
+      mecali::Serial_Robot reduced_robot_model_2;
+    // Define list of joints to be locked (by index)
       // std::vector<std::size_t> list_of_joints_to_lock_by_id = {1,3,5};
-      // std::vector<std::string> list_of_joints_to_lock_by_name = {"Actuator2","Actuator4","Actuator7","bla"};
-      std::vector<int> list_of_joints_to_lock_by_idint = {1,2,3};
+      std::vector<int> list_of_joints_to_lock_by_idint = {1,3,5};
+    // Define (optinal) robot configuration where joints should be locked
+      std::vector<double> q_init_vec_2 = {1, 0, 0.6, 1, 0, -0.4, 1, 0, 0.3, 1, 0};
+      Eigen::VectorXd q_init_2 = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(q_init_vec_2.data(), q_init_vec_2.size());
+    // Define (optinal) gravity vector to be used
+      Eigen::Vector3d gravity_vector_2(0,0,-9.81);
+    // Create the model based on a URDF file
+      // reduced_robot_model_2.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_id);
+      // reduced_robot_model_2.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_id, q_init_2,);
+      // reduced_robot_model_2.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_id, q_init_2, gravity_vector_2);
+      // reduced_robot_model_2.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_idint);
+      // reduced_robot_model_2.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_idint, q_init_2);
+      reduced_robot_model_2.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_idint, q_init_2, gravity_vector_2);
 
-      Eigen::Vector3d gravity_vector(0,0,-9.81);
+      reduced_robot_model_2.print_model_data();
 
-      // reduced_robot_model.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_id);
-      // reduced_robot_model.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_id, q_init, gravity_vector);
-      // reduced_robot_model.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_name);
-      // reduced_robot_model.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_name, q_init, gravity_vector);
-      reduced_robot_model.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_idint);
-      // reduced_robot_model.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_idint, q_init, gravity_vector);
-
-      reduced_robot_model.print_model_data();
-
-
-      // std::cout << "vector " << q_init << std::endl;
 }

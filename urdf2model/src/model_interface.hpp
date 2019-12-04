@@ -58,9 +58,8 @@ namespace mecali
 
       // METHODS
       void                     import_model(std::string filename);
-      void                     import_model(std::string filename, bool verbose);
-      // void                     import_model(std::string filename, Eigen::Vector3d gravity_vector);
-      // void                     import_model(std::string filename, Eigen::Vector3d gravity_vector, bool verbose);
+      void                     import_model(std::string filename, Eigen::Vector3d gravity_vector);
+      void                     import_model(std::string filename, Eigen::Vector3d gravity_vector, bool verbose);
 
       void                     import_reduced_model(std::string filename, std::vector<mecali::Index> joints_to_lock_by_index);
       void                     import_reduced_model(std::string filename, std::vector<mecali::Index> joints_to_lock_by_index, Eigen::VectorXd robot_configuration);

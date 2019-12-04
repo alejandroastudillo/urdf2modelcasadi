@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_CASE(Reduced_model)
     list_of_joints_to_lock_by_name.push_back("Actuator2");
     list_of_joints_to_lock_by_name.push_back("Actuator4"); // It can be in the wrong order
     list_of_joints_to_lock_by_name.push_back("Actuator5");
-    list_of_joints_to_lock_by_name.push_back("blabla"); // Joint not in the model
+    // list_of_joints_to_lock_by_name.push_back("blabla"); // Joint not in the model
 
     // Print the list of joints to remove + retrieve the joint id
     std::vector<mecali::Index> list_of_joints_to_lock_by_id;
@@ -224,21 +224,17 @@ BOOST_AUTO_TEST_CASE(Reduced_model)
       const std::string & joint_name = *it;
       if(model.existJointName(joint_name)) // do not consider joint that are not in the model
         list_of_joints_to_lock_by_id.push_back(model.getJointId(joint_name));
-      else
-        std::cout << "joint: " << joint_name << " does not belong to the model" << std::endl;
     }
 
     Eigen::VectorXd q_rand = pinocchio::randomConfiguration(model);
+
+    mecali::Serial_Robot reduced_robot_model;
+    reduced_robot_model.import_reduced_model(filename, list_of_joints_to_lock_by_name,q_rand);
+
     mecali::Model reduced_model = pinocchio::buildReducedModel(model,list_of_joints_to_lock_by_id,q_rand);
 
-    // Print the list of joints in the original model
-    std::cout << "List of joints in the original model:" << std::endl;
-    for(mecali::Index joint_id = 1; joint_id < model.joints.size(); ++joint_id)
-      std::cout << "\t- " << model.names[joint_id] << std::endl;
+    BOOST_CHECK(reduced_robot_model.n_joints == reduced_model.njoints);
+    BOOST_CHECK(reduced_robot_model.gravity.isApprox(reduced_model.gravity.linear_impl()));
 
-    // Print the list of joints in the reduced model
-    std::cout << "List of joints in the reduced model:" << std::endl;
-    for(mecali::Index joint_id = 1; joint_id < reduced_model.joints.size(); ++joint_id)
-      std::cout << "\t- " << reduced_model.names[joint_id] << std::endl;
 
 }

@@ -32,14 +32,15 @@ namespace mecali
     name = "NOT_SET";
   }
 
-  void              Serial_Robot::import_model(std::string filename, bool verbose)
+  void              Serial_Robot::import_model(std::string filename, Eigen::Vector3d gravity_vector, bool verbose)
   {
     // Pinocchio model
       Model         model;
     // Build the model using the URDF parser
       pinocchio::urdf::buildModel(filename,model,verbose);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
     // Set the gravity applied to the model
-      model.gravity.linear(pinocchio::Model::gravity981);
+      model.gravity.linear(gravity_vector);
+      // model.gravity.linear(pinocchio::Model::gravity981);
       // model.gravity.setZero();
     // Initialize the data structure for the model
       Data          data = pinocchio::Data(model);
@@ -75,9 +76,13 @@ namespace mecali
 
       this->_casadi_model         = casadi_model;
   }
+  void              Serial_Robot::import_model(std::string filename, Eigen::Vector3d gravity_vector)
+  {
+    this->import_model(filename, gravity_vector, false); // verbose can be omitted from the buildModel execution: <pinocchio::urdf::buildModel(filename,model)>
+  }
   void              Serial_Robot::import_model(std::string filename)
   {
-    this->import_model(filename, false); // verbose can be omitted from the buildModel execution: <pinocchio::urdf::buildModel(filename,model)>
+    this->import_model(filename, pinocchio::Model::gravity981, false); // verbose can be omitted from the buildModel execution: <pinocchio::urdf::buildModel(filename,model)>
   }
 
   void              Serial_Robot::import_reduced_model(std::string filename, std::vector<mecali::Index> joints_to_lock_by_index, Eigen::VectorXd robot_configuration, Eigen::Vector3d gravity_vector)

@@ -147,7 +147,7 @@ int main()
       mecali::Serial_Robot reduced_robot_model_2;
     // Define list of joints to be locked (by index)
       // std::vector<std::size_t> list_of_joints_to_lock_by_id = {1,3,5};
-      std::vector<int> list_of_joints_to_lock_by_idint = {1,3,5};
+      std::vector<int> list_of_joints_to_lock_by_idint = {3,4,5,6,7};
     // Define (optinal) robot configuration where joints should be locked
       std::vector<double> q_init_vec_2 = {1, 0, 0.6, 1, 0, -0.4, 1, 0, 0.3, 1, 0};
       Eigen::VectorXd q_init_2 = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(q_init_vec_2.data(), q_init_vec_2.size());
@@ -162,5 +162,10 @@ int main()
       reduced_robot_model_2.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_idint, q_init_2, gravity_vector_2);
 
       reduced_robot_model_2.print_model_data();
+
+      std::cout << "home config for reduced: " << reduced_robot_model_2.neutral_configuration << std::endl;
+      std::cout << "forward dynamics: " << reduced_robot_model_2.forward_dynamics() << std::endl;
+      std::cout << "forward kinematics: " << reduced_robot_model_2.forward_kinematics("position", "EndEffector_Link") << std::endl;
+      std::cout << "barycentric parameters: " << reduced_robot_model_2.barycentric_params << std::endl;
 
 }

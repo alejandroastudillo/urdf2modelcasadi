@@ -116,10 +116,56 @@ int main()
     // ---------------------------------------------------------------------
     // Code-generate or save a function
       // If not setting options, function fk_T_1 (or any function) will only be C-code-generated as "first_function.c" (or any other name you set)
-      mecali::generate_code(fk_T_1, "first_function");
+      // mecali::generate_code(fk_T_1, "first_function");
       // If you use options, you can set if you want to C-code-generate the function, or just save it as "second_function.casadi" (which can be loaded afterwards using casadi::Function::load("second_function.casadi"))
-      mecali::Dictionary codegen_options;
-      codegen_options["c"]=false;
-      codegen_options["save"]=true;
-      mecali::generate_code(fk_T_multiframes_by_name, "second_function", codegen_options);
+      // mecali::Dictionary codegen_options;
+      // codegen_options["c"]=false;
+      // codegen_options["save"]=true;
+      // mecali::generate_code(fk_T_multiframes_by_name, "second_function", codegen_options);
+
+    // ------------------------------------------------------------------------
+    // Create a reduced model based on a URDF file and list of joints by name
+    // ------------------------------------------------------------------------
+
+    // Instantiate a Serial_Robot object called robot_model
+      mecali::Serial_Robot reduced_robot_model_1;
+    // Define list of joints to be locked (by name)
+      std::vector<std::string> list_of_joints_to_lock_by_name = {"Actuator2","Actuator4","Actuator7","bla"};
+    // Define (optinal) robot configuration where joints should be locked
+      Eigen::VectorXd q_init_1 = robot_model.neutral_configuration;
+    // Define (optinal) gravity vector to be used
+      Eigen::Vector3d gravity_vector_1(0,0,-9.81);
+    // Create the model based on a URDF file
+      // reduced_robot_model_1.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_name);
+      // reduced_robot_model_1.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_name, q_init_1);
+      reduced_robot_model_1.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_name, q_init_1, gravity_vector_1);
+
+    // ------------------------------------------------------------------------
+    // Create a reduced model based on a URDF file and list of joints by index
+    // ------------------------------------------------------------------------
+    // Instantiate a Serial_Robot object called robot_model
+      mecali::Serial_Robot reduced_robot_model_2;
+    // Define list of joints to be locked (by index)
+      // std::vector<std::size_t> list_of_joints_to_lock_by_id = {1,3,5};
+      std::vector<int> list_of_joints_to_lock_by_idint = {3,4,5,6,7};
+    // Define (optinal) robot configuration where joints should be locked
+      std::vector<double> q_init_vec_2 = {1, 0, 0.6, 1, 0, -0.4, 1, 0, 0.3, 1, 0};
+      Eigen::VectorXd q_init_2 = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(q_init_vec_2.data(), q_init_vec_2.size());
+    // Define (optinal) gravity vector to be used
+      Eigen::Vector3d gravity_vector_2(0,0,-9.81);
+    // Create the model based on a URDF file
+      // reduced_robot_model_2.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_id);
+      // reduced_robot_model_2.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_id, q_init_2,);
+      // reduced_robot_model_2.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_id, q_init_2, gravity_vector_2);
+      // reduced_robot_model_2.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_idint);
+      // reduced_robot_model_2.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_idint, q_init_2);
+      reduced_robot_model_2.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_idint, q_init_2, gravity_vector_2);
+
+      reduced_robot_model_2.print_model_data();
+
+      std::cout << "home config for reduced: " << reduced_robot_model_2.neutral_configuration << std::endl;
+      std::cout << "forward dynamics: " << reduced_robot_model_2.forward_dynamics() << std::endl;
+      std::cout << "forward kinematics: " << reduced_robot_model_2.forward_kinematics("position", "EndEffector_Link") << std::endl;
+      std::cout << "barycentric parameters: " << reduced_robot_model_2.barycentric_params << std::endl;
+
 }

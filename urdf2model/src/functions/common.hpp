@@ -23,5 +23,7 @@ namespace mecali
 
   typedef CasadiModel::ConfigVectorType       ConfigVectorCasadi;
   typedef CasadiModel::TangentVectorType      TangentVectorCasadi;
+
+  typedef std::size_t                         Index;
 }
 #endif // COMMON_H_INCLUDED

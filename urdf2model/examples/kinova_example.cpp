@@ -11,12 +11,14 @@ int main()
       std::string urdf_filename = "../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf";
     // Instantiate a Serial_Robot object called robot_model
       mecali::Serial_Robot robot_model;
+    // Define (optinal) gravity vector to be used
+      Eigen::Vector3d gravity_vector(0,0,0);
     // Create the model based on a URDF file
-      robot_model.import_model(urdf_filename);
+      robot_model.import_model(urdf_filename, gravity_vector);
 
 
     // Print some information related to the imported model (boundaries, frames, DoF, etc)
-      robot_model.print_model_data();
+      // robot_model.print_model_data();
 
     // ---------------------------------------------------------------------
     // Set functions for robot dynamics and kinematics
@@ -73,6 +75,8 @@ int main()
       casadi::DM pos_res = expressions(casadi::DMVector {q_vec, v_vec, tau_vec, vp_vec, wp_vec})[1];
       std::cout << "Ode_aug_res: " << ode_aug_res << std::endl;
       std::cout << "pos_res: " << pos_res << std::endl;
+
+      std::cout << "Instructions: " << expressions.n_instructions() << std::endl;
 
       // q_sx, v_sx, tau_sx, vp_sx, wp_sx
 

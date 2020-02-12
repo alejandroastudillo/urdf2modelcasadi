@@ -49,6 +49,10 @@ namespace mecali
     // Call the Articulated-body algorithm
     pinocchio::aba(cas_model, cas_data, q_casadi, v_casadi, tau_casadi);
     pinocchio::computeMinverse(cas_model, cas_data, q_casadi);
+
+    // TODO: There should be a more efficient way to do this:
+    cas_data.Minv.triangularView<Eigen::StrictlyLower>() = cas_data.Minv.transpose().triangularView<Eigen::StrictlyLower>();
+    
     // Get the result from ABA into an SX
     CasadiScalar        Minv_sx(cas_model.nv, cas_model.nv);
     pinocchio::casadi::copy( cas_data.Minv, Minv_sx );

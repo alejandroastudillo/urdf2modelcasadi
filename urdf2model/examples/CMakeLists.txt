@@ -67,3 +67,12 @@ target_link_libraries( kinova_example
 #                       ${PROJECT_NAME}
 #                       ${CASADI_LIB}
 #                     )
+# # TJ example
+add_executable( tj_example
+                tj_example.cpp
+              )
+target_link_libraries( tj_example
+
+                       ${PROJECT_NAME}
+                       ${CASADI_LIB}
+                     )

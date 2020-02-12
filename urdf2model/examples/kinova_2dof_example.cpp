@@ -80,5 +80,5 @@ int main()
       mecali::generate_code(regressor, "kin3_regressor", codegen_options);
 
 
-
+      casadi::Function bla = casadi::Function::load("second_function.casadi");
 }

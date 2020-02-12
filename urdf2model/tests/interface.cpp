@@ -116,8 +116,8 @@ BOOST_AUTO_TEST_CASE(RNEA_pinocchio_casadi)
   // Recursive Newton-Euler algorithm (inverse dynamics) test with robot's home configuration
   // Pinocchio
     mecali::ConfigVector  q_home = pinocchio::randomConfiguration(model);  // pinocchio::randomConfiguration(model); pinocchio::neutral(model);
-    mecali::TangentVector v_home(Eigen::VectorXd::Zero(model.nv));
-    mecali::TangentVector a_home(Eigen::VectorXd::Zero(model.nv));
+    mecali::TangentVector v_home(Eigen::VectorXd::Random(model.nv));
+    mecali::TangentVector a_home(Eigen::VectorXd::Random(model.nv));
 
     pinocchio::rnea(model,data,q_home,v_home,a_home);
 
@@ -172,6 +172,9 @@ BOOST_AUTO_TEST_CASE(RNEA_pinocchio_casadi)
     pinocchio::computeMinverse(model,data_nt,q_home);
     Eigen::MatrixXd data_minv = data_nt.Minv;
 
+    // Populate the zeros in the lower triangle of the Minv
+    data_minv.triangularView<Eigen::StrictlyLower>() = data_minv.transpose().triangularView<Eigen::StrictlyLower>();
+
     // M(q)*ddq + C(q, dq)*dq + g(q) = tau
     Eigen::VectorXd tau_naive_nt = data_minv.inverse()*a_home + data_coriolis*v_home + data_gravity;
 
@@ -196,4 +199,45 @@ BOOST_AUTO_TEST_CASE(RNEA_pinocchio_casadi)
     BOOST_CHECK(coriolis_mat.isApprox(data_coriolis));
     BOOST_CHECK(mass_inverse_mat.isApprox(data_minv));
     BOOST_CHECK(tau_naive_cas.isApprox(data.tau));
+}
+
+BOOST_AUTO_TEST_CASE(Reduced_model)
+{
+  // Instantiate model and data objects
+    mecali::Model         model;                                        // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1ModelTpl.html
+    mecali::Data          data = pinocchio::Data(model);                // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1DataTpl.html
+
+    pinocchio::urdf::buildModel(filename,model);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
+  // Set the gravity applied to the model
+    model.gravity.linear(pinocchio::Model::gravity981);     // options: model.gravity.setZero(), model.gravity.linear( Eigen::Vector3d(0,0,-9.81));
+  // initialize the data structure for the model
+    data = pinocchio::Data(model);
+
+    std::vector<std::string> list_of_joints_to_lock_by_name;
+    list_of_joints_to_lock_by_name.push_back("Actuator2");
+    list_of_joints_to_lock_by_name.push_back("Actuator4"); // It can be in the wrong order
+    list_of_joints_to_lock_by_name.push_back("Actuator5");
+    // list_of_joints_to_lock_by_name.push_back("blabla"); // Joint not in the model
+
+    // Print the list of joints to remove + retrieve the joint id
+    std::vector<mecali::Index> list_of_joints_to_lock_by_id;
+    for(std::vector<std::string>::const_iterator it = list_of_joints_to_lock_by_name.begin();
+        it != list_of_joints_to_lock_by_name.end(); ++it)
+    {
+      const std::string & joint_name = *it;
+      if(model.existJointName(joint_name)) // do not consider joint that are not in the model
+        list_of_joints_to_lock_by_id.push_back(model.getJointId(joint_name));
+    }
+
+    Eigen::VectorXd q_rand = pinocchio::randomConfiguration(model);
+
+    mecali::Serial_Robot reduced_robot_model;
+    reduced_robot_model.import_reduced_model(filename, list_of_joints_to_lock_by_name,q_rand);
+
+    mecali::Model reduced_model = pinocchio::buildReducedModel(model,list_of_joints_to_lock_by_id,q_rand);
+
+    BOOST_CHECK(reduced_robot_model.n_joints == reduced_model.njoints);
+    BOOST_CHECK(reduced_robot_model.gravity.isApprox(reduced_model.gravity.linear_impl()));
+
+
 }

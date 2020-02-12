@@ -11,8 +11,10 @@ int main()
       std::string urdf_filename = "../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11.urdf";
     // Instantiate a Serial_Robot object called robot_model
       mecali::Serial_Robot robot_model;
+    // Define (optinal) gravity vector to be used
+      Eigen::Vector3d gravity_vector(0,0,0);
     // Create the model based on a URDF file
-      robot_model.import_model(urdf_filename);
+      robot_model.import_model(urdf_filename, gravity_vector);
 
 
     // Print some information related to the imported model (boundaries, frames, DoF, etc)
@@ -62,17 +64,19 @@ int main()
 
       mecali::generate_code(expressions, "kin3_expressions_noG", codegen_options);
 
-      // std::cout << "Function expressions: " << expressions << std::endl;
-      // std::vector<double> q_vec = {0.86602540378, 0.5, 0, 1, 0, -0.45, 1, 0, 0, 1, 0};
-      // std::vector<double> v_vec = {0, 0, 0, 0, 0, 0, 0};
-      // std::vector<double> tau_vec = {0, 0, 0, 0, 0, 0, 0};
-      // std::vector<double> vp_vec = {0, 0};
-      // std::vector<double> wp_vec = {0};
-      //
-      // casadi::DM ode_aug_res = expressions(casadi::DMVector {q_vec, v_vec, tau_vec, vp_vec, wp_vec})[0];
-      // casadi::DM pos_res = expressions(casadi::DMVector {q_vec, v_vec, tau_vec, vp_vec, wp_vec})[1];
-      // std::cout << "Ode_aug_res: " << ode_aug_res << std::endl;
-      // std::cout << "pos_res: " << pos_res << std::endl;
+      std::cout << "Function expressions: " << expressions << std::endl;
+      std::vector<double> q_vec = {0.86602540378, 0.5, 0, 1, 0, -0.45, 1, 0, 0, 1, 0};
+      std::vector<double> v_vec = {0, 0, 0, 0, 0, 0, 0};
+      std::vector<double> tau_vec = {0, 0, 0, 0, 0, 0, 0};
+      std::vector<double> vp_vec = {0, 0};
+      std::vector<double> wp_vec = {0};
+
+      casadi::DM ode_aug_res = expressions(casadi::DMVector {q_vec, v_vec, tau_vec, vp_vec, wp_vec})[0];
+      casadi::DM pos_res = expressions(casadi::DMVector {q_vec, v_vec, tau_vec, vp_vec, wp_vec})[1];
+      std::cout << "Ode_aug_res: " << ode_aug_res << std::endl;
+      std::cout << "pos_res: " << pos_res << std::endl;
+
+      std::cout << "Instructions: " << expressions.n_instructions() << std::endl;
 
       // q_sx, v_sx, tau_sx, vp_sx, wp_sx
 

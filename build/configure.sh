@@ -6,7 +6,7 @@
 
 # Set variables used by CMake
   # export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/casadi_351"
-  export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/build/install_matlab"
+  export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/build-python/install_python"
   export PINOCCHIO_INCLUDE="/opt/openrobots/include/"
   export EIGEN_INCLUDE="/usr/include/eigen3"
   export INSTALL_FOLDER="install_folder"

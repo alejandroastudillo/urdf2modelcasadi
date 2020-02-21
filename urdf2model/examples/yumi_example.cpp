@@ -33,6 +33,8 @@ int main()
         "gripper_r_base", "gripper_r_finger_r", "gripper_r_finger_l" };
 
       casadi::Function fk_pos = robot_model.forward_kinematics("transformation", required_Frames);
+      casadi::Function fd     = robot_model.forward_dynamics();
+      casadi::Function id     = robot_model.inverse_dynamics();
 
 
 
@@ -45,6 +47,8 @@ int main()
       codegen_options["c"]=false;
       codegen_options["save"]=true;
       mecali::generate_code(fk_pos, "yumi_fk", codegen_options);
+      mecali::generate_code(fd, "yumi_fd", codegen_options);
+      mecali::generate_code(id, "yumi_id", codegen_options);
 
 
 

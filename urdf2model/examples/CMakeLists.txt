@@ -59,14 +59,14 @@ target_link_libraries( kinova_example
 #                     )
 #
 # # Yumi example
-# add_executable( yumi_example
-#                yumi_example.cpp
-#              )
-# target_link_libraries( yumi_example
-#
-#                       ${PROJECT_NAME}
-#                       ${CASADI_LIB}
-#                     )
+add_executable( yumi_example
+               yumi_example.cpp
+             )
+target_link_libraries( yumi_example
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                    )
 # # TJ example
 add_executable( tj_example
                 tj_example.cpp

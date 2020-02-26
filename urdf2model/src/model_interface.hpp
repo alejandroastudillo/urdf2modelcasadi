@@ -24,6 +24,13 @@
 #include "functions/common.hpp"
 #include "functions/robot_expressions.hpp"
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/optional.hpp>
+#include <iostream>
+#include <sstream>
+#include <cstdlib>
+
 /*
 TODO Check how to include code_generation as a public method in class Serial_Robot: follow the save example https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp
 TODO Add jacobians and derivatives to Serial_Robot
@@ -72,6 +79,8 @@ namespace mecali
       void                     import_reduced_model(std::string filename, std::vector<std::string> joints_to_lock_by_name);
       void                     import_reduced_model(std::string filename, std::vector<std::string> joints_to_lock_by_name, Eigen::VectorXd robot_configuration);
       void                     import_reduced_model(std::string filename, std::vector<std::string> joints_to_lock_by_name, Eigen::VectorXd robot_configuration, Eigen::Vector3d gravity_vector);
+
+      void                     generate_json(std::string filename);
 
 
       // random configuration methods

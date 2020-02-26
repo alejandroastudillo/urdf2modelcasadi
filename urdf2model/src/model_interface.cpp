@@ -212,6 +212,24 @@ namespace mecali
       this->import_reduced_model(filename, joints_to_lock_by_intid, pinocchio::neutral(model), pinocchio::Model::gravity981);
   }
 
+  void Serial_Robot::generate_json(std::string filename)
+  {
+    boost::property_tree::ptree pt;
+    pt.put("Test", "string");
+    pt.put("Test2.inner0", "string2");
+    pt.put("Test2.inner1", "string3");
+    pt.put("Test2.inner2", 1234);
+
+    std::stringstream ss;
+    boost::property_tree::json_parser::write_json(ss, pt);
+
+    // std::cout << ss.str() << std::endl;
+
+    std::ofstream outFile;
+    outFile.open(filename);
+    outFile << ss.rdbuf();
+  }
+
 
   Eigen::VectorXd   Serial_Robot::randomConfiguration()
   {

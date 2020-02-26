@@ -37,22 +37,22 @@ int main()
       casadi::Function fd       = robot_model.forward_dynamics();
       casadi::Function id       = robot_model.inverse_dynamics();
 
-
+      robot_model.generate_json("json_0.json");
 
     // ---------------------------------------------------------------------
     // Generate (or save) a function
     // ---------------------------------------------------------------------
     // Code-generate or save a function
       // If you use options, you can set if you want to C-code-generate the function, or just save it as "second_function.casadi" (which can be loaded afterwards using casadi::Function::load("second_function.casadi"))
-      mecali::Dictionary codegen_options;
-      codegen_options["c"]=false;
-      codegen_options["save"]=true;
-      mecali::generate_code(fkpos_ee, "kinova_fkpos_ee", codegen_options);
-      mecali::generate_code(fkrot_ee, "kinova_fkrot_ee", codegen_options);
-      mecali::generate_code(fk_ee, "kinova_fk_ee", codegen_options);
-      mecali::generate_code(fk, "kinova_fk", codegen_options);
-      mecali::generate_code(fd, "kinova_fd", codegen_options);
-      mecali::generate_code(id, "kinova_id", codegen_options);
+      // mecali::Dictionary codegen_options;
+      // codegen_options["c"]=false;
+      // codegen_options["save"]=true;
+      // mecali::generate_code(fkpos_ee, "kinova_fkpos_ee", codegen_options);
+      // mecali::generate_code(fkrot_ee, "kinova_fkrot_ee", codegen_options);
+      // mecali::generate_code(fk_ee, "kinova_fk_ee", codegen_options);
+      // mecali::generate_code(fk, "kinova_fk", codegen_options);
+      // mecali::generate_code(fd, "kinova_fd", codegen_options);
+      // mecali::generate_code(id, "kinova_id", codegen_options);
 
 
 

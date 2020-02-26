@@ -76,3 +76,12 @@ target_link_libraries( tj_example
                        ${PROJECT_NAME}
                        ${CASADI_LIB}
                      )
+# # Gen3 example
+add_executable( gen3_example
+               gen3_example.cpp
+             )
+target_link_libraries( gen3_example
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                    )

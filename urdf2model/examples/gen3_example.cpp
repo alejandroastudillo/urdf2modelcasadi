@@ -37,7 +37,7 @@ int main()
       casadi::Function fd       = robot_model.forward_dynamics();
       casadi::Function id       = robot_model.inverse_dynamics();
 
-      robot_model.generate_json("json_0.json");
+      robot_model.generate_json("kinova.json");
 
     // ---------------------------------------------------------------------
     // Generate (or save) a function

@@ -214,17 +214,33 @@ namespace mecali
 
   void Serial_Robot::generate_json(std::string filename)
   {
+    // Eigen::VectorXd          barycentric_params;
+
     boost::property_tree::ptree pt;
-    pt.put("Test", "string");
-    pt.put("Test2.inner0", "string2");
-    pt.put("Test2.inner1", "string3");
-    pt.put("Test2.inner2", 1234);
+    pt.put("name", this->name);
+    pt.put("n_dof", this->n_dof);
+    pt.put("n_joints", this->n_joints);
+    pt.put("n_q", this->n_q);
+    pt.put("n_frames", this->n_frames);
+    pt.put("gravity.x", this->gravity[0]);
+    pt.put("gravity.y", this->gravity[1]);
+    pt.put("gravity.z", this->gravity[2]);
+    // for (int i = 0; i < 10*(this->n_dof); i++)
+    // {
+    //   pt.put("barycentric_params.b"+i, this->barycentric_params[i]);
+    // }
+    for (int i = 1; i < this->n_joints; i++)
+    {
+      pt.put("joints."+this->joint_names[i]+".joint_types", this->joint_types[i-1]);
+      pt.put("joints."+this->joint_names[i]+".joint_pos_ub", this->joint_pos_ub[i-1]);
+      pt.put("joints."+this->joint_names[i]+".joint_pos_lb", this->joint_pos_lb[i-1]);
+      pt.put("joints."+this->joint_names[i]+".joint_torque_limit", this->joint_torque_limit[i-1]);
+      pt.put("joints."+this->joint_names[i]+".joint_vel_limit", this->joint_vel_limit[i-1]);
+    }
 
     std::stringstream ss;
     boost::property_tree::json_parser::write_json(ss, pt);
-
     // std::cout << ss.str() << std::endl;
-
     std::ofstream outFile;
     outFile.open(filename);
     outFile << ss.rdbuf();

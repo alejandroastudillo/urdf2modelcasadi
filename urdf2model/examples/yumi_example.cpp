@@ -36,6 +36,8 @@ int main()
       casadi::Function fd     = robot_model.forward_dynamics();
       casadi::Function id     = robot_model.inverse_dynamics();
 
+      robot_model.generate_json("yumi.json");
+
 
 
     // ---------------------------------------------------------------------

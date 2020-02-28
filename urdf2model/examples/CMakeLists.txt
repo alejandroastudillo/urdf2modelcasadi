@@ -85,3 +85,13 @@ target_link_libraries( gen3_example
                       ${PROJECT_NAME}
                       ${CASADI_LIB}
                     )
+
+## Kinova with gripper example
+add_executable( kinova_gripper_example
+               kinova_gripper_example.cpp
+             )
+target_link_libraries( kinova_gripper_example
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                    )

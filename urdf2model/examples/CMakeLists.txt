@@ -19,15 +19,15 @@ target_link_libraries( basic_example
                        ${PROJECT_NAME}
                        ${CASADI_LIB}
                      )
-# # Complete example
-# add_executable( complete_example
-#                complete_example.cpp
-#              )
-# target_link_libraries( complete_example
-#
-#                       ${PROJECT_NAME}
-#                       ${CASADI_LIB}
-#                     )
+# Complete example
+add_executable( complete_example
+               complete_example.cpp
+             )
+target_link_libraries( complete_example
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                    )
 
 # Kinova example
 add_executable( kinova_example
@@ -49,15 +49,15 @@ target_link_libraries( kinova_example
 #                     )
 
 # # UR10 example
-# add_executable( ur10_example
-#                ur10_example.cpp
-#              )
-# target_link_libraries( ur10_example
-#
-#                       ${PROJECT_NAME}
-#                       ${CASADI_LIB}
-#                     )
-#
+add_executable( ur10_example
+               ur10_example.cpp
+             )
+target_link_libraries( ur10_example
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                    )
+
 # # Yumi example
 add_executable( yumi_example
                yumi_example.cpp
@@ -91,6 +91,16 @@ add_executable( kinova_gripper_example
                kinova_gripper_example.cpp
              )
 target_link_libraries( kinova_gripper_example
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                    )
+
+## iiwa example
+add_executable( iiwa_example
+               iiwa_example.cpp
+             )
+target_link_libraries( iiwa_example
 
                       ${PROJECT_NAME}
                       ${CASADI_LIB}

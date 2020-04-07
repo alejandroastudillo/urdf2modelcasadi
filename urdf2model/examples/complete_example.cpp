@@ -18,7 +18,10 @@ int main(int argc, char ** argv)
     */
 
       mecali::Serial_Robot robot_model;
-      robot_model.import_model(urdf_filename);
+
+      Eigen::Vector3d gravity_vector(0,0,0);
+    // Create the model based on a URDF file
+      robot_model.import_model(urdf_filename, gravity_vector);
 
       std::cout << "robot_model name: " << robot_model.name << std::endl;
 
@@ -51,26 +54,28 @@ int main(int argc, char ** argv)
         // casadi::Function fk_rot_allframes = robot_model.forward_kinematics("rotation", required_Frames);
         // casadi::Function fk_T_allframes   = robot_model.forward_kinematics("transformation", required_Frames);
 
-        std::cout << "Position all frames: \n" << fk_pos_allframes << std::endl;
+        // std::cout << "Position all frames: \n" << fk_pos_allframes << std::endl;
 
       // Test functions
-        std::vector<double> q_vec((size_t)robot_model.n_q);
-        Eigen::Map<mecali::ConfigVector>( q_vec.data(), robot_model.n_q, 1 ) = robot_model.neutral_configuration; // Populate q_vec with the robot's neutral configuration
-        // std::vector<double> q_vec = {0.86602540378, 0.5, 0, 1, 0, -0.45, 1, 0, 0, 1, 0};
-        std::vector<double> v_vec((size_t)robot_model.n_dof);
-        Eigen::Map<mecali::TangentVector>(v_vec.data(),robot_model.n_dof,1) = Eigen::VectorXd::Zero(robot_model.n_dof);
-        // std::vector<double> v_vec = {0, 0, 0, 0, 0, 0, 0};
-        std::vector<double> a_vec((size_t)robot_model.n_dof);
-        Eigen::Map<mecali::TangentVector>(a_vec.data(),robot_model.n_dof,1) = Eigen::VectorXd::Zero(robot_model.n_dof);
-        // std::vector<double> a_vec = {0, 0, 0, 0, 0, 0, 0};
-        std::vector<double> tau_vec((size_t)robot_model.n_dof);
-        Eigen::Map<mecali::TangentVector>(tau_vec.data(),robot_model.n_dof,1) = Eigen::VectorXd::Zero(robot_model.n_dof);
-        // std::vector<double> tau_vec = {0, 0, 0, 0, 0, 0, 0};
+        // std::vector<double> q_vec((size_t)robot_model.n_q);
+        // Eigen::Map<mecali::ConfigVector>( q_vec.data(), robot_model.n_q, 1 ) = robot_model.neutral_configuration; // Populate q_vec with the robot's neutral configuration
+        std::vector<double> q_vec = {0.86602540378, 0.5, 0, 1, 0, -0.45, 1, 0, 0, 1, 0};
+        // std::vector<double> v_vec((size_t)robot_model.n_dof);
+        // Eigen::Map<mecali::TangentVector>(v_vec.data(),robot_model.n_dof,1) = Eigen::VectorXd::Zero(robot_model.n_dof);
+        std::vector<double> v_vec = {0, 0, 0, 0, 0, 0, 0};
+        // std::vector<double> a_vec((size_t)robot_model.n_dof);
+        // Eigen::Map<mecali::TangentVector>(a_vec.data(),robot_model.n_dof,1) = Eigen::VectorXd::Zero(robot_model.n_dof);
+        std::vector<double> a_vec = {0, 0, 0, 0, 0, 0, 0};
+        // std::vector<double> tau_vec((size_t)robot_model.n_dof);
+        // Eigen::Map<mecali::TangentVector>(tau_vec.data(),robot_model.n_dof,1) = Eigen::VectorXd::Zero(robot_model.n_dof);
+        std::vector<double> tau_vec = {0.5, 0, 0, 0, 0, 0, 0};
 
         casadi::DM ddq_res = aba(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
         casadi::DM tau_res = rnea(casadi::DMVector {q_vec, v_vec, a_vec})[0];
         casadi::DM pos_res = fk_pos(casadi::DMVector {q_vec})[0];
         casadi::DM rot_res = fk_rot(casadi::DMVector {q_vec})[0];
+
+        std::cout << "FD: " << ddq_res << std::endl;
 
 
 

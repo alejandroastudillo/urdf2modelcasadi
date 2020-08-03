@@ -16,13 +16,13 @@ sudo apt-get install liburdfdom-dev
 ```
 * CASADI >= 3.4.4 (with pkg-config support)
 
-* Pinocchio (with Casadi interface - needs pkg-config support) from branch 'devel' - commit 607bab825ae37749034f2da11d16e3b883670f0b
+* Pinocchio (with Casadi interface - needs pkg-config support) from branch 'devel' - commit e5479944569c4305479be2c8c63a25ebaaa30ff8
 ```
 # Clone Pinocchio's repository (devel branch)
 git clone -b devel https://github.com/stack-of-tasks/pinocchio.git
 # Checkout the commit I have been using
 cd pinocchio
-git checkout 607bab825ae37749034f2da11d16e3b883670f0b
+git checkout e5479944569c4305479be2c8c63a25ebaaa30ff8
 # Build from source
 ...
 ```
@@ -80,17 +80,17 @@ int main()
       casadi::Function fwd_dynamics = robot_model.forward_dynamics();
     // Set function for inverse dynamics
       casadi::Function inv_dynamics = robot_model.inverse_dynamics();
-      
+
     // Set functions for mass_inverse matrix, coriolis matrix, and generalized gravity vector
       casadi::Function gen_gravity = robot_model.generalized_gravity();
-      
+
       casadi::Function coriolis = robot_model.coriolis_matrix();
-      
+
       casadi::Function mass_inverse = robot_model.mass_inverse_matrix();
-      
+
     // Set function for joint torque regressor: regressor(q, dq, ddq)*barycentric_params = tau
       casadi::Function regressor = robot_model.joint_torque_regressor();
-      
+
     // Set function for forward kinematics
       // The forward kinematics function can be set in multiple ways
       // Calling forward_kinematics without any argument generates a function which outputs a transformation matrix for each frame in the robot.

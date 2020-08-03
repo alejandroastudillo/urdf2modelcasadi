@@ -331,7 +331,7 @@ BOOST_AUTO_TEST_CASE(RNEA_DIFF_pinocchio_casadi)
     pinocchio::computeGeneralizedGravityDerivatives(model, data, q_home, g_partial_dq_sc);
 
   // Interface
-    mecali::CasadiData::MatrixXs g_partial_dq(model.nv,model.nv); //g_partial_dq.setZero();
+    mecali::CasadiData::MatrixXs g_partial_dq(model.nv,model.nv); g_partial_dq.setZero();
     pinocchio::computeGeneralizedGravityDerivatives(cas_model,cas_data,q_casadi,g_partial_dq);
 
     casadi::SX          g_partial_dq_sx( cas_model.nv, cas_model.nv);
@@ -387,14 +387,17 @@ BOOST_AUTO_TEST_CASE(RNEA_DIFF_pinocchio_casadi)
     std::vector<double> dtau_da_vec(static_cast< std::vector<double> >(dtau_da_res));
     BOOST_CHECK(Eigen::Map<mecali::Data::MatrixXs>(dtau_da_vec.data(), model.nv, model.nv).isApprox(dtau_da_ref));
 
-      // ---
-      // pinocchio::rnea( cas_model, cas_data, q_casadi, v_casadi, a_casadi );
+    // ---
+    mecali::CasadiData::MatrixXs dtau_dq_casadi(model.nv,model.nv); dtau_dq_casadi.setZero();
+    mecali::CasadiData::MatrixXs dtau_dv_casadi(model.nv,model.nv); dtau_dv_casadi.setZero();
+    mecali::CasadiData::MatrixXs dtau_da_casadi(model.nv,model.nv); dtau_da_casadi.setZero();
+    pinocchio::computeRNEADerivatives(cas_model,cas_data,q_casadi,v_int_casadi,a_casadi,dtau_dq_casadi,dtau_dv_casadi,dtau_da_casadi);
 
-      // mecali::CasadiData::MatrixXs dtau_dq_casadi(model.nv,model.nv), dtau_dv_casadi(model.nv,model.nv), dtau_da_casadi(model.nv,model.nv);
-      // dtau_dq_casadi.setZero();
-      // dtau_dv_casadi.setZero();
-      // dtau_da_casadi.setZero();
-      // pinocchio::computeRNEADerivatives(cas_model, cas_data, q_casadi, v_casadi, a_casadi, dtau_dq_casadi, dtau_dv_casadi, dtau_da_casadi);
+    // mecali::CasadiData::MatrixXs dtau_dq_casadi(model.nv,model.nv), dtau_dv_casadi(model.nv,model.nv), dtau_da_casadi(model.nv,model.nv);
+    // dtau_dq_casadi.setZero();
+    // dtau_dv_casadi.setZero();
+    // dtau_da_casadi.setZero();
+    // pinocchio::computeRNEADerivatives(cas_model, cas_data, q_casadi, v_casadi, a_casadi, dtau_dq_casadi, dtau_dv_casadi, dtau_da_casadi);
 
 
 

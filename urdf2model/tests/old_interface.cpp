@@ -201,49 +201,49 @@ BOOST_AUTO_TEST_CASE(RNEA_model_interface)
     BOOST_CHECK(tau_mat.isApprox(data.tau));
 }
 
-BOOST_AUTO_TEST_CASE(RNEA_Derivatives_model_interface)
-{
-  // Instantiate model and data objects
-      Model         model;                                        // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1ModelTpl.html
-      Data          data = pinocchio::Data(model);                // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1DataTpl.html
-
-      pinocchio::urdf::buildModel(filename,model);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
-    // Set the gravity applied to the model
-      model.gravity.linear(pinocchio::Model::gravity981);     // options: model.gravity.setZero(), model.gravity.linear( Eigen::Vector3d(0,0,-9.81));
-    // initialize the data structure for the model
-      data = pinocchio::Data(model);
-
-    CasadiModel casadi_model = model.cast<CasadiScalar>();
-    CasadiData casadi_data(casadi_model);
-
-// Recursive Newton-Euler algorithm (inverse dynamics) test with robot's home configuration
-  // Pinocchio
-    ConfigVector  q_home = pinocchio::neutral(model);  // pinocchio::randomConfiguration(model);
-    TangentVector v_home(Eigen::VectorXd::Zero(model.nv));
-    TangentVector a_home(Eigen::VectorXd::Zero(model.nv));
-
-    Eigen::MatrixXd rnea_partial_dq(model.nv,model.nv);
-    rnea_partial_dq.setZero();
-    Eigen::MatrixXd rnea_partial_dv(model.nv,model.nv);
-    rnea_partial_dv.setZero();
-    Eigen::MatrixXd rnea_partial_da(model.nv,model.nv);
-    rnea_partial_da.setZero();
-
-    pinocchio::computeRNEADerivatives(model,data,q_home,v_home,a_home,rnea_partial_dq,rnea_partial_dv,rnea_partial_da);
-
-  // Pinocchio + Casadi
-    CasadiScalar q_sx = casadi::SX::sym("q", model.nq);
-    ConfigVectorCasadi q_casadi(model.nq);
-    pinocchio::casadi::copy(q_sx,q_casadi); // q_casadi = Eigen::Map<ConfigVectorCasadi>(static_cast< std::vector<CasadiScalar> >(q_sx).data(),model.nq,1);
-
-    CasadiScalar v_sx = casadi::SX::sym("v", model.nv);
-    TangentVectorCasadi v_casadi(model.nv);
-    pinocchio::casadi::copy(v_sx,v_casadi); // v_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(v_sx).data(),model.nv,1);
-
-    CasadiScalar a_sx = casadi::SX::sym("a", model.nv);
-    TangentVectorCasadi a_casadi(model.nv);
-    pinocchio::casadi::copy(a_sx,a_casadi); // a_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(a_sx).data(),model.nv,1);
-
-    pinocchio::rnea(casadi_model,casadi_data,q_casadi,v_casadi,a_casadi);
-
-}
+// BOOST_AUTO_TEST_CASE(RNEA_Derivatives_model_interface)
+// {
+//   // Instantiate model and data objects
+//       Model         model;                                        // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1ModelTpl.html
+//       Data          data = pinocchio::Data(model);                // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1DataTpl.html
+// 
+//       pinocchio::urdf::buildModel(filename,model);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
+//     // Set the gravity applied to the model
+//       model.gravity.linear(pinocchio::Model::gravity981);     // options: model.gravity.setZero(), model.gravity.linear( Eigen::Vector3d(0,0,-9.81));
+//     // initialize the data structure for the model
+//       data = pinocchio::Data(model);
+//
+//     CasadiModel casadi_model = model.cast<CasadiScalar>();
+//     CasadiData casadi_data(casadi_model);
+//
+// // Recursive Newton-Euler algorithm (inverse dynamics) test with robot's home configuration
+//   // Pinocchio
+//     ConfigVector  q_home = pinocchio::neutral(model);  // pinocchio::randomConfiguration(model);
+//     TangentVector v_home(Eigen::VectorXd::Zero(model.nv));
+//     TangentVector a_home(Eigen::VectorXd::Zero(model.nv));
+//
+//     Eigen::MatrixXd rnea_partial_dq(model.nv,model.nv);
+//     rnea_partial_dq.setZero();
+//     Eigen::MatrixXd rnea_partial_dv(model.nv,model.nv);
+//     rnea_partial_dv.setZero();
+//     Eigen::MatrixXd rnea_partial_da(model.nv,model.nv);
+//     rnea_partial_da.setZero();
+//
+//     pinocchio::computeRNEADerivatives(model,data,q_home,v_home,a_home,rnea_partial_dq,rnea_partial_dv,rnea_partial_da);
+//
+//   // Pinocchio + Casadi
+//     CasadiScalar q_sx = casadi::SX::sym("q", model.nq);
+//     ConfigVectorCasadi q_casadi(model.nq);
+//     pinocchio::casadi::copy(q_sx,q_casadi); // q_casadi = Eigen::Map<ConfigVectorCasadi>(static_cast< std::vector<CasadiScalar> >(q_sx).data(),model.nq,1);
+//
+//     CasadiScalar v_sx = casadi::SX::sym("v", model.nv);
+//     TangentVectorCasadi v_casadi(model.nv);
+//     pinocchio::casadi::copy(v_sx,v_casadi); // v_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(v_sx).data(),model.nv,1);
+//
+//     CasadiScalar a_sx = casadi::SX::sym("a", model.nv);
+//     TangentVectorCasadi a_casadi(model.nv);
+//     pinocchio::casadi::copy(a_sx,a_casadi); // a_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(a_sx).data(),model.nv,1);
+//
+//     pinocchio::rnea(casadi_model,casadi_data,q_casadi,v_casadi,a_casadi);
+//
+// }

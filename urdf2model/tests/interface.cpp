@@ -331,15 +331,16 @@ BOOST_AUTO_TEST_CASE(RNEA_DIFF_pinocchio_casadi)
     pinocchio::computeGeneralizedGravityDerivatives(model, data, q_home, g_partial_dq_sc);
 
   // Interface
-    mecali::CasadiData::MatrixXs g_partial_dq(model.nv,model.nv); g_partial_dq.setZero();
-    pinocchio::computeGeneralizedGravityDerivatives(cas_model,cas_data,q_casadi,g_partial_dq);
+    // mecali::CasadiData::MatrixXs g_partial_dq(model.nv,model.nv); g_partial_dq.setZero();
+    // pinocchio::computeGeneralizedGravityDerivatives(cas_model,cas_data,q_casadi,g_partial_dq);
+    //
+    // casadi::SX          g_partial_dq_sx( cas_model.nv, cas_model.nv);
+    // pinocchio::casadi::copy( g_partial_dq, g_partial_dq_sx );
+    //
+    // casadi::Function    generalized_gravity_derivatives("generalized_gravity_derivatives", casadi::SXVector {q_sx}, casadi::SXVector {g_partial_dq_sx});
+    casadi::Function gravity_derivatives = robot_model.generalized_gravity_derivatives();
 
-    casadi::SX          g_partial_dq_sx( cas_model.nv, cas_model.nv);
-    pinocchio::casadi::copy( g_partial_dq, g_partial_dq_sx );
-
-    casadi::Function    generalized_gravity_derivatives("generalized_gravity_derivatives", casadi::SXVector {q_sx}, casadi::SXVector {g_partial_dq_sx});
-
-    casadi::DM gravity_deriv_res = generalized_gravity_derivatives(casadi::DMVector {q_vec})[0];
+    casadi::DM gravity_deriv_res = gravity_derivatives(casadi::DMVector {q_vec})[0];
 
     Eigen::MatrixXd gravity_deriv_mat = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(gravity_deriv_res).data(),robot_model.n_dof,robot_model.n_dof);
 
@@ -350,48 +351,49 @@ BOOST_AUTO_TEST_CASE(RNEA_DIFF_pinocchio_casadi)
   // -----------------------------------------------------------------------
   // Pinocchio
     // compute references
-    mecali::Data::MatrixXs dtau_dq_ref(model.nv,model.nv), dtau_dv_ref(model.nv,model.nv), dtau_da_ref(model.nv,model.nv);
-    dtau_dq_ref.setZero(); dtau_dv_ref.setZero(); dtau_da_ref.setZero();
-
-    pinocchio::computeRNEADerivatives(model, data, q_home, v_home, a_home, dtau_dq_ref, dtau_dv_ref, dtau_da_ref);
-    dtau_da_ref.triangularView<Eigen::StrictlyLower>() = dtau_da_ref.transpose().triangularView<Eigen::StrictlyLower>();
-
-  // Interface
-    // check with respect to q+dq
-    casadi::SX dtau_dq = jacobian(tau_sx, v_sx_int);
-    casadi::Function eval_dtau_dq("eval_dtau_dq",
-                                  casadi::SXVector {q_sx, v_sx_int, v_sx, a_sx},
-                                  casadi::SXVector {dtau_dq});
-
-    casadi::DM dtau_dq_res = eval_dtau_dq(casadi::DMVector {q_vec, v_int_vec, v_vec, a_vec})[0];
-    std::vector<double> dtau_dq_vec(static_cast< std::vector<double> >(dtau_dq_res));
-    BOOST_CHECK(Eigen::Map<mecali::Data::MatrixXs>(dtau_dq_vec.data(),model.nv,model.nv).isApprox(dtau_dq_ref));
-
-    // check with respect to v+dv
-    casadi::SX dtau_dv = jacobian(tau_sx, v_sx);
-    casadi::Function eval_dtau_dv("eval_dtau_dv",
-                                  casadi::SXVector {q_sx, v_sx_int, v_sx, a_sx},
-                                  casadi::SXVector {dtau_dv});
-
-    casadi::DM dtau_dv_res = eval_dtau_dv(casadi::DMVector {q_vec, v_int_vec, v_vec, a_vec})[0];
-    std::vector<double> dtau_dv_vec(static_cast< std::vector<double> >(dtau_dv_res));
-    BOOST_CHECK(Eigen::Map<mecali::Data::MatrixXs>(dtau_dv_vec.data(), model.nv, model.nv).isApprox(dtau_dv_ref));
-
-    // check with respect to a+da
-    casadi::SX dtau_da = jacobian(tau_sx, a_sx);
-    casadi::Function eval_dtau_da("eval_dtau_da",
-                                  casadi::SXVector {q_sx, v_sx_int, v_sx, a_sx},
-                                  casadi::SXVector {dtau_da});
-
-    casadi::DM dtau_da_res = eval_dtau_da(casadi::DMVector {q_vec, v_int_vec, v_vec, a_vec})[0];
-    std::vector<double> dtau_da_vec(static_cast< std::vector<double> >(dtau_da_res));
-    BOOST_CHECK(Eigen::Map<mecali::Data::MatrixXs>(dtau_da_vec.data(), model.nv, model.nv).isApprox(dtau_da_ref));
-
-    // ---
-    mecali::CasadiData::MatrixXs dtau_dq_casadi(model.nv,model.nv); dtau_dq_casadi.setZero();
-    mecali::CasadiData::MatrixXs dtau_dv_casadi(model.nv,model.nv); dtau_dv_casadi.setZero();
-    mecali::CasadiData::MatrixXs dtau_da_casadi(model.nv,model.nv); dtau_da_casadi.setZero();
-    pinocchio::computeRNEADerivatives(cas_model,cas_data,q_casadi,v_int_casadi,a_casadi,dtau_dq_casadi,dtau_dv_casadi,dtau_da_casadi);
+  //   mecali::Data::MatrixXs dtau_dq_ref(model.nv,model.nv), dtau_dv_ref(model.nv,model.nv), dtau_da_ref(model.nv,model.nv);
+  //   dtau_dq_ref.setZero(); dtau_dv_ref.setZero(); dtau_da_ref.setZero();
+  //
+  //   pinocchio::computeRNEADerivatives(model, data, q_home, v_home, a_home, dtau_dq_ref, dtau_dv_ref, dtau_da_ref);
+  //   dtau_da_ref.triangularView<Eigen::StrictlyLower>() = dtau_da_ref.transpose().triangularView<Eigen::StrictlyLower>();
+  //
+  // // Interface
+  //   // check with respect to q+dq
+  //   casadi::SX dtau_dq = jacobian(tau_sx, v_sx_int);
+  //   casadi::Function eval_dtau_dq("eval_dtau_dq",
+  //                                 casadi::SXVector {q_sx, v_sx_int, v_sx, a_sx},
+  //                                 casadi::SXVector {dtau_dq});
+  //
+  //   casadi::DM dtau_dq_res = eval_dtau_dq(casadi::DMVector {q_vec, v_int_vec, v_vec, a_vec})[0];
+  //   std::vector<double> dtau_dq_vec(static_cast< std::vector<double> >(dtau_dq_res));
+  //   BOOST_CHECK(Eigen::Map<mecali::Data::MatrixXs>(dtau_dq_vec.data(),model.nv,model.nv).isApprox(dtau_dq_ref));
+  //
+  //   // check with respect to v+dv
+  //   casadi::SX dtau_dv = jacobian(tau_sx, v_sx);
+  //   casadi::Function eval_dtau_dv("eval_dtau_dv",
+  //                                 casadi::SXVector {q_sx, v_sx_int, v_sx, a_sx},
+  //                                 casadi::SXVector {dtau_dv});
+  //
+  //   casadi::DM dtau_dv_res = eval_dtau_dv(casadi::DMVector {q_vec, v_int_vec, v_vec, a_vec})[0];
+  //   std::vector<double> dtau_dv_vec(static_cast< std::vector<double> >(dtau_dv_res));
+  //   BOOST_CHECK(Eigen::Map<mecali::Data::MatrixXs>(dtau_dv_vec.data(), model.nv, model.nv).isApprox(dtau_dv_ref));
+  //
+  //   // check with respect to a+da
+  //   casadi::SX dtau_da = jacobian(tau_sx, a_sx);
+  //   casadi::Function eval_dtau_da("eval_dtau_da",
+  //                                 casadi::SXVector {q_sx, v_sx_int, v_sx, a_sx},
+  //                                 casadi::SXVector {dtau_da});
+  //
+  //   casadi::DM dtau_da_res = eval_dtau_da(casadi::DMVector {q_vec, v_int_vec, v_vec, a_vec})[0];
+  //   std::vector<double> dtau_da_vec(static_cast< std::vector<double> >(dtau_da_res));
+  //   BOOST_CHECK(Eigen::Map<mecali::Data::MatrixXs>(dtau_da_vec.data(), model.nv, model.nv).isApprox(dtau_da_ref));
+  //
+  //   // ---
+  //   mecali::CasadiData::MatrixXs dtau_dq_casadi(model.nv,model.nv); dtau_dq_casadi.setZero();
+  //   mecali::CasadiData::MatrixXs dtau_dv_casadi(model.nv,model.nv); dtau_dv_casadi.setZero();
+  //   mecali::CasadiData::MatrixXs dtau_da_casadi(model.nv,model.nv); dtau_da_casadi.setZero();
+  //
+  //   pinocchio::computeRNEADerivatives(cas_model,cas_data,q_casadi,v_casadi,a_casadi,dtau_dq_casadi,dtau_dv_casadi,dtau_da_casadi);
 
     // mecali::CasadiData::MatrixXs dtau_dq_casadi(model.nv,model.nv), dtau_dv_casadi(model.nv,model.nv), dtau_da_casadi(model.nv,model.nv);
     // dtau_dq_casadi.setZero();
@@ -401,4 +403,74 @@ BOOST_AUTO_TEST_CASE(RNEA_DIFF_pinocchio_casadi)
 
 
 
+}
+
+BOOST_AUTO_TEST_CASE(GRAV_DIFF_pinocchio_casadi)
+{
+  // Instantiate model and data objects
+    mecali::Model         model;                                        // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1ModelTpl.html
+    mecali::Data          data = pinocchio::Data(model);                // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1DataTpl.html
+
+    pinocchio::urdf::buildModel(filename,model);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
+  // Set the gravity applied to the model
+    model.gravity.linear(pinocchio::Model::gravity981);     // options: model.gravity.setZero(), model.gravity.linear( Eigen::Vector3d(0,0,-9.81));
+  // initialize the data structure for the model
+    data = pinocchio::Data(model);
+
+  // Recursive Newton-Euler algorithm (inverse dynamics) test with robot's home configuration
+  // Pinocchio
+    mecali::Serial_Robot robot_model;
+    robot_model.import_model(filename);
+
+    mecali::ConfigVector  q_home = pinocchio::randomConfiguration(model);  // pinocchio::randomConfiguration(model); pinocchio::neutral(model);
+    mecali::TangentVector v_home(Eigen::VectorXd::Random(model.nv));
+    mecali::TangentVector a_home(Eigen::VectorXd::Random(model.nv));
+
+    pinocchio::rnea(model, data, q_home, v_home, a_home);
+
+
+    mecali::CasadiModel cas_model = model.cast<mecali::CasadiScalar>();
+    mecali::CasadiData cas_data(cas_model);
+
+    mecali::CasadiScalar        q_sx = casadi::SX::sym("q", cas_model.nq);
+    mecali::ConfigVectorCasadi  q_casadi(cas_model.nq);
+
+    std::vector<double> q_vec((size_t)model.nq);
+    Eigen::Map<mecali::ConfigVector>( q_vec.data(), model.nq, 1 ) = q_home;
+
+
+    pinocchio::casadi::copy( q_sx, q_casadi );
+
+  // -----------------------------------------------------------------------
+  // Generalized gravity derivatives ---------------------------------------
+  // -----------------------------------------------------------------------
+  // Pinocchio
+    Eigen::MatrixXd g_partial_dq_sc(model.nv,model.nv);
+    g_partial_dq_sc.setZero();
+    pinocchio::computeGeneralizedGravityDerivatives(model, data, q_home, g_partial_dq_sc);
+
+  // Interface
+    mecali::CasadiData::MatrixXs g_partial_dq(model.nv,model.nv);
+    g_partial_dq.setZero();
+    pinocchio::computeGeneralizedGravityDerivatives(cas_model, cas_data, q_casadi, g_partial_dq);
+
+    casadi::SX          g_partial_dq_sx( cas_model.nv, cas_model.nv);
+    pinocchio::casadi::copy( g_partial_dq, g_partial_dq_sx );
+
+    casadi::Function    generalized_gravity_derivatives("generalized_gravity_derivatives", casadi::SXVector {q_sx}, casadi::SXVector {g_partial_dq_sx});
+
+    casadi::DM gravity_deriv_res_0 = generalized_gravity_derivatives(casadi::DMVector {q_vec})[0];
+
+    Eigen::MatrixXd gravity_deriv_mat_0 = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(gravity_deriv_res_0).data(),robot_model.n_dof,robot_model.n_dof);
+
+
+    // Interface functions
+    casadi::Function gravity_derivatives = robot_model.generalized_gravity_derivatives();
+
+    casadi::DM gravity_deriv_res = gravity_derivatives(casadi::DMVector {q_vec})[0];
+
+    Eigen::MatrixXd gravity_deriv_mat = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(gravity_deriv_res).data(),robot_model.n_dof,robot_model.n_dof);
+
+    BOOST_CHECK(gravity_deriv_mat_0.isApprox(gravity_deriv_mat));
+    BOOST_CHECK(gravity_deriv_mat.isApprox(g_partial_dq_sc));
 }

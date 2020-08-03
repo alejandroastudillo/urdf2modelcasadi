@@ -6,16 +6,12 @@
 
 #include <casadi/casadi.hpp>
 #include <pinocchio/math/casadi.hpp>
+// #include <pinocchio/autodiff/casadi.hpp>
 
 #include <pinocchio/multibody/model.hpp>
 #include <pinocchio/parsers/urdf.hpp>
 #include <pinocchio/algorithm/joint-configuration.hpp>
 #include <pinocchio/algorithm/model.hpp>
-
-// #include "pinocchio/algorithm/jacobian.hpp"
-// #include "pinocchio/algorithm/crba.hpp"
-// #include "pinocchio/algorithm/rnea-derivatives.hpp"
-// #include "pinocchio/algorithm/aba-derivatives.hpp"
 
 #include "functions/forward_dynamics.hpp"
 #include "functions/inverse_dynamics.hpp"
@@ -101,6 +97,7 @@ namespace mecali
       casadi::Function         forward_kinematics(std::string content, int frame_index);
       casadi::Function         forward_kinematics(std::string content);
       casadi::Function         forward_kinematics();
+      casadi::Function         generalized_gravity_derivatives();
 
       casadi::Function         robot_expressions(std::vector<std::string> frame_names, bool AUGMENT_ODE);
 

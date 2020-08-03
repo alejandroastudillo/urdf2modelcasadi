@@ -59,7 +59,6 @@ namespace mecali
 
     return generalized_gravity;
   }
-
   casadi::Function get_coriolis(CasadiModel &cas_model, CasadiData &cas_data)
   {
     // Set variables
@@ -117,4 +116,27 @@ namespace mecali
     return joint_torque_regressor;
   }
 
+  casadi::Function get_generalized_gravity_derivatives(CasadiModel &cas_model, CasadiData &cas_data)
+  {
+    // Set variables
+    CasadiScalar        q_sx = casadi::SX::sym("q", cas_model.nq);
+    ConfigVectorCasadi  q_casadi(cas_model.nq);
+    pinocchio::casadi::copy( q_sx, q_casadi );
+
+    // Output variable
+    CasadiScalar          g_partial_dq_sx( cas_model.nv, cas_model.nv);
+    CasadiData::MatrixXs  g_partial_dq(cas_model.nv,cas_model.nv);
+    g_partial_dq.setZero();
+
+    // Call the derivatives function
+    pinocchio::computeGeneralizedGravityDerivatives(cas_model, cas_data, q_casadi, g_partial_dq);
+
+    // Get the result into an SX
+    pinocchio::casadi::copy( g_partial_dq, g_partial_dq_sx );
+
+    // Create function
+    casadi::Function    generalized_gravity_derivatives("generalized_gravity_derivatives", casadi::SXVector {q_sx}, casadi::SXVector {g_partial_dq_sx});
+
+    return generalized_gravity_derivatives;
+  }
 }

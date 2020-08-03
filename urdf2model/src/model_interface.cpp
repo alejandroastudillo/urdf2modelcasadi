@@ -404,6 +404,12 @@ namespace mecali
 
       return get_joint_torque_regressor( this->_casadi_model, casadi_data );
   }
+  casadi::Function  Serial_Robot::generalized_gravity_derivatives()
+  {
+      CasadiData casadi_data( this->_casadi_model );
+
+      return get_generalized_gravity_derivatives( this->_casadi_model, casadi_data );
+  }
 
   casadi::Function  Serial_Robot::forward_kinematics(std::string content, std::vector<std::string> frame_names)
   {
@@ -446,7 +452,6 @@ namespace mecali
 
   casadi::Function  Serial_Robot::robot_expressions(std::vector<std::string> frame_names, bool AUGMENT_ODE)
   {
-    // ode_aug (fd), fk_eeT (pos, rot)
     CasadiData casadi_data( this->_casadi_model );
 
     return get_robot_expressions( this->_casadi_model, casadi_data, frame_names, AUGMENT_ODE );

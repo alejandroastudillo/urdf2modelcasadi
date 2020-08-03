@@ -33,7 +33,7 @@
 
 # Execute unit tests
   print_title "########## Executing unit tests ##########"
-  # export BOOST_TEST_LOG_LEVEL="message"
+  export BOOST_TEST_LOG_LEVEL="message"
   # # ctest -V
   make test ARGS="-j3 -V" # -V
 

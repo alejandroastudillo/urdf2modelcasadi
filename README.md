@@ -24,7 +24,11 @@ git clone -b devel https://github.com/stack-of-tasks/pinocchio.git
 cd pinocchio
 git checkout e5479944569c4305479be2c8c63a25ebaaa30ff8
 # Build from source
-...
+cd /pinocchio/build
+export CMAKE_PREFIX_PATH=/home/alejandro/phd_software/casadi_source/build:$CMAKE_PREFIX_PATH
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/openrobots -DBUILD_PYTHON_INTERFACE=OFF -DBUILD_WITH_CASADI_SUPPORT=ON
+sudo make -j4
+sudo make install
 ```
 * C++11 (for randomConfiguration)
 

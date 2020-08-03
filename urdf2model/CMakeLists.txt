@@ -1,4 +1,4 @@
-  CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+  CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 # Set project name
   project(mecali)
@@ -15,11 +15,15 @@
   option(BUILD_UNIT_TESTS "Build the unit tests" ON)
   option(BUILD_EXAMPLES "Build the examples" ON)
 
+
 # Set GCC flags
+  SET(CMAKE_CXX_STANDARD 11)
+
   if(DEBUG_MODE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -fPIC -std=c++11 -DPINOCCHIO_URDFDOM_TYPEDEF_SHARED_PTR -DPINOCCHIO_WITH_URDFDOM -DDEBUG")
   else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -fPIC -std=c++11 -DPINOCCHIO_URDFDOM_TYPEDEF_SHARED_PTR -DPINOCCHIO_WITH_URDFDOM")
+    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -fPIC -std=c++11 -DPINOCCHIO_URDFDOM_TYPEDEF_SHARED_PTR -DPINOCCHIO_WITH_URDFDOM")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -fPIC -std=c++11 -DPINOCCHIO_URDFDOM_TYPEDEF_SHARED_PTR -DPINOCCHIO_WITH_URDFDOM -DBOOST_MPL_LIMIT_LIST_SIZE=30")
   endif(DEBUG_MODE)
 
 # Set source directories
@@ -31,6 +35,9 @@
   find_library(CASADI_LIB casadi HINTS ${CASADI_DIR}/lib)
   # set(casadi_DIR /home/alejandro/phd_software/casadi_source/build)
   # find_package(casadi REQUIRED)
+
+  find_package(pinocchio REQUIRED)
+  # link_directories( ${PINOCCHIO_LIBRARY_DIRS} )
 
 # Include root folder to the project's include path
   # include_directories(${CMAKE_SOURCE_DIR})

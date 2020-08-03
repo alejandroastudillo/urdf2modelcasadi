@@ -18,8 +18,9 @@ target_link_libraries( basic_example
 
                        ${PROJECT_NAME}
                        ${CASADI_LIB}
+                       pinocchio::pinocchio
                      )
-# Complete example
+# # Complete example
 add_executable( complete_example
                complete_example.cpp
              )
@@ -27,6 +28,7 @@ target_link_libraries( complete_example
 
                       ${PROJECT_NAME}
                       ${CASADI_LIB}
+                      pinocchio::pinocchio
                     )
 
 # Kinova example
@@ -37,16 +39,18 @@ target_link_libraries( kinova_example
 
                        ${PROJECT_NAME}
                        ${CASADI_LIB}
+                       pinocchio::pinocchio
                      )
 
-# add_executable( kinova_2dof_example
-#                kinova_2dof_example.cpp
-#              )
-# target_link_libraries( kinova_2dof_example
-#
-#                       ${PROJECT_NAME}
-#                       ${CASADI_LIB}
-#                     )
+add_executable( kinova_2dof_example
+               kinova_2dof_example.cpp
+             )
+target_link_libraries( kinova_2dof_example
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                      pinocchio::pinocchio
+                    )
 
 # # UR10 example
 add_executable( ur10_example
@@ -56,6 +60,7 @@ target_link_libraries( ur10_example
 
                       ${PROJECT_NAME}
                       ${CASADI_LIB}
+                      pinocchio::pinocchio
                     )
 
 # # Yumi example
@@ -66,6 +71,7 @@ target_link_libraries( yumi_example
 
                       ${PROJECT_NAME}
                       ${CASADI_LIB}
+                      pinocchio::pinocchio
                     )
 # # TJ example
 add_executable( tj_example
@@ -75,8 +81,9 @@ target_link_libraries( tj_example
 
                        ${PROJECT_NAME}
                        ${CASADI_LIB}
+                       pinocchio::pinocchio
                      )
-# # Gen3 example
+# # # Gen3 example
 add_executable( gen3_example
                gen3_example.cpp
              )
@@ -84,9 +91,10 @@ target_link_libraries( gen3_example
 
                       ${PROJECT_NAME}
                       ${CASADI_LIB}
+                      pinocchio::pinocchio
                     )
 
-## Kinova with gripper example
+# ## Kinova with gripper example
 add_executable( kinova_gripper_example
                kinova_gripper_example.cpp
              )
@@ -94,6 +102,7 @@ target_link_libraries( kinova_gripper_example
 
                       ${PROJECT_NAME}
                       ${CASADI_LIB}
+                      pinocchio::pinocchio
                     )
 
 ## iiwa example
@@ -104,4 +113,5 @@ target_link_libraries( iiwa_example
 
                       ${PROJECT_NAME}
                       ${CASADI_LIB}
+                      pinocchio::pinocchio
                     )

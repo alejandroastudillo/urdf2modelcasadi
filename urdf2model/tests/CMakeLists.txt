@@ -12,14 +12,14 @@ include_directories (${ROB_DYN_INTERFACE_DIR}
 add_definitions (-DBOOST_TEST_DYN_LINK)
 
 
-add_executable (Basic_tests basictests.cpp)
-target_link_libraries (Basic_tests
-                       # ${CASADI_LIB}
-                       # stdc++
-                       ${Boost_FILESYSTEM_LIBRARY}
-                       ${Boost_SYSTEM_LIBRARY}
-                       ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-                       )
+# add_executable (Basic_tests basictests.cpp)
+# target_link_libraries (Basic_tests
+#                        # ${CASADI_LIB}
+#                        # stdc++
+#                        ${Boost_FILESYSTEM_LIBRARY}
+#                        ${Boost_SYSTEM_LIBRARY}
+#                        ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+#                        )
 
 add_executable (Interface_tests interface.cpp)
 target_link_libraries (Interface_tests
@@ -32,6 +32,7 @@ target_link_libraries (Interface_tests
                       ${Boost_FILESYSTEM_LIBRARY}
                       ${Boost_SYSTEM_LIBRARY}
                       ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+                      pinocchio::pinocchio
                       )
 target_compile_definitions(Interface_tests PRIVATE MODELS_DIR=${CMAKE_SOURCE_DIR}/models) # can also be set like: add_definitions (-DMODELS_DIR=${CMAKE_SOURCE_DIR}/models) for all executables at once
 
@@ -45,8 +46,9 @@ target_link_libraries (Old_interface_tests
                       ${Boost_FILESYSTEM_LIBRARY}
                       ${Boost_SYSTEM_LIBRARY}
                       ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+                      pinocchio::pinocchio
                       )
 
-add_test (NAME Basic_Test COMMAND Basic_tests)
+# add_test (NAME Basic_Test COMMAND Basic_tests)
 add_test (NAME Interface_Test COMMAND Interface_tests)
 add_test (NAME Old_Interface_Test COMMAND Old_interface_tests)

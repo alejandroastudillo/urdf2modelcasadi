@@ -1,5 +1,5 @@
 
-#define BOOST_TEST_MODULE FWDKIN_TESTS
+#define BOOST_TEST_MODULE FWD_KINEMATICS_TESTS
 #include <boost/test/unit_test.hpp>
 
 #include "model_interface.hpp"

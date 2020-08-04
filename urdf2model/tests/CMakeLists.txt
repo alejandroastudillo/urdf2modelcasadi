@@ -39,7 +39,7 @@ target_compile_definitions(Interface_tests PRIVATE MODELS_DIR=${CMAKE_SOURCE_DIR
 
 # ------------------------------------------------------------------------------
 
-add_executable (RNEA_tests invdyn_tests.cpp)
+add_executable (RNEA_tests invdynamics_test.cpp)
 target_link_libraries (RNEA_tests
 
                       ${PROJECT_NAME}
@@ -56,7 +56,7 @@ target_compile_definitions(RNEA_tests PRIVATE MODELS_DIR=${CMAKE_SOURCE_DIR}/mod
 
 # ------------------------------------------------------------------------------
 
-add_executable (ABA_tests fwddyn_tests.cpp)
+add_executable (ABA_tests fwddynamics_test.cpp)
 target_link_libraries (ABA_tests
 
                       ${PROJECT_NAME}
@@ -73,8 +73,8 @@ target_compile_definitions(ABA_tests PRIVATE MODELS_DIR=${CMAKE_SOURCE_DIR}/mode
 
 # ------------------------------------------------------------------------------
 
-add_executable (FWDKIN_tests fwdkin_tests.cpp)
-target_link_libraries (FWDKIN_tests
+add_executable (FWD_KINEMATICS_tests fwdkinematics_test.cpp)
+target_link_libraries (FWD_KINEMATICS_tests
 
                       ${PROJECT_NAME}
                       ${CASADI_LIB}
@@ -86,7 +86,7 @@ target_link_libraries (FWDKIN_tests
                       ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
                       pinocchio::pinocchio
                       )
-target_compile_definitions(FWDKIN_tests PRIVATE MODELS_DIR=${CMAKE_SOURCE_DIR}/models) # can also be set like: add_definitions (-DMODELS_DIR=${CMAKE_SOURCE_DIR}/models) for all executables at once
+target_compile_definitions(FWD_KINEMATICS_tests PRIVATE MODELS_DIR=${CMAKE_SOURCE_DIR}/models) # can also be set like: add_definitions (-DMODELS_DIR=${CMAKE_SOURCE_DIR}/models) for all executables at once
 
 # ------------------------------------------------------------------------------
 
@@ -108,6 +108,6 @@ target_link_libraries (Old_interface_tests
 add_test (NAME Interface_Test COMMAND Interface_tests)
 add_test (NAME RNEA_Test COMMAND RNEA_tests)
 add_test (NAME ABA_Test COMMAND ABA_tests)
-add_test (NAME FWDKIN_Test COMMAND FWDKIN_tests)
+add_test (NAME FWD_KINEMATICS_Test COMMAND FWD_KINEMATICS_tests)
 
 add_test (NAME Old_Interface_Test COMMAND Old_interface_tests)

@@ -73,9 +73,9 @@ BOOST_AUTO_TEST_CASE(ABA_DIFF_pinocchio_casadi)
 
   // Articulated-Body algorithm (forward dynamics) test with robot's home configuration
   // Pinocchio
-    mecali::ConfigVector  q_home = pinocchio::neutral(model);  // pinocchio::randomConfiguration(model);
-    mecali::TangentVector v_home(Eigen::VectorXd::Zero(model.nv)); // v_home(Eigen::VectorXd::Random(model.nv));
-    mecali::TangentVector tau_home(Eigen::VectorXd::Zero(model.nv)); // tau_home(Eigen::VectorXd::Random(model.nv));
+    mecali::ConfigVector  q_home = pinocchio::randomConfiguration(model); // pinocchio::neutral(model);
+    mecali::TangentVector v_home(Eigen::VectorXd::Random(model.nv)); // v_home(Eigen::VectorXd::Zero(model.nv));
+    mecali::TangentVector tau_home(Eigen::VectorXd::Random(model.nv)); // tau_home(Eigen::VectorXd::Zero(model.nv));
 
     pinocchio::aba(model,data,q_home,v_home,tau_home);
 

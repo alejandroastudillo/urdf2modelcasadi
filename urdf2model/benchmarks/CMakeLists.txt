@@ -10,11 +10,21 @@ include_directories(${CASADI_DIR}/include)
 include_directories(${SRC_DIR})
 
 # Adds an executable target to be built from the source files listed after it
-## derivatives
-add_executable( derivatives
-               derivatives.cpp
+## inverse_dynamics_derivatives
+add_executable( inverse_dynamics_derivatives
+               inverse_dynamics_derivatives.cpp
              )
-target_link_libraries( derivatives
+target_link_libraries( inverse_dynamics_derivatives
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                      pinocchio::pinocchio
+                    )
+## forward_dynamics_derivatives
+add_executable( forward_dynamics_derivatives
+               forward_dynamics_derivatives.cpp
+             )
+target_link_libraries( forward_dynamics_derivatives
 
                       ${PROJECT_NAME}
                       ${CASADI_LIB}

@@ -80,8 +80,8 @@ BOOST_AUTO_TEST_CASE(ABA_DIFF_pinocchio_casadi)
     pinocchio::aba(model,data,q_home,v_home,tau_home);
 
   // Pinochio Test
-    // mecali::Serial_Robot robot_model;
-    // robot_model.import_model(filename);
+    mecali::Serial_Robot robot_model;
+    robot_model.import_model(filename);
 
     mecali::CasadiModel cas_model = model.cast<mecali::CasadiScalar>();
     mecali::CasadiData cas_data(cas_model);
@@ -169,7 +169,8 @@ BOOST_AUTO_TEST_CASE(ABA_DIFF_pinocchio_casadi)
 
     casadi::DM ddq_dv_res = eval_ddq_dv(casadi::DMVector {q_vec, v_int_vec, v_vec, tau_vec})[0];
     std::vector<double> ddq_dv_vec(static_cast< std::vector<double> >(ddq_dv_res));
-    BOOST_CHECK(Eigen::Map<mecali::Data::MatrixXs>(ddq_dv_vec.data(),model.nv,model.nv).isApprox(ddq_dv_ref));
+    mecali::Data::MatrixXs ddq_dv_res_jac = Eigen::Map<mecali::Data::MatrixXs>(ddq_dv_vec.data(),model.nv,model.nv);
+    BOOST_CHECK(ddq_dv_res_jac.isApprox(ddq_dv_ref));
 
   // check with respect to tau
     casadi::SX ddq_dtau = jacobian(ddq_sx, tau_sx);
@@ -179,17 +180,9 @@ BOOST_AUTO_TEST_CASE(ABA_DIFF_pinocchio_casadi)
 
     casadi::DM ddq_dtau_res = eval_ddq_dtau(casadi::DMVector {q_vec, v_int_vec, v_vec, tau_vec})[0];
     std::vector<double> ddq_dtau_vec(static_cast< std::vector<double> >(ddq_dtau_res));
-    BOOST_CHECK(Eigen::Map<mecali::Data::MatrixXs>(ddq_dtau_vec.data(),model.nv,model.nv).isApprox(ddq_dtau_ref));
+    mecali::Data::MatrixXs ddq_dtau_res_jac = Eigen::Map<mecali::Data::MatrixXs>(ddq_dtau_vec.data(),model.nv,model.nv);
+    BOOST_CHECK(ddq_dtau_res_jac.isApprox(ddq_dtau_ref));
 
-
-    mecali::CasadiData::MatrixXs ddq_dq_casadi(model.nv,model.nv);
-    ddq_dq_casadi.setZero();
-    mecali::CasadiData::MatrixXs ddq_dv_casadi(model.nv,model.nv);
-    ddq_dv_casadi.setZero();
-    mecali::CasadiData::MatrixXs ddq_dtau_casadi(model.nv,model.nv);
-    ddq_dtau_casadi.setZero();
-    //
-    // pinocchio::computeABADerivatives(cas_model, cas_data, q_int_casadi, v_casadi, tau_casadi, ddq_dq_casadi, ddq_dv_casadi, ddq_dtau_casadi);
     pinocchio::computeABADerivatives(cas_model, cas_data, q_casadi, v_casadi, tau_casadi);
 
     cas_data.Minv.triangularView<Eigen::StrictlyLower>() = cas_data.Minv.transpose().triangularView<Eigen::StrictlyLower>();
@@ -221,7 +214,7 @@ BOOST_AUTO_TEST_CASE(ABA_DIFF_pinocchio_casadi)
     mecali::Data::MatrixXs ddq_dv_res_direct_map = Eigen::Map<mecali::Data::MatrixXs>(static_cast< std::vector<double> >(ddq_dv_res_direct).data(),model.nv,model.nv);
 
     BOOST_CHECK(ddq_dv_ref.isApprox(ddq_dv_res_direct_map));
-    // BOOST_CHECK(ddq_dq_res_jac.isApprox(ddq_dq_res_direct_map));
+    BOOST_CHECK(ddq_dv_res_jac.isApprox(ddq_dv_res_direct_map));
 
     casadi::Function eval_aba_derivatives_dtau("eval_aba_derivatives_dtau",
                                               casadi::SXVector {q_sx, v_sx, tau_sx},
@@ -231,5 +224,23 @@ BOOST_AUTO_TEST_CASE(ABA_DIFF_pinocchio_casadi)
     mecali::Data::MatrixXs ddq_dtau_res_direct_map = Eigen::Map<mecali::Data::MatrixXs>(static_cast< std::vector<double> >(ddq_dtau_res_direct).data(),model.nv,model.nv);
 
     BOOST_CHECK(ddq_dtau_ref.isApprox(ddq_dtau_res_direct_map));
-    // BOOST_CHECK(ddq_dq_res_jac.isApprox(ddq_dq_res_direct_map));
+    BOOST_CHECK(ddq_dtau_res_jac.isApprox(ddq_dtau_res_direct_map));
+
+  // Interface functions
+    casadi::Function forward_dynamics_derivatives = robot_model.forward_dynamics_derivatives();
+
+    casadi::DM ddq_dq_dm = forward_dynamics_derivatives(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
+    Eigen::MatrixXd ddq_dq_dm_mat = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(ddq_dq_dm).data(),robot_model.n_dof,robot_model.n_dof);
+
+    casadi::DM ddq_dv_dm = forward_dynamics_derivatives(casadi::DMVector {q_vec, v_vec, tau_vec})[1];
+    Eigen::MatrixXd ddq_dv_dm_mat = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(ddq_dv_dm).data(),robot_model.n_dof,robot_model.n_dof);
+
+    casadi::DM ddq_dtau_dm = forward_dynamics_derivatives(casadi::DMVector {q_vec, v_vec, tau_vec})[2];
+    Eigen::MatrixXd ddq_dtau_dm_mat = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(ddq_dtau_dm).data(),robot_model.n_dof,robot_model.n_dof);
+
+    BOOST_CHECK(ddq_dq_dm_mat.isApprox(ddq_dq_res_direct_map));
+    BOOST_CHECK(ddq_dv_dm_mat.isApprox(ddq_dv_res_direct_map));
+    BOOST_CHECK(ddq_dtau_dm_mat.isApprox(ddq_dtau_res_direct_map));
+
+
 }

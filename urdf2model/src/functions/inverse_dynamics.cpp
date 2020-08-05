@@ -160,16 +160,16 @@ namespace mecali
 
     // // Output variable
     CasadiScalar          dtau_dq_sx( cas_model.nv, cas_model.nv);
-    CasadiData::MatrixXs  dtau_dq_casadi(cas_model.nv,cas_model.nv);
-    dtau_dq_casadi.setZero();
+    // CasadiData::MatrixXs  dtau_dq_casadi(cas_model.nv,cas_model.nv);
+    // dtau_dq_casadi.setZero();
 
     CasadiScalar          dtau_dv_sx( cas_model.nv, cas_model.nv);
-    CasadiData::MatrixXs  dtau_dv_casadi(cas_model.nv,cas_model.nv);
-    dtau_dv_casadi.setZero();
+    // CasadiData::MatrixXs  dtau_dv_casadi(cas_model.nv,cas_model.nv);
+    // dtau_dv_casadi.setZero();
 
     CasadiScalar          dtau_da_sx( cas_model.nv, cas_model.nv);
-    CasadiData::MatrixXs  dtau_da_casadi(cas_model.nv,cas_model.nv);
-    dtau_da_casadi.setZero();
+    // CasadiData::MatrixXs  dtau_da_casadi(cas_model.nv,cas_model.nv);
+    // dtau_da_casadi.setZero();
 
     // Call the derivatives function
     pinocchio::computeRNEADerivatives(cas_model, cas_data, q_casadi, v_casadi, a_casadi);

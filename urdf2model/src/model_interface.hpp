@@ -93,7 +93,8 @@ namespace mecali
       casadi::Function         mass_inverse_matrix();
       casadi::Function         joint_torque_regressor();
 
-      // casadi::Function        forward_dynamics_derivatives();
+      casadi::Function         forward_dynamics_derivatives(std::string type);
+      casadi::Function         forward_dynamics_derivatives();
 
       casadi::Function         generalized_gravity_derivatives();
       casadi::Function         inverse_dynamics_derivatives(std::string type);

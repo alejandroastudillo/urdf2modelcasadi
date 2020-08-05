@@ -41,11 +41,17 @@ int main()
 
       // Benchmark
 
-      std::cout << "ALL = "       << robot_model.inverse_dynamics_derivatives() << std::endl;
-      std::cout << "dtau_dq = "   << robot_model.inverse_dynamics_derivatives("dtau_dq") << std::endl;
-      std::cout << "dtau_dv = "   << robot_model.inverse_dynamics_derivatives("dtau_dv") << std::endl;
-      std::cout << "dtau_da = "   << robot_model.inverse_dynamics_derivatives("dtau_da") << std::endl;
-      std::cout << "jacobian = "  << robot_model.inverse_dynamics_derivatives("jacobian") << std::endl;
+      std::cout << "RNEA ALL = "       << robot_model.inverse_dynamics_derivatives() << std::endl;
+      std::cout << "RNEA dtau_dq = "   << robot_model.inverse_dynamics_derivatives("dtau_dq") << std::endl;
+      std::cout << "RNEA dtau_dv = "   << robot_model.inverse_dynamics_derivatives("dtau_dv") << std::endl;
+      std::cout << "RNEA dtau_da = "   << robot_model.inverse_dynamics_derivatives("dtau_da") << std::endl;
+      std::cout << "RNEA jacobian = "  << robot_model.inverse_dynamics_derivatives("jacobian") << std::endl;
+
+      std::cout << "ABA ALL = "         << robot_model.forward_dynamics_derivatives() << std::endl;
+      std::cout << "ABA ddq_dq = "      << robot_model.forward_dynamics_derivatives("ddq_dq") << std::endl;
+      std::cout << "ABA ddq_dv = "      << robot_model.forward_dynamics_derivatives("ddq_dv") << std::endl;
+      std::cout << "ABA ddq_dtau = "    << robot_model.forward_dynamics_derivatives("ddq_dtau") << std::endl;
+      std::cout << "ABA jacobian = "    << robot_model.forward_dynamics_derivatives("jacobian") << std::endl;
 
     // ---------------------------------------------------------------------
     // Generate (or save) a function

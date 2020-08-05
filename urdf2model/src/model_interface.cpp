@@ -404,6 +404,17 @@ namespace mecali
 
       return get_joint_torque_regressor( this->_casadi_model, casadi_data );
   }
+
+  casadi::Function  Serial_Robot::forward_dynamics_derivatives(std::string type)
+  {
+      CasadiData casadi_data( this->_casadi_model );
+
+      return get_forward_dynamics_derivatives( this->_casadi_model, casadi_data, type );
+  }
+  casadi::Function  Serial_Robot::forward_dynamics_derivatives()
+  {
+      return this->forward_dynamics_derivatives("all");
+  }
   casadi::Function  Serial_Robot::generalized_gravity_derivatives()
   {
       CasadiData casadi_data( this->_casadi_model );

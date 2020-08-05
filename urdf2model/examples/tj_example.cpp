@@ -18,14 +18,16 @@ int main()
       mecali::Serial_Robot robot_model_2dof;
       mecali::Serial_Robot robot_model_2dof_wobase;
     // Define (optinal) gravity vector to be used
+
       Eigen::Vector3d gravity_vector(0,0,-9.81);
-      Eigen::Vector3d no_gravity_vector(0,0,0);
+      // Eigen::Vector3d gravity_vector(0,0,0);
+
     // Create models based on a URDF files
-      robot_model_7dof.import_model(urdf_filename_1, no_gravity_vector);
+      robot_model_7dof.import_model(urdf_filename_1, gravity_vector);
 
-      robot_model_2dof.import_model(urdf_filename_2, no_gravity_vector);
+      robot_model_2dof.import_model(urdf_filename_2, gravity_vector);
 
-      robot_model_2dof_wobase.import_model(urdf_filename_3, no_gravity_vector);
+      robot_model_2dof_wobase.import_model(urdf_filename_3, gravity_vector);
 
       // Define list of joints to be locked (by name)
       std::vector<std::string> list_of_joints_to_lock_by_name = {"Actuator3","Actuator4","Actuator5","Actuator6","Actuator7"};
@@ -33,7 +35,7 @@ int main()
       std::vector<double> q_init_vec = {1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0};
       Eigen::VectorXd q_init = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(q_init_vec.data(), q_init_vec.size());
       // Create the model based on a URDF file
-      reduced_robot_model.import_reduced_model(urdf_filename_1, list_of_joints_to_lock_by_name, q_init, no_gravity_vector);
+      reduced_robot_model.import_reduced_model(urdf_filename_1, list_of_joints_to_lock_by_name, q_init, gravity_vector);
 
     // ---------------------------------------------------------------------
     // Compare kinematics and dynamics of the generated models
@@ -131,6 +133,9 @@ int main()
 
     casadi::DM mass_inverse_res_4 = mass_inverse_4(casadi::DMVector {q_vec_random_2})[0];
     std::cout << "mass_inverse_4 result with random input        : " << mass_inverse_res_4 << std::endl;
+
+    casadi::DM gravity_res_4 = gravity_4(casadi::DMVector {q_vec_random_2})[0];
+    std::cout << "gravity_4 result with random input        : " << gravity_res_4 << std::endl;
 
 
     // ---------------------------------------------------------------------

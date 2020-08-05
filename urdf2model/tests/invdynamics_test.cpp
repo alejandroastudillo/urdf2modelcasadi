@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(GRAV_DIFF_pinocchio_casadi)
     g_partial_dq_sc.setZero();
     pinocchio::computeGeneralizedGravityDerivatives(model, data, q_home, g_partial_dq_sc);
 
-  // Interface
+  // Pinocchio + Casadi
     mecali::CasadiData::MatrixXs g_partial_dq(model.nv,model.nv);
     g_partial_dq.setZero();
     pinocchio::computeGeneralizedGravityDerivatives(cas_model, cas_data, q_casadi, g_partial_dq);
@@ -181,8 +181,11 @@ BOOST_AUTO_TEST_CASE(GRAV_DIFF_pinocchio_casadi)
 
     Eigen::MatrixXd gravity_deriv_mat = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(gravity_deriv_res).data(),robot_model.n_dof,robot_model.n_dof);
 
+    // Check
     BOOST_CHECK(gravity_deriv_mat_0.isApprox(gravity_deriv_mat));
     BOOST_CHECK(gravity_deriv_mat.isApprox(g_partial_dq_sc));
+
+    // std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@\n" << g_partial_dq_sc;
 }
 
 BOOST_AUTO_TEST_CASE(RNEA_DIFF_pinocchio_casadi)
@@ -293,49 +296,69 @@ BOOST_AUTO_TEST_CASE(RNEA_DIFF_pinocchio_casadi)
   // -----------------------------------------------------------------------
   // Pinocchio
     // compute references
-  //   mecali::Data::MatrixXs dtau_dq_ref(model.nv,model.nv), dtau_dv_ref(model.nv,model.nv), dtau_da_ref(model.nv,model.nv);
-  //   dtau_dq_ref.setZero(); dtau_dv_ref.setZero(); dtau_da_ref.setZero();
-  //
-  //   pinocchio::computeRNEADerivatives(model, data, q_home, v_home, a_home, dtau_dq_ref, dtau_dv_ref, dtau_da_ref);
-  //   dtau_da_ref.triangularView<Eigen::StrictlyLower>() = dtau_da_ref.transpose().triangularView<Eigen::StrictlyLower>();
-  //
-  // // Interface
-  //   // check with respect to q+dq
-  //   casadi::SX dtau_dq = jacobian(tau_sx, v_sx_int);
-  //   casadi::Function eval_dtau_dq("eval_dtau_dq",
-  //                                 casadi::SXVector {q_sx, v_sx_int, v_sx, a_sx},
-  //                                 casadi::SXVector {dtau_dq});
-  //
-  //   casadi::DM dtau_dq_res = eval_dtau_dq(casadi::DMVector {q_vec, v_int_vec, v_vec, a_vec})[0];
-  //   std::vector<double> dtau_dq_vec(static_cast< std::vector<double> >(dtau_dq_res));
-  //   BOOST_CHECK(Eigen::Map<mecali::Data::MatrixXs>(dtau_dq_vec.data(),model.nv,model.nv).isApprox(dtau_dq_ref));
-  //
-  //   // check with respect to v+dv
-  //   casadi::SX dtau_dv = jacobian(tau_sx, v_sx);
-  //   casadi::Function eval_dtau_dv("eval_dtau_dv",
-  //                                 casadi::SXVector {q_sx, v_sx_int, v_sx, a_sx},
-  //                                 casadi::SXVector {dtau_dv});
-  //
-  //   casadi::DM dtau_dv_res = eval_dtau_dv(casadi::DMVector {q_vec, v_int_vec, v_vec, a_vec})[0];
-  //   std::vector<double> dtau_dv_vec(static_cast< std::vector<double> >(dtau_dv_res));
-  //   BOOST_CHECK(Eigen::Map<mecali::Data::MatrixXs>(dtau_dv_vec.data(), model.nv, model.nv).isApprox(dtau_dv_ref));
-  //
-  //   // check with respect to a+da
-  //   casadi::SX dtau_da = jacobian(tau_sx, a_sx);
-  //   casadi::Function eval_dtau_da("eval_dtau_da",
-  //                                 casadi::SXVector {q_sx, v_sx_int, v_sx, a_sx},
-  //                                 casadi::SXVector {dtau_da});
-  //
-  //   casadi::DM dtau_da_res = eval_dtau_da(casadi::DMVector {q_vec, v_int_vec, v_vec, a_vec})[0];
-  //   std::vector<double> dtau_da_vec(static_cast< std::vector<double> >(dtau_da_res));
-  //   BOOST_CHECK(Eigen::Map<mecali::Data::MatrixXs>(dtau_da_vec.data(), model.nv, model.nv).isApprox(dtau_da_ref));
-  //
-  //   // ---
-  //   mecali::CasadiData::MatrixXs dtau_dq_casadi(model.nv,model.nv); dtau_dq_casadi.setZero();
-  //   mecali::CasadiData::MatrixXs dtau_dv_casadi(model.nv,model.nv); dtau_dv_casadi.setZero();
-  //   mecali::CasadiData::MatrixXs dtau_da_casadi(model.nv,model.nv); dtau_da_casadi.setZero();
-  //
-  //   pinocchio::computeRNEADerivatives(cas_model,cas_data,q_casadi,v_casadi,a_casadi,dtau_dq_casadi,dtau_dv_casadi,dtau_da_casadi);
+    mecali::Data::MatrixXs dtau_dq_ref(model.nv,model.nv), dtau_dv_ref(model.nv,model.nv), dtau_da_ref(model.nv,model.nv);
+    dtau_dq_ref.setZero(); dtau_dv_ref.setZero(); dtau_da_ref.setZero();
+
+    pinocchio::computeRNEADerivatives(model, data, q_home, v_home, a_home, dtau_dq_ref, dtau_dv_ref, dtau_da_ref);
+    dtau_da_ref.triangularView<Eigen::StrictlyLower>() = dtau_da_ref.transpose().triangularView<Eigen::StrictlyLower>();
+
+  // Interface
+    // check with respect to q+dq
+    casadi::SX dtau_dq = jacobian(tau_sx, v_sx_int);
+    casadi::Function eval_dtau_dq("eval_dtau_dq",
+                                  casadi::SXVector {q_sx, v_sx_int, v_sx, a_sx},
+                                  casadi::SXVector {dtau_dq});
+
+    casadi::DM dtau_dq_res = eval_dtau_dq(casadi::DMVector {q_vec, v_int_vec, v_vec, a_vec})[0];
+    std::vector<double> dtau_dq_vec(static_cast< std::vector<double> >(dtau_dq_res));
+    mecali::Data::MatrixXs dtau_dq_res_jac = Eigen::Map<mecali::Data::MatrixXs>(dtau_dq_vec.data(),model.nv,model.nv);
+    BOOST_CHECK(dtau_dq_res_jac.isApprox(dtau_dq_ref));
+
+    // check with respect to v+dv
+    casadi::SX dtau_dv = jacobian(tau_sx, v_sx);
+    casadi::Function eval_dtau_dv("eval_dtau_dv",
+                                  casadi::SXVector {q_sx, v_sx_int, v_sx, a_sx},
+                                  casadi::SXVector {dtau_dv});
+
+    casadi::DM dtau_dv_res = eval_dtau_dv(casadi::DMVector {q_vec, v_int_vec, v_vec, a_vec})[0];
+    std::vector<double> dtau_dv_vec(static_cast< std::vector<double> >(dtau_dv_res));
+    BOOST_CHECK(Eigen::Map<mecali::Data::MatrixXs>(dtau_dv_vec.data(), model.nv, model.nv).isApprox(dtau_dv_ref));
+
+    // check with respect to a+da
+    casadi::SX dtau_da = jacobian(tau_sx, a_sx);
+    casadi::Function eval_dtau_da("eval_dtau_da",
+                                  casadi::SXVector {q_sx, v_sx_int, v_sx, a_sx},
+                                  casadi::SXVector {dtau_da});
+
+    casadi::DM dtau_da_res = eval_dtau_da(casadi::DMVector {q_vec, v_int_vec, v_vec, a_vec})[0];
+    std::vector<double> dtau_da_vec(static_cast< std::vector<double> >(dtau_da_res));
+    BOOST_CHECK(Eigen::Map<mecali::Data::MatrixXs>(dtau_da_vec.data(), model.nv, model.nv).isApprox(dtau_da_ref));
+
+    // --------------------------------------------------------------------------------------
+    mecali::CasadiData::MatrixXs dtau_dq_casadi(model.nv,model.nv); dtau_dq_casadi.setZero();
+    mecali::CasadiData::MatrixXs dtau_dv_casadi(model.nv,model.nv); dtau_dv_casadi.setZero();
+    mecali::CasadiData::MatrixXs dtau_da_casadi(model.nv,model.nv); dtau_da_casadi.setZero();
+
+    pinocchio::computeRNEADerivatives(cas_model, cas_data, q_casadi, v_casadi, a_casadi);
+
+    cas_data.M.triangularView<Eigen::StrictlyLower>()= cas_data.M.transpose().triangularView<Eigen::StrictlyLower>();
+
+    casadi::SX dtau_dq_sx(model.nv,model.nv);
+    casadi::SX dtau_dv_sx(model.nv,model.nv);
+    casadi::SX dtau_da_sx(model.nv,model.nv);
+
+    pinocchio::casadi::copy(cas_data.dtau_dq, dtau_dq_sx);
+    pinocchio::casadi::copy(cas_data.dtau_dv, dtau_dv_sx);
+    pinocchio::casadi::copy(cas_data.M, dtau_da_sx);
+
+    casadi::Function eval_rnea_derivatives_dq("eval_rnea_derivatives_dq",
+                                              casadi::SXVector {q_sx, v_sx, a_sx},
+                                              casadi::SXVector {dtau_dq_sx});
+
+    casadi::DM dtau_dq_res_direct = eval_rnea_derivatives_dq(casadi::DMVector {q_vec,v_vec,a_vec})[0];
+    mecali::Data::MatrixXs dtau_dq_res_direct_map = Eigen::Map<mecali::Data::MatrixXs>(static_cast< std::vector<double> >(dtau_dq_res_direct).data(),model.nv,model.nv);
+    BOOST_CHECK(dtau_dq_ref.isApprox(dtau_dq_res_direct_map));
+    BOOST_CHECK(dtau_dq_res_jac.isApprox(dtau_dq_res_direct_map));
 
     // mecali::CasadiData::MatrixXs dtau_dq_casadi(model.nv,model.nv), dtau_dv_casadi(model.nv,model.nv), dtau_da_casadi(model.nv,model.nv);
     // dtau_dq_casadi.setZero();
@@ -343,6 +366,10 @@ BOOST_AUTO_TEST_CASE(RNEA_DIFF_pinocchio_casadi)
     // dtau_da_casadi.setZero();
     // pinocchio::computeRNEADerivatives(cas_model, cas_data, q_casadi, v_casadi, a_casadi, dtau_dq_casadi, dtau_dv_casadi, dtau_da_casadi);
 
+    // std::cout << "###############################\n nq = " << model.nq << "\n nv = " << model.nv << std::endl;
+    // std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@1111\n" << dtau_dq_res_direct_map;
+    // std::cout << "\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@1111\n" << dtau_dq_ref;
+    // std::cout << "\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@1111\n" << dtau_dq_res_jac;
 
 
 }

@@ -150,15 +150,6 @@ BOOST_AUTO_TEST_CASE(ABA_DIFF_pinocchio_casadi)
 
   // Interface
 
-    // mecali::CasadiData::MatrixXs ddq_dq_casadi(model.nv,model.nv);
-    // ddq_dq_casadi.setZero();
-    // mecali::CasadiData::MatrixXs ddq_dv_casadi(model.nv,model.nv);
-    // ddq_dv_casadi.setZero();
-    // mecali::CasadiData::MatrixXs ddq_dtau_casadi(model.nv,model.nv);
-    // ddq_dtau_casadi.setZero();
-    //
-    // pinocchio::computeABADerivatives(cas_model, cas_data, q_int_casadi, v_casadi, tau_casadi, ddq_dq_casadi, ddq_dv_casadi, ddq_dtau_casadi);
-
   // check with respect to q+dq
     casadi::SX ddq_dq = jacobian(ddq_sx, v_sx_int);
     casadi::Function eval_ddq_dq("eval_ddq_dq",
@@ -167,8 +158,8 @@ BOOST_AUTO_TEST_CASE(ABA_DIFF_pinocchio_casadi)
 
     casadi::DM ddq_dq_res = eval_ddq_dq(casadi::DMVector {q_vec, v_int_vec, v_vec, tau_vec})[0];
     std::vector<double> ddq_dq_vec(static_cast< std::vector<double> >(ddq_dq_res));
-
-    BOOST_CHECK(Eigen::Map<mecali::Data::MatrixXs>(ddq_dq_vec.data(),model.nv,model.nv).isApprox(ddq_dq_ref));
+    mecali::Data::MatrixXs ddq_dq_res_jac = Eigen::Map<mecali::Data::MatrixXs>(ddq_dq_vec.data(),model.nv,model.nv);
+    BOOST_CHECK(ddq_dq_res_jac.isApprox(ddq_dq_ref));
 
   // check with respect to v+dv
     casadi::SX ddq_dv = jacobian(ddq_sx, v_sx);
@@ -189,4 +180,36 @@ BOOST_AUTO_TEST_CASE(ABA_DIFF_pinocchio_casadi)
     casadi::DM ddq_dtau_res = eval_ddq_dtau(casadi::DMVector {q_vec, v_int_vec, v_vec, tau_vec})[0];
     std::vector<double> ddq_dtau_vec(static_cast< std::vector<double> >(ddq_dtau_res));
     BOOST_CHECK(Eigen::Map<mecali::Data::MatrixXs>(ddq_dtau_vec.data(),model.nv,model.nv).isApprox(ddq_dtau_ref));
+
+
+    mecali::CasadiData::MatrixXs ddq_dq_casadi(model.nv,model.nv);
+    ddq_dq_casadi.setZero();
+    mecali::CasadiData::MatrixXs ddq_dv_casadi(model.nv,model.nv);
+    ddq_dv_casadi.setZero();
+    mecali::CasadiData::MatrixXs ddq_dtau_casadi(model.nv,model.nv);
+    ddq_dtau_casadi.setZero();
+    //
+    // pinocchio::computeABADerivatives(cas_model, cas_data, q_int_casadi, v_casadi, tau_casadi, ddq_dq_casadi, ddq_dv_casadi, ddq_dtau_casadi);
+    pinocchio::computeABADerivatives(cas_model, cas_data, q_casadi, v_casadi, tau_casadi);
+
+    cas_data.Minv.triangularView<Eigen::StrictlyLower>() = cas_data.Minv.transpose().triangularView<Eigen::StrictlyLower>();
+
+    // call ABA derivatives in Casadi
+    casadi::SX ddq_dq_sx(model.nv,model.nv);
+    casadi::SX ddq_dv_sx(model.nv,model.nv);
+    casadi::SX ddq_dtau_sx(model.nv,model.nv);
+
+    pinocchio::casadi::copy(cas_data.ddq_dq, ddq_dq_sx);
+    pinocchio::casadi::copy(cas_data.ddq_dv, ddq_dv_sx);
+    pinocchio::casadi::copy(cas_data.Minv, ddq_dtau_sx);
+
+    casadi::Function eval_aba_derivatives_dq("eval_aba_derivatives_dq",
+                                              casadi::SXVector {q_sx, v_sx, tau_sx},
+                                              casadi::SXVector {ddq_dq_sx});
+
+    casadi::DM ddq_dq_res_direct = eval_aba_derivatives_dq(casadi::DMVector {q_vec,v_vec,tau_vec})[0];
+    mecali::Data::MatrixXs ddq_dq_res_direct_map = Eigen::Map<mecali::Data::MatrixXs>(static_cast< std::vector<double> >(ddq_dq_res_direct).data(),model.nv,model.nv);
+
+    BOOST_CHECK(ddq_dq_ref.isApprox(ddq_dq_res_direct_map));
+    BOOST_CHECK(ddq_dq_res_jac.isApprox(ddq_dq_res_direct_map));
 }

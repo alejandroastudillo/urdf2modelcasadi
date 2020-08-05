@@ -16,13 +16,27 @@ sudo apt-get install liburdfdom-dev
 ```
 * CASADI >= 3.4.4 (with pkg-config support)
 
-* Pinocchio (with Casadi interface - needs pkg-config support) from branch 'devel' - commit e5479944569c4305479be2c8c63a25ebaaa30ff8
+* Pinocchio (with Casadi interface - needs pkg-config support) from branch 'devel' - commit 006f5b0a9784623167a17274045738f912a4d806
 ```
 # Clone Pinocchio's repository (devel branch)
 git clone -b devel https://github.com/stack-of-tasks/pinocchio.git
 # Checkout the commit I have been using
 cd pinocchio
-git checkout e5479944569c4305479be2c8c63a25ebaaa30ff8
+git checkout 006f5b0a9784623167a17274045738f912a4d806
+# Build from source
+cd /pinocchio/build
+export CMAKE_PREFIX_PATH=/home/alejandro/phd_software/casadi_source/build:$CMAKE_PREFIX_PATH
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/openrobots -DBUILD_PYTHON_INTERFACE=OFF -DBUILD_WITH_CASADI_SUPPORT=ON
+sudo make -j4
+sudo make install
+```
+From Justin's fork:
+```
+# Clone Pinocchio's repository (devel branch)
+git clone -b topic/casadi https://github.com/jcarpent/pinocchio.git
+# Checkout the commit I have been using
+cd pinocchio
+git checkout 0981fc1b0dad8c303ab143b8aca2e61e9a450edb
 # Build from source
 cd /pinocchio/build
 export CMAKE_PREFIX_PATH=/home/alejandro/phd_software/casadi_source/build:$CMAKE_PREFIX_PATH

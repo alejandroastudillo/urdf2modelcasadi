@@ -14,6 +14,7 @@
   option(DEBUG_MODE "Activate debug mode" OFF)
   option(BUILD_UNIT_TESTS "Build the unit tests" ON)
   option(BUILD_EXAMPLES "Build the examples" ON)
+  option(BUILD_BENCHMARKS "Build the benchmarks" ON)
 
 
 # Set GCC flags
@@ -91,3 +92,7 @@
     enable_testing ()
     add_subdirectory (tests)
   endif(BUILD_UNIT_TESTS)
+
+  if(BUILD_BENCHMARKS)
+    add_subdirectory (benchmarks)
+  endif(BUILD_BENCHMARKS)

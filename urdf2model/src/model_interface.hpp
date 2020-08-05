@@ -92,14 +92,19 @@ namespace mecali
       casadi::Function         coriolis_matrix();
       casadi::Function         mass_inverse_matrix();
       casadi::Function         joint_torque_regressor();
+
+      // casadi::Function        forward_dynamics_derivatives();
+
       casadi::Function         generalized_gravity_derivatives();
+      casadi::Function         inverse_dynamics_derivatives(std::string type);
+      casadi::Function         inverse_dynamics_derivatives();
 
       casadi::Function         forward_kinematics(std::string content, std::vector<std::string> frame_names);
       casadi::Function         forward_kinematics(std::string content, std::vector<int> frame_indices);
       casadi::Function         forward_kinematics(std::string content, std::string frame_name);
       casadi::Function         forward_kinematics(std::string content, int frame_index);
       casadi::Function         forward_kinematics(std::string content);
-      casadi::Function         forward_kinematics();    
+      casadi::Function         forward_kinematics();
 
       casadi::Function         robot_expressions(std::vector<std::string> frame_names, bool AUGMENT_ODE);
 

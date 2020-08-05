@@ -212,7 +212,7 @@ namespace mecali
       this->import_reduced_model(filename, joints_to_lock_by_intid, pinocchio::neutral(model), pinocchio::Model::gravity981);
   }
 
-  void Serial_Robot::generate_json(std::string filename)
+  void              Serial_Robot::generate_json(std::string filename)
   {
     // Eigen::VectorXd          barycentric_params;
 
@@ -409,6 +409,16 @@ namespace mecali
       CasadiData casadi_data( this->_casadi_model );
 
       return get_generalized_gravity_derivatives( this->_casadi_model, casadi_data );
+  }
+  casadi::Function  Serial_Robot::inverse_dynamics_derivatives(std::string type)
+  {
+      CasadiData casadi_data( this->_casadi_model );
+
+      return get_inverse_dynamics_derivatives( this->_casadi_model, casadi_data, type );
+  }
+  casadi::Function  Serial_Robot::inverse_dynamics_derivatives()
+  {
+      return this->inverse_dynamics_derivatives("all");
   }
 
   casadi::Function  Serial_Robot::forward_kinematics(std::string content, std::vector<std::string> frame_names)

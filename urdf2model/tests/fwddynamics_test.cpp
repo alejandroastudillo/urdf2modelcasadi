@@ -212,4 +212,24 @@ BOOST_AUTO_TEST_CASE(ABA_DIFF_pinocchio_casadi)
 
     BOOST_CHECK(ddq_dq_ref.isApprox(ddq_dq_res_direct_map));
     BOOST_CHECK(ddq_dq_res_jac.isApprox(ddq_dq_res_direct_map));
+
+    casadi::Function eval_aba_derivatives_dv("eval_aba_derivatives_dv",
+                                              casadi::SXVector {q_sx, v_sx, tau_sx},
+                                              casadi::SXVector {ddq_dv_sx});
+
+    casadi::DM ddq_dv_res_direct = eval_aba_derivatives_dv(casadi::DMVector {q_vec,v_vec,tau_vec})[0];
+    mecali::Data::MatrixXs ddq_dv_res_direct_map = Eigen::Map<mecali::Data::MatrixXs>(static_cast< std::vector<double> >(ddq_dv_res_direct).data(),model.nv,model.nv);
+
+    BOOST_CHECK(ddq_dv_ref.isApprox(ddq_dv_res_direct_map));
+    // BOOST_CHECK(ddq_dq_res_jac.isApprox(ddq_dq_res_direct_map));
+
+    casadi::Function eval_aba_derivatives_dtau("eval_aba_derivatives_dtau",
+                                              casadi::SXVector {q_sx, v_sx, tau_sx},
+                                              casadi::SXVector {ddq_dtau_sx});
+
+    casadi::DM ddq_dtau_res_direct = eval_aba_derivatives_dtau(casadi::DMVector {q_vec,v_vec,tau_vec})[0];
+    mecali::Data::MatrixXs ddq_dtau_res_direct_map = Eigen::Map<mecali::Data::MatrixXs>(static_cast< std::vector<double> >(ddq_dtau_res_direct).data(),model.nv,model.nv);
+
+    BOOST_CHECK(ddq_dtau_ref.isApprox(ddq_dtau_res_direct_map));
+    // BOOST_CHECK(ddq_dq_res_jac.isApprox(ddq_dq_res_direct_map));
 }

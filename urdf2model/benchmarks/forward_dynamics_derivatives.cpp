@@ -6,7 +6,8 @@ int main()
     // ---------------------------------------------------------------------
     // Create a model based on a URDF file
     // ---------------------------------------------------------------------
-      std::string urdf_filename = "../urdf2model/models/kortex_description/urdf/GEN3_URDF_V12.urdf";
+      // std::string urdf_filename = "../urdf2model/models/kortex_description/urdf/GEN3_URDF_V12.urdf";
+      std::string urdf_filename = "../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11lim.urdf";
     // Instantiate a Serial_Robot object called robot_model
       mecali::Serial_Robot robot_model;
       // Define (optinal) gravity vector to be used
@@ -120,8 +121,12 @@ int main()
 
         casadi::Function aba_derivatives = robot_model.forward_dynamics_derivatives();
 
+      // Jacobians
+        // Jacobian from interface
+        casadi::Function J_ddq_interface = robot_model.forward_dynamics_derivatives("jacobian");
 
-        casadi::Function aba_der_from_jacobian = aba.jacobian();
+        // casadi::Function J_ddq_jacobian("J_ddq_jacobian", casadi::SXVector {q_sx, v_sx_int, v_sx, tau_sx}, casadi::SXVector {horzcat(ddq_dq, ddq_dv, ddq_dtau)}, std::vector<std::string>{"q", "v_int", "v","tau"}, std::vector<std::string>{"J_ddq_jacobian"});
+        casadi::Function J_ddq_jacobian = aba.jacobian();
         // TODO: Corregir este jacobiano para que retorne 7x21 en lugar de 7x25 (continous joints)
         // TODO: Una vez se corrija esto, tambien seria bueno comparar los tiempos vs cuando no se require la corrección. Es decir, utilizando el mismo urdf pero los joints continuos son cambiados por revolute y limitados.
 
@@ -146,12 +151,22 @@ int main()
     // Benchmark
     // ---------------------------------------------------------------------
       // First of all compare the results
-        std::cout << "From Pinocchio:\n" << ddq_dq_ref << std::endl;
-        std::cout << "From Pinocchio + Casadi::Jacobian:\n" << ddq_dq_wJacobian_mat << std::endl;
-        std::cout << "From Interface:\n" << ddq_dq_mat << std::endl;
+        // std::cout << "From Pinocchio:\n" << ddq_dq_ref << std::endl;
+        // std::cout << "From Pinocchio + Casadi::Jacobian:\n" << ddq_dq_wJacobian_mat << std::endl;
+        // std::cout << "From Interface:\n" << ddq_dq_mat << std::endl;
 
-        std::cout << "\n\nJacobian from interface: \t" << robot_model.forward_dynamics_derivatives("jacobian") << std::endl;
-        std::cout << "\n\nJacobian from CasADi: \t" << aba_der_from_jacobian << std::endl;
+        std::cout << "\n\nJacobian from interface: \t" << J_ddq_interface << std::endl;
+        std::cout << "\n\nJacobian from CasADi: \t\t" << J_ddq_jacobian << std::endl;
+
+        casadi::DM J_ddq_interface_res  = J_ddq_interface(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
+        // mecali::Data::MatrixXs J_ddq_interface_mat   = Eigen::Map<mecali::Data::MatrixXs>(static_cast< std::vector<double> >(J_ddq_interface_res).data(),model.nv,model.nv);
+        casadi::DM J_ddq_jacobian_res   = J_ddq_jacobian(casadi::DMVector {q_vec, v_int_vec, v_vec, tau_vec})[0];
+        // mecali::Data::MatrixXs J_ddq_jacobian_mat   = Eigen::Map<mecali::Data::MatrixXs>(static_cast< std::vector<double> >(J_ddq_jacobian_res).data(),model.nv,model.nv);
+
+        std::cout << "\n\nJacobian from interface: \t" << J_ddq_interface_res << std::endl;
+        std::cout << "\n\nJacobian from CasADi: \t\t" << J_ddq_jacobian_res << std::endl;
+        std::cout << "\n\nJacobian from Pinocchio: \t" << ddq_dq_ref << std::endl;
+
     // ---------------------------------------------------------------------
     // Generate (or save) a function
     // ---------------------------------------------------------------------

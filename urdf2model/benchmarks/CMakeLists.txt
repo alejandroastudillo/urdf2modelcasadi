@@ -30,3 +30,14 @@ target_link_libraries( forward_dynamics_derivatives
                       ${CASADI_LIB}
                       pinocchio::pinocchio
                     )
+
+## forward_dynamics_derivatives
+add_executable( forward_dynamics
+               forward_dynamics.cpp
+             )
+target_link_libraries( forward_dynamics
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                      pinocchio::pinocchio
+                    )

@@ -17,45 +17,154 @@ std::string filename = Rob_models_dir"/kortex_description/urdf/JACO3_URDF_V11.ur
 
 BOOST_AUTO_TEST_CASE(ABA_pinocchio_casadi)
 {
-  // Instantiate model and data objects
-    mecali::Model         model;                                        // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1ModelTpl.html
-    mecali::Data          data = pinocchio::Data(model);                // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1DataTpl.html
+  // ---------------------------------------------------------------------
+  // 1.1 Compute ABA solely from Pinocchio wo Integrate
+  // ---------------------------------------------------------------------
+    // Instantiate model and data objects
+      mecali::Model         model;                                        // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1ModelTpl.html
+      mecali::Data          data = pinocchio::Data(model);                // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1DataTpl.html
 
-    pinocchio::urdf::buildModel(filename,model);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
-  // Set the gravity applied to the model
-    model.gravity.linear(pinocchio::Model::gravity981);     // options: model.gravity.setZero(), model.gravity.linear( Eigen::Vector3d(0,0,-9.81));
-  // initialize the data structure for the model
-    data = pinocchio::Data(model);
+      pinocchio::urdf::buildModel(filename,model);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
+    // Set the gravity applied to the model
+      model.gravity.linear(pinocchio::Model::gravity981);     // options: model.gravity.setZero(), model.gravity.linear( Eigen::Vector3d(0,0,-9.81));
+    // initialize the data structure for the model
+      data = pinocchio::Data(model);
 
-  // Articulated-Body algorithm (forward dynamics) test with robot's home configuration
-  // Pinocchio
-    mecali::ConfigVector  q_home = pinocchio::neutral(model);  // pinocchio::randomConfiguration(model);
-    mecali::TangentVector v_home(Eigen::VectorXd::Zero(model.nv)); // v_home(Eigen::VectorXd::Random(model.nv));
-    mecali::TangentVector tau_home(Eigen::VectorXd::Zero(model.nv)); // tau_home(Eigen::VectorXd::Random(model.nv));
+    // Articulated-Body algorithm (forward dynamics) test with robot's home configuration
+    // Pinocchio
+      mecali::ConfigVector  q_home = pinocchio::neutral(model);  // pinocchio::randomConfiguration(model);
+      mecali::TangentVector v_home(Eigen::VectorXd::Zero(model.nv)); // v_home(Eigen::VectorXd::Random(model.nv));
+      mecali::TangentVector tau_home(Eigen::VectorXd::Zero(model.nv)); // tau_home(Eigen::VectorXd::Random(model.nv));
 
-    pinocchio::aba(model,data,q_home,v_home,tau_home);
+      pinocchio::aba(model,data,q_home,v_home,tau_home);
 
-  // Interface
-    mecali::Serial_Robot robot_model;
-    robot_model.import_model(filename);
+  // ---------------------------------------------------------------------
+  // 1.2 Compute ABA solely from Pinocchio w/integrate
+  // ---------------------------------------------------------------------
+      mecali::Data          data_int = pinocchio::Data(model);
+      mecali::ConfigVector  q_int_home(Eigen::VectorXd::Zero(model.nq));
+      mecali::TangentVector v_int_home(Eigen::VectorXd::Zero(model.nv));
 
-    std::vector<double> q_vec((size_t)model.nq);
-    Eigen::Map<mecali::ConfigVector>(q_vec.data(),model.nq,1) = q_home;
+      pinocchio::integrate(model, q_home, v_int_home, q_int_home);
 
-    std::vector<double> v_vec((size_t)model.nv);
-    Eigen::Map<mecali::TangentVector>(v_vec.data(),model.nv,1) = v_home;
+      pinocchio::aba(model, data_int, q_int_home, v_home, tau_home);
+    // Save results
+      mecali::Data::MatrixXs ddq_ref_int   = data_int.ddq;
 
-    std::vector<double> tau_vec((size_t)model.nv);
-    Eigen::Map<mecali::TangentVector>(tau_vec.data(),model.nv,1) = tau_home;
+      BOOST_CHECK((data_int.ddq).isApprox(data.ddq));
 
-    casadi::Function aba = robot_model.forward_dynamics();
+  // ---------------------------------------------------------------------
+  // 2.1 Compute ABA from Pinocchio+Casadi wo Integrate
+  // ---------------------------------------------------------------------
+      mecali::Serial_Robot robot_model;
+      robot_model.import_model(filename);
 
-    casadi::DM ddq_res = aba(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
+      mecali::CasadiModel cas_model = model.cast<mecali::CasadiScalar>();
+      mecali::CasadiData cas_data(cas_model);
 
-    mecali::Data::TangentVectorType ddq_mat = Eigen::Map<mecali::Data::TangentVectorType>(static_cast< std::vector<double> >(ddq_res).data(), model.nv,1);
+      // Set variables
+      mecali::CasadiScalar        q_sx = casadi::SX::sym("q", cas_model.nq);
+      mecali::ConfigVectorCasadi  q_casadi(cas_model.nq);
+      pinocchio::casadi::copy( q_sx, q_casadi ); // q_casadi = Eigen::Map<ConfigVectorCasadi>(static_cast< std::vector<CasadiScalar> >(q_sx).data(),model.nq,1);
 
-  // Check
-    BOOST_CHECK(ddq_mat.isApprox(data.ddq));
+      mecali::CasadiScalar        v_sx = casadi::SX::sym("v", cas_model.nv);
+      mecali::TangentVectorCasadi v_casadi(cas_model.nv);
+      pinocchio::casadi::copy( v_sx, v_casadi ); // v_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(v_sx).data(),model.nv,1);
+
+      mecali::CasadiScalar        tau_sx = casadi::SX::sym("tau", cas_model.nv);
+      mecali::TangentVectorCasadi tau_casadi(cas_model.nv);
+      pinocchio::casadi::copy( tau_sx, tau_casadi ); // tau_casadi = Eigen::Map<TangentVectorCasadi>(static_cast< std::vector<CasadiScalar> >(tau_sx).data(),model.nv,1);
+
+      // Call the Articulated-body algorithm
+      pinocchio::aba(cas_model, cas_data, q_casadi, v_casadi, tau_casadi);
+
+      // Get the result from ABA into an SX
+      mecali::CasadiScalar        ddq_sx(cas_model.nv, 1);
+      pinocchio::casadi::copy( cas_data.ddq, ddq_sx );
+
+      // Create the ABA function
+      casadi::Function    aba_2_1("aba_2_1", casadi::SXVector {q_sx, v_sx, tau_sx}, casadi::SXVector {ddq_sx});
+
+      std::vector<double> q_vec((size_t)model.nq);
+      Eigen::Map<mecali::ConfigVector>(q_vec.data(),model.nq,1) = q_home;
+
+      std::vector<double> v_vec((size_t)model.nv);
+      Eigen::Map<mecali::TangentVector>(v_vec.data(),model.nv,1) = v_home;
+
+      std::vector<double> tau_vec((size_t)model.nv);
+      Eigen::Map<mecali::TangentVector>(tau_vec.data(),model.nv,1) = tau_home;
+
+      // casadi::Function aba = robot_model.forward_dynamics();
+      casadi::DM ddq_res_2_1 = aba_2_1(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
+
+      mecali::Data::TangentVectorType ddq_mat_2_1 = Eigen::Map<mecali::Data::TangentVectorType>(static_cast< std::vector<double> >(ddq_res_2_1).data(), model.nv,1);
+
+      BOOST_CHECK(ddq_mat_2_1.isApprox(data_int.ddq));
+
+  // ---------------------------------------------------------------------
+  // 2.2 Compute ABA from Pinocchio+Casadi w/Integrate
+  // ---------------------------------------------------------------------
+      mecali::CasadiData cas_data_int(cas_model);
+
+      mecali::ConfigVectorCasadi  q_int_casadi(cas_model.nq);
+
+      mecali::CasadiScalar        v_sx_int = casadi::SX::sym("v_inc", model.nv);
+      mecali::ConfigVectorCasadi  v_int_casadi(cas_model.nv);
+      pinocchio::casadi::copy( v_sx_int, v_int_casadi );
+
+      pinocchio::integrate(cas_model, q_casadi, v_int_casadi, q_int_casadi); // Integrate a configuration vector for the specified model for a tangent vector during one unit time
+      mecali::CasadiScalar q_sx_int(model.nq,1);
+      pinocchio::casadi::copy( q_int_casadi, q_sx_int );
+
+      std::vector<double> v_int_vec((size_t)model.nv);
+      // Eigen::Map<mecali::TangentVector>(v_int_vec.data(),model.nv,1) = v_home;
+      Eigen::Map<mecali::TangentVector>(v_int_vec.data(),model.nv,1).setZero();
+
+      pinocchio::aba(cas_model, cas_data_int, q_int_casadi, v_casadi, tau_casadi);
+
+      casadi::SX ddq_sx_2_2(model.nv,1);
+      for(Eigen::DenseIndex k = 0; k < model.nv; ++k)
+        ddq_sx_2_2(k) = cas_data_int.ddq[k];
+      casadi::Function eval_aba("eval_aba",
+                                casadi::SXVector {q_sx, v_sx_int, v_sx, tau_sx},
+                                casadi::SXVector {ddq_sx_2_2});
+      casadi::DM ddq_res_2_2 = eval_aba(casadi::DMVector {q_vec, v_int_vec, v_vec, tau_vec})[0];
+
+      mecali::Data::TangentVectorType ddq_mat_2_2 = Eigen::Map<mecali::Data::TangentVectorType>(static_cast< std::vector<double> >(ddq_res_2_2).data(), model.nv,1);
+
+      BOOST_CHECK(ddq_mat_2_2.isApprox(ddq_mat_2_1));
+
+
+      // mecali::CasadiScalar        v_int_sx_zeros = casadi::SX::sym("v_int_zeros", Sparsity::dense(model.nv, 1));
+      // mecali::CasadiScalar        v_int_sx_zeros = casadi::SX::zeros(v_sx.sparsity());
+      // y = MX.sym('y',Sparsity.lower(n));
+      // casadi:DM v_int_sx_zeros = casadi::DM::zeros(model.nv, 1);
+
+      // casadi::Function eval_aba_simp("eval_aba_simp",
+      //                           casadi::SXVector {q_sx, v_sx, tau_sx},
+      //                           casadi::SXVector {eval_aba(casadi::SXVector {q_sx, v_int_sx_zeros, v_sx, tau_sx})});
+      // casadi::DM ddq_res_2_2_simp = eval_aba_simp(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
+      // mecali::Data::TangentVectorType ddq_mat_2_2_simp = Eigen::Map<mecali::Data::TangentVectorType>(static_cast< std::vector<double> >(ddq_res_2_2_simp).data(), model.nv,1);
+      // BOOST_CHECK(ddq_mat_2_2_simp.isApprox(ddq_mat_2_2));
+
+
+  // ---------------------------------------------------------------------
+  // 3.1 Compute ABA from Interface wo Integrate
+  // ---------------------------------------------------------------------
+      casadi::Function aba = robot_model.forward_dynamics();
+
+      casadi::DM ddq_res_interface = aba(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
+
+      mecali::Data::TangentVectorType ddq_mat = Eigen::Map<mecali::Data::TangentVectorType>(static_cast< std::vector<double> >(ddq_res_interface).data(), model.nv,1);
+
+    // Check
+      BOOST_CHECK(ddq_mat.isApprox(ddq_mat_2_2));
+
+
+  // ---------------------------------------------------------------------
+  // 4.1 Compute ABA Jacobian from Pinocchio+Casadi w/Integrate
+  // ---------------------------------------------------------------------
+
 
 }
 
@@ -242,5 +351,23 @@ BOOST_AUTO_TEST_CASE(ABA_DIFF_pinocchio_casadi)
     BOOST_CHECK(ddq_dv_dm_mat.isApprox(ddq_dv_res_direct_map));
     BOOST_CHECK(ddq_dtau_dm_mat.isApprox(ddq_dtau_res_direct_map));
 
+  // Test partial derivatives
+    casadi::Function interface_ddq_dq = robot_model.forward_dynamics_derivatives("ddq_dq");
+
+    std::cout << "*************** " << eval_aba << std::endl;
+    // std::cout << "*************** " << interface_ddq_dq(std::vector<casadi::SX>{q_sx, v_sx, tau_sx}) << std::endl;
+    // casadi::SX res_ddq_sx = eval_aba(std::vector<casadi::SX>{q_sx, v_sx_int, v_sx, tau_sx});
+    // casadi::SX pincas_ddq_dq_sx = jacobian(res_ddq_sx, q_sx);
+    // casadi::Function pincas_ddq_dq("pincas_ddq_dq", casadi::SXVector {q_sx, v_sx_int, v_sx, tau_sx}, casadi::SXVector {pincas_ddq_dq_sx} );
+    //
+    casadi::Function interface_aba = robot_model.forward_dynamics();
+    // casadi::DM interface_aba_DM = interface_aba(std::vector<casadi::DM>{q_vec, v_vec, tau_vec});
+    // std::cout << "*************** " << interface_aba_DM << std::endl;
+    // casadi::SX interface_aba_sx = interface_aba(std::vector<casadi::SX>{q_sx, v_sx, tau_sx});
+    // std::cout << "*************** " << interface_aba_sx << std::endl;
+    // casadi::SX jac_int_ddq_dq_sx = jacobian(interface_aba(casadi::SXVector {q_sx, v_sx, tau_sx}), q_sx);
+    // casadi::Function jacobian_interface_ddq_dq("jacobian_interface_ddq_dq", casadi::SXVector {q_sx, v_sx, tau_sx}, casadi::SXVector {jac_int_ddq_dq_sx});
+    //
+    // std::cout << "*** JACOBIANS: \n" << interface_ddq_dq << "\n" << pincas_ddq_dq << "\n" << jacobian_interface_ddq_dq << std::endl;
 
 }

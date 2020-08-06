@@ -31,7 +31,7 @@ namespace mecali
     // pinocchio::casadi::copy( cas_data.ddq, ddq_sx );
 
     // Create the ABA function
-    casadi::Function    aba("aba", casadi::SXVector {q_sx, v_sx, tau_sx}, casadi::SXVector {ddq_sx});
+    casadi::Function    aba("aba", casadi::SXVector {q_sx, v_sx, tau_sx}, casadi::SXVector {ddq_sx}, std::vector<std::string>{"q","v","tau"}, std::vector<std::string>{"ddq"});
 
     return aba;
   }

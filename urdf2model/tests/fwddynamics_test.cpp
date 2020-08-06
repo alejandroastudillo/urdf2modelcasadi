@@ -13,7 +13,7 @@
     #define Rob_models_dir "../../urdf2model/models"
 #endif
 
-std::string filename = Rob_models_dir"/kortex_description/urdf/JACO3_URDF_V11.urdf";
+std::string filename = Rob_models_dir"/kortex_description/urdf/JACO3_URDF_V11lim.urdf";
 
 BOOST_AUTO_TEST_CASE(ABA_pinocchio_casadi)
 {
@@ -354,20 +354,58 @@ BOOST_AUTO_TEST_CASE(ABA_DIFF_pinocchio_casadi)
   // Test partial derivatives
     casadi::Function interface_ddq_dq = robot_model.forward_dynamics_derivatives("ddq_dq");
 
-    std::cout << "*************** " << eval_aba << std::endl;
     // std::cout << "*************** " << interface_ddq_dq(std::vector<casadi::SX>{q_sx, v_sx, tau_sx}) << std::endl;
     // casadi::SX res_ddq_sx = eval_aba(std::vector<casadi::SX>{q_sx, v_sx_int, v_sx, tau_sx});
     // casadi::SX pincas_ddq_dq_sx = jacobian(res_ddq_sx, q_sx);
     // casadi::Function pincas_ddq_dq("pincas_ddq_dq", casadi::SXVector {q_sx, v_sx_int, v_sx, tau_sx}, casadi::SXVector {pincas_ddq_dq_sx} );
     //
-    casadi::Function interface_aba = robot_model.forward_dynamics();
-    // casadi::DM interface_aba_DM = interface_aba(std::vector<casadi::DM>{q_vec, v_vec, tau_vec});
-    // std::cout << "*************** " << interface_aba_DM << std::endl;
-    // casadi::SX interface_aba_sx = interface_aba(std::vector<casadi::SX>{q_sx, v_sx, tau_sx});
-    // std::cout << "*************** " << interface_aba_sx << std::endl;
-    // casadi::SX jac_int_ddq_dq_sx = jacobian(interface_aba(casadi::SXVector {q_sx, v_sx, tau_sx}), q_sx);
-    // casadi::Function jacobian_interface_ddq_dq("jacobian_interface_ddq_dq", casadi::SXVector {q_sx, v_sx, tau_sx}, casadi::SXVector {jac_int_ddq_dq_sx});
-    //
-    // std::cout << "*** JACOBIANS: \n" << interface_ddq_dq << "\n" << pincas_ddq_dq << "\n" << jacobian_interface_ddq_dq << std::endl;
+
+    // CALCULATE PARTIAL DERIVATIVES OF ABA COMING FROM INTERFACE (using Jacobian)
+      casadi::Function interface_aba = robot_model.forward_dynamics();
+      casadi::SX interface_aba_sx = interface_aba(std::vector<casadi::SX>{q_sx, v_sx, tau_sx})[0];
+
+      casadi::SX jac_int_ddq_dq_sx    = jacobian(interface_aba_sx, q_sx);
+      casadi::SX jac_int_ddq_dv_sx    = jacobian(interface_aba_sx, v_sx);
+      casadi::SX jac_int_ddq_dtau_sx  = jacobian(interface_aba_sx, tau_sx);
+
+      casadi::Function jacobian_interface_ddq_dq("jacobian_interface_ddq_dq", casadi::SXVector {q_sx, v_sx, tau_sx}, casadi::SXVector {jac_int_ddq_dq_sx});
+      casadi::Function jacobian_interface_ddq_dv("jacobian_interface_ddq_dv", casadi::SXVector {q_sx, v_sx, tau_sx}, casadi::SXVector {jac_int_ddq_dv_sx});
+      casadi::Function jacobian_interface_ddq_dtau("jacobian_interface_ddq_dtau", casadi::SXVector {q_sx, v_sx, tau_sx}, casadi::SXVector {jac_int_ddq_dtau_sx});
+
+      casadi::SX full_Jddq_interface_sx = jacobian(interface_aba_sx, vertcat(q_sx,v_sx,tau_sx));
+      casadi::Function full_Jddq_interface("full_Jddq_interface", casadi::SXVector {q_sx, v_sx, tau_sx}, casadi::SXVector {full_Jddq_interface_sx});
+
+      //Evaluate
+      casadi::DM ddq_dq_dm_0 = jacobian_interface_ddq_dq(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
+      casadi::DM ddq_dv_dm_0 = jacobian_interface_ddq_dv(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
+      casadi::DM ddq_dtau_dm_0 = jacobian_interface_ddq_dtau(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
+      // casadi::DM Jddq_dm_0 = full_Jddq_interface(casadi::DMVector {q_vec, v_int_vec, v_vec, tau_vec})[0];
+      casadi::DM Jddq_dm_0 = full_Jddq_interface(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
+
+      Eigen::MatrixXd ddq_dq_mat_0    = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(ddq_dq_dm_0).data(),robot_model.n_dof,robot_model.n_dof);
+      Eigen::MatrixXd ddq_dv_mat_0    = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(ddq_dv_dm_0).data(),robot_model.n_dof,robot_model.n_dof);
+      Eigen::MatrixXd ddq_dtau_mat_0  = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(ddq_dtau_dm_0).data(),robot_model.n_dof,robot_model.n_dof);
+
+      Eigen::MatrixXd Jddq_mat_0  = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(Jddq_dm_0).data(),robot_model.n_dof,3*robot_model.n_dof);
+
+      Eigen::MatrixXd Jddq_mat_0_cat(robot_model.n_dof, 3*robot_model.n_dof);
+      Jddq_mat_0_cat << ddq_dq_mat_0, ddq_dv_mat_0, ddq_dtau_mat_0;
+
+      // std::cout << "*** PARTIAL DERIVATIVES: \n" << ddq_dq_mat_0 << "\n\n" << ddq_dv_mat_0 << "\n\n" << ddq_dtau_mat_0 << std::endl;
+      // std::cout << "\n*** JACOBIAN: \n" << Jddq_dm_0 << std::endl;
+      // std::cout << "*** PARTIAL DERIVATIVES: \n" << ddq_dq_mat_0 << "\n\n" << ddq_dv_mat_0 << "\n\n" << ddq_dtau_mat_0 << std::endl;
+      // std::cout << "\n*** JACOBIAN 1: \n" << Jddq_mat_0 << std::endl;
+
+      BOOST_CHECK(Jddq_mat_0.isApprox(Jddq_mat_0_cat));
+
+      casadi::Function full_Jddq_aba_jacobian = interface_aba.jacobian();
+      casadi::DM Jddq_dm_from_casadi = full_Jddq_aba_jacobian(casadi::DMVector {q_vec, v_vec, tau_vec, v_int_vec })[0];
+      Eigen::MatrixXd Jddq_dm_from_casadi_mat_0  = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(Jddq_dm_from_casadi).data(),robot_model.n_dof,3*robot_model.n_dof);
+
+      // TODO: ASK JORIS WHY DOES THE JACOBIAN HAVE 4 INPUTS
+      BOOST_CHECK(Jddq_mat_0.isApprox(Jddq_dm_from_casadi_mat_0));
+
+      // std::cout << "*** JACOBIANS: \n" << interface_ddq_dq << "\n" << pincas_ddq_dq << "\n" << jacobian_interface_ddq_dq << std::endl;
+      std::cout << full_Jddq_aba_jacobian << std::endl;
 
 }

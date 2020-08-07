@@ -402,10 +402,9 @@ BOOST_AUTO_TEST_CASE(ABA_DIFF_pinocchio_casadi)
       casadi::DM Jddq_dm_from_casadi = full_Jddq_aba_jacobian(casadi::DMVector {q_vec, v_vec, tau_vec, v_int_vec })[0];
       Eigen::MatrixXd Jddq_dm_from_casadi_mat_0  = Eigen::Map<Eigen::MatrixXd>(static_cast< std::vector<double> >(Jddq_dm_from_casadi).data(),robot_model.n_dof,3*robot_model.n_dof);
 
-      // TODO: ASK JORIS WHY DOES THE JACOBIAN HAVE 4 INPUTS
       BOOST_CHECK(Jddq_mat_0.isApprox(Jddq_dm_from_casadi_mat_0));
 
       // std::cout << "*** JACOBIANS: \n" << interface_ddq_dq << "\n" << pincas_ddq_dq << "\n" << jacobian_interface_ddq_dq << std::endl;
-      std::cout << full_Jddq_aba_jacobian << std::endl;
+      // std::cout << full_Jddq_aba_jacobian << std::endl;
 
 }

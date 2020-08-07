@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<robot name="kuka-lwr" xmlns:xacro="http://ros.org/wiki/xacro">
+  <!--virtual_joint child_link="base_link" name="virtual_joint" parent_frame="world" type="floating"/-->
+
+  <!--GROUPS: Representation of a set of joints and links. This can be useful for specifying DOF to plan for, defining arms, end effectors, etc-->
+  <!--LINKS: When a link is specified, the parent joint of that link (if it exists) is automatically included-->
+  <!--JOINTS: When a joint is specified, the child link of that joint (which will always exist) is automatically included-->
+  <!--CHAINS: When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
+  <!--SUBGROUPS: Groups can also be formed by referencing to already defined group names-->
+  
+  <!--group name="base">
+    <link name="Waist"/>
+  </group-->
+  <group name="full_arm">
+    <chain base_link="lwr_arm_base_link" tip_link="lwr_arm_7_link"/>
+  </group>
+  <group name="chains">
+    <!--THIS HAS TO BE THE LAST GROUP IN THE FILE -->
+    <group name="full_arm"/>
+  </group>
+  <rtt-gazebo reference="full_arm">
+    <controller type="JointPositionCtrl">
+      <gains D="0.1" I="0." P="1000." reference="lwr_arm_0_joint"/>
+      <gains D="0.1" I="0." P="1000." reference="lwr_arm_1_joint"/>
+      <gains D="0.1" I="0." P="600." reference="lwr_arm_2_joint"/>
+      <gains D="0.1" I="0." P="1000." reference="lwr_arm_3_joint"/>
+      <gains D="0.1" I="0." P="100." reference="lwr_arm_4_joint"/>
+      <gains D="0.1" I="0." P="100." reference="lwr_arm_5_joint"/>
+      <gains D="0.01" I="0." P="10." reference="lwr_arm_6_joint"/>
+    </controller>
+    <controller type="JointImpedanceCtrl">
+      <gains damping="30." reference="lwr_arm_0_joint" stiffness="300."/>
+      <gains damping="30." reference="lwr_arm_1_joint" stiffness="300."/>
+      <gains damping="30." reference="lwr_arm_2_joint" stiffness="300."/>
+      <gains damping="30." reference="lwr_arm_3_joint" stiffness="300."/>
+      <gains damping="30." reference="lwr_arm_4_joint" stiffness="300."/>
+      <gains damping="30." reference="lwr_arm_5_joint" stiffness="300."/>
+      <gains damping="30." reference="lwr_arm_6_joint" stiffness="300."/>
+    </controller>
+    <controller type="JointTorqueCtrl"/>
+  </rtt-gazebo>
+</robot>

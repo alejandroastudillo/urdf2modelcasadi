@@ -1,5 +1,11 @@
 #include <casadi/casadi.hpp>
 #include "model_interface.hpp"
+
+#include "pinocchio/utils/timer.hpp"
+#include "pinocchio/container/aligned-vector.hpp"
+
+#define NDEBUG
+
 using namespace std;
 int main()
 {
@@ -7,7 +13,9 @@ int main()
     // Create a model based on a URDF file
     // ---------------------------------------------------------------------
       // std::string urdf_filename = "../urdf2model/models/kortex_description/urdf/GEN3_URDF_V12.urdf";
-      std::string urdf_filename = "../urdf2model/models/kortex_description/urdf/JACO3_URDF_V11lim.urdf";
+      // std::string urdf_filename = "../urdf2model/models/kortex_description/urdf/GEN3_URDF_V12lim.urdf";
+      // std::string urdf_filename = "../urdf2model/models/kuka_lwr_4_plus/model.urdf";
+      std::string urdf_filename = "../urdf2model/models/iiwa_description/urdf/iiwa7.urdf";
     // Instantiate a Serial_Robot object called robot_model
       mecali::Serial_Robot robot_model;
       // Define (optinal) gravity vector to be used
@@ -160,7 +168,7 @@ int main()
 
         casadi::DM J_ddq_interface_res  = J_ddq_interface(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
         // mecali::Data::MatrixXs J_ddq_interface_mat   = Eigen::Map<mecali::Data::MatrixXs>(static_cast< std::vector<double> >(J_ddq_interface_res).data(),model.nv,model.nv);
-        casadi::DM J_ddq_jacobian_res   = J_ddq_jacobian(casadi::DMVector {q_vec, v_int_vec, v_vec, tau_vec})[0];
+        casadi::DM J_ddq_jacobian_res   = J_ddq_jacobian(casadi::DMVector {q_vec,v_vec, tau_vec, v_int_vec})[0];
         // mecali::Data::MatrixXs J_ddq_jacobian_mat   = Eigen::Map<mecali::Data::MatrixXs>(static_cast< std::vector<double> >(J_ddq_jacobian_res).data(),model.nv,model.nv);
 
         std::cout << "\n\nJacobian from interface: \t" << J_ddq_interface_res << std::endl;
@@ -181,6 +189,99 @@ int main()
       // mecali::generate_code(fk, "kinova_fk", codegen_options);
       // mecali::generate_code(fd, "kinova_fd", codegen_options);
       // mecali::generate_code(id, "kinova_id", codegen_options);
+
+      PinocchioTicToc timer(PinocchioTicToc::US);
+      #ifdef NDEBUG
+        // const int NBT = 1000*100;
+        const int NBT = 100000;
+      #else
+        const int NBT = 1;
+        std::cout << "(the time score in debug mode is not relevant) " << std::endl;
+      #endif
+
+      PINOCCHIO_ALIGNED_STD_VECTOR(Eigen::VectorXd) qs     (NBT);
+      PINOCCHIO_ALIGNED_STD_VECTOR(Eigen::VectorXd) qdots  (NBT);
+      PINOCCHIO_ALIGNED_STD_VECTOR(Eigen::VectorXd) qddots (NBT);
+      PINOCCHIO_ALIGNED_STD_VECTOR(Eigen::VectorXd) taus (NBT);
+
+      Eigen::VectorXd qmax = Eigen::VectorXd::Ones(model.nq);
+      for(size_t i=0;i<NBT;++i)
+      {
+        qs[i]     = randomConfiguration(model,-qmax,qmax);
+        qdots[i]  = Eigen::VectorXd::Random(model.nv);
+        qddots[i] = Eigen::VectorXd::Random(model.nv);
+        taus[i] = Eigen::VectorXd::Random(model.nv);
+      }
+
+      std::cout << "\nABA timings\n\t";
+      timer.tic();
+      SMOOTH(NBT)
+      {
+        // pinocchio::aba(cas_model, cas_data, q_int_casadi, v_casadi, tau_casadi);
+        pinocchio::aba(model,data,qs[_smooth],qdots[_smooth],taus[_smooth]);
+      }
+      timer.toc(std::cout,NBT);
+
+
+      std::cout << "\nafter warming up - ABA timings (pinocchio)\n\t";
+      timer.tic();
+      // SMOOTH(NBT)
+      for(size_t _smooth=0;_smooth<NBT;++_smooth)
+      {
+        // pinocchio::aba(cas_model, cas_data, q_int_casadi, v_casadi, tau_casadi);
+        pinocchio::aba(model,data,qs[_smooth],qdots[_smooth],taus[_smooth]);
+      }
+      std::cout << timer.toc()/NBT << " us" << std::endl;
+      // timer.toc(std::cout,NBT);
+
+      // -----------------------------------------------------------------------
+      // ABA Timings
+      // -----------------------------------------------------------------------
+
+      casadi::DM dq_res = casadi::DM::zeros(model.nv, 1);
+      std::cout << "\nafter warming up - ABA timings (interface)\n\t";
+      timer.tic();
+      // SMOOTH(NBT)
+      for(size_t _smooth=0;_smooth<NBT;++_smooth)
+      {
+          dq_res = aba(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
+      }
+      std::cout << timer.toc()/NBT << " us" << std::endl;
+
+      // -----------------------------------------------------------------------
+      // ABA Partial Derivatives Timings
+      // -----------------------------------------------------------------------
+
+
+      // -----------------------------------------------------------------------
+      // ABA Jacobian Timings
+      // -----------------------------------------------------------------------
+      std::cout << "\nABA Jacobian timings\n";
+
+      double time_jac_interf = 0;
+      std::cout << "\t- Interface: \t\t";
+      timer.tic();
+      SMOOTH(NBT) // for(size_t _smooth=0;_smooth<NBT;++_smooth)
+      {
+          ddq_dq_res = J_ddq_interface(casadi::DMVector {q_vec, v_vec, tau_vec})[0];
+      }
+      time_jac_interf = timer.toc()/NBT;
+      // timer.toc(std::cout,NBT); // std::cout << timer.toc()/NBT << " us" << std::endl;
+      std::cout << time_jac_interf << " us" << std::endl;
+
+
+      double time_jac_cas = 0;
+      std::cout << "\t- Jacobian from CasADi: ";
+      timer.tic();
+      SMOOTH(NBT) // for(size_t _smooth=0;_smooth<NBT;++_smooth)
+      {
+          ddq_dq_res = J_ddq_jacobian(casadi::DMVector {q_vec,v_vec, tau_vec, v_int_vec})[0];
+      }
+      time_jac_cas = timer.toc()/NBT;
+      // timer.toc(std::cout,NBT); // std::cout << timer.toc()/NBT << " us" << std::endl;
+      std::cout << time_jac_cas << " us" << std::endl;
+
+      std::cout << "\t\t (Speed-up: " << time_jac_cas/time_jac_interf << "x)" << std::endl;
 
 
 

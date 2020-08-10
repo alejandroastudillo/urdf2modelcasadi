@@ -12,14 +12,14 @@
 
 # options
   option(DEBUG_MODE "Activate debug mode" OFF)
-  option(BUILD_UNIT_TESTS "Build the unit tests" ON)
-  option(BUILD_EXAMPLES "Build the examples" ON)
-  option(BUILD_BENCHMARKS "Build the benchmarks" ON)
+  option(BUILD_UNIT_TESTS "Build the unit tests" OFF)
+  option(BUILD_EXAMPLES "Build the examples" OFF)
+  # option(BUILD_BENCHMARKS "Build the benchmarks" OFF)
 
 
 # Set GCC flags
   SET(CMAKE_CXX_STANDARD 11)
-  # SET(CMAKE_BUILD_TYPE Release)
+  SET(CMAKE_BUILD_TYPE Release)
 
   if(DEBUG_MODE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -fPIC -std=c++11 -DPINOCCHIO_URDFDOM_TYPEDEF_SHARED_PTR -DPINOCCHIO_WITH_URDFDOM -DDEBUG")
@@ -94,6 +94,6 @@
     add_subdirectory (tests)
   endif(BUILD_UNIT_TESTS)
 
-  if(BUILD_BENCHMARKS)
-    add_subdirectory (benchmarks)
-  endif(BUILD_BENCHMARKS)
+  # if(BUILD_BENCHMARKS)
+  #   add_subdirectory (benchmarks)
+  # endif(BUILD_BENCHMARKS)

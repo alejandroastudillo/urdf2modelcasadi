@@ -1,5 +1,12 @@
-# Rigid body dynamics from URDF
+# Rigid body dynamics from URDF into CasADi
 
+### Build from Source
+* Clone this repository.
+* Go the the build directory.
+* Open the `configure.sh` file and modify the paths of `CASADI_DIRECTORY`, `PINOCCHIO_INCLUDE`, and `EIGEN_INCLUDE` with those from your system.
+* You can also set a custom INSTALL_FOLDER.
+* Open a terminal inside the build directory.
+* Execute `source configure.sh`.
 
 ### Dependencies
 * CMake
@@ -14,7 +21,7 @@ sudo apt-get install libboost-all-dev
 ```
 sudo apt-get install liburdfdom-dev
 ```
-* CASADI >= 3.4.4 (with pkg-config support)
+* CASADI >= 3.4.5 (with pkg-config support)
 
 * Pinocchio (with Casadi interface - needs pkg-config support) from branch 'devel' - commit 006f5b0a9784623167a17274045738f912a4d806
 ```
@@ -22,7 +29,6 @@ sudo apt-get install liburdfdom-dev
 git clone -b devel https://github.com/stack-of-tasks/pinocchio.git
 # Checkout the commit I have been using
 cd pinocchio
-git checkout 006f5b0a9784623167a17274045738f912a4d806
 # Build from source
 cd /pinocchio/build
 export CMAKE_PREFIX_PATH=/home/alejandro/phd_software/casadi_source/build:$CMAKE_PREFIX_PATH
@@ -46,12 +52,6 @@ sudo make install
 ```
 * C++11 (for randomConfiguration)
 
-### Build from Source
-* Clone this repository.
-* Go the the build directory.
-* Open the `configure.sh` file and modify the paths of `CASADI_DIRECTORY`, `PINOCCHIO_INCLUDE`, and `EIGEN_INCLUDE` with those from your system.
-* Open a terminal inside the build directory.
-* Execute `source configure.sh`.
 
 ### Example
 ```cpp

@@ -1,4 +1,4 @@
-# Rigid body dynamics from URDF into CasADi
+# INTERFACE - Rigid body dynamics from URDF into CasADi
 
 ### Build from Source
 * Clone this repository.
@@ -23,7 +23,7 @@ sudo apt-get install liburdfdom-dev
 ```
 * CASADI >= 3.4.5 (with pkg-config support)
 
-* Pinocchio (with Casadi interface - needs pkg-config support) from branch 'devel' - commit 006f5b0a9784623167a17274045738f912a4d806
+* Pinocchio (with Casadi interface - needs pkg-config support) from branch 'devel' - commit 0a8094da7feb9a5822a120acc4b6817c06722da7
 ```
 # Clone Pinocchio's repository (devel branch)
 git clone -b devel https://github.com/stack-of-tasks/pinocchio.git

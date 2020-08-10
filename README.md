@@ -1,5 +1,12 @@
-# Rigid body dynamics from URDF
+# Rigid body dynamics from URDF into CasADi
 
+### Build from Source
+* Clone this repository.
+* Go the the build directory.
+* Open the `configure.sh` file and modify the paths of `CASADI_DIRECTORY`, `PINOCCHIO_INCLUDE`, and `EIGEN_INCLUDE` with those from your system.
+* You can also set a custom INSTALL_FOLDER.
+* Open a terminal inside the build directory.
+* Execute `source configure.sh`.
 
 ### Dependencies
 * CMake
@@ -14,37 +21,39 @@ sudo apt-get install libboost-all-dev
 ```
 sudo apt-get install liburdfdom-dev
 ```
-* CASADI >= 3.5.1 (with pkg-config support)
 
-* Pinocchio (with Casadi interface - needs pkg-config support) from branch 'devel' - commit 607bab825ae37749034f2da11d16e3b883670f0b
+* CASADI >= 3.4.5 (with pkg-config support)
+
+* Pinocchio (with Casadi interface - needs pkg-config support) from branch 'devel' - commit 006f5b0a9784623167a17274045738f912a4d806
 ```
 # Clone Pinocchio's repository (devel branch)
 git clone -b devel https://github.com/stack-of-tasks/pinocchio.git
 # Checkout the commit I have been using
 cd pinocchio
-git checkout e5479944569c4305479be2c8c63a25ebaaa30ff8
 # Build from source
-cd pinocchio
-mkdir build 
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/openrobots -DBUILD_PYTHON_INTERFACE=OFF -DBUILD_WITH_CASADI_SUPPORT=ON -DBUILD_UNIT_TESTS=ON
-sudo make -j3
+cd /pinocchio/build
+export CMAKE_PREFIX_PATH=/home/alejandro/phd_software/casadi_source/build:$CMAKE_PREFIX_PATH
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/openrobots -DBUILD_PYTHON_INTERFACE=OFF -DBUILD_WITH_CASADI_SUPPORT=ON
+sudo make -j4
 sudo make install
-
-# Copy the following three lines in .bashrc
-export PATH=/usr/local/bin:$PATH
-export PKG_CONFIG_PATH =/opt/openrobots/lib/pkgconfig:$PKG_CONFIG_PATH
-export LD_LIBRARY_PATH=/opt/openrobots/lib:$LD_LIBRARY_PATH
+```
+From Justin's fork:
+```
+# Clone Pinocchio's repository (devel branch)
+git clone -b topic/casadi https://github.com/jcarpent/pinocchio.git
+# Checkout the commit I have been using
+cd pinocchio
+git checkout 0981fc1b0dad8c303ab143b8aca2e61e9a450edb
+# Build from source
+cd /pinocchio/build
+export CMAKE_PREFIX_PATH=/home/alejandro/phd_software/casadi_source/build:$CMAKE_PREFIX_PATH
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/openrobots -DBUILD_PYTHON_INTERFACE=OFF -DBUILD_WITH_CASADI_SUPPORT=ON
+sudo make -j4
+sudo make install
 
 ```
 * C++11 (for randomConfiguration)
 
-### Build from Source
-* Clone this repository.
-* Go the the build directory.
-* Open the `configure.sh` file and modify the paths of `CASADI_DIRECTORY`, `PINOCCHIO_INCLUDE`, and `EIGEN_INCLUDE` with those from your system.
-* Open a terminal inside the build directory.
-* Execute `source configure.sh`.
 
 ### Example
 ```cpp
@@ -91,17 +100,17 @@ int main()
       casadi::Function fwd_dynamics = robot_model.forward_dynamics();
     // Set function for inverse dynamics
       casadi::Function inv_dynamics = robot_model.inverse_dynamics();
-      
+
     // Set functions for mass_inverse matrix, coriolis matrix, and generalized gravity vector
       casadi::Function gen_gravity = robot_model.generalized_gravity();
-      
+
       casadi::Function coriolis = robot_model.coriolis_matrix();
-      
+
       casadi::Function mass_inverse = robot_model.mass_inverse_matrix();
-      
+
     // Set function for joint torque regressor: regressor(q, dq, ddq)*barycentric_params = tau
       casadi::Function regressor = robot_model.joint_torque_regressor();
-      
+
     // Set function for forward kinematics
       // The forward kinematics function can be set in multiple ways
       // Calling forward_kinematics without any argument generates a function which outputs a transformation matrix for each frame in the robot.

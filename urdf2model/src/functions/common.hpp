@@ -2,7 +2,8 @@
 #define COMMON_H_INCLUDED
 
 #include <casadi/casadi.hpp>
-#include <pinocchio/math/casadi.hpp>
+// #include <pinocchio/math/casadi.hpp>
+#include <pinocchio/autodiff/casadi.hpp>
 #include <pinocchio/multibody/model.hpp>
 
 namespace mecali

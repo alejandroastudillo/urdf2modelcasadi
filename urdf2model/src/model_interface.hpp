@@ -6,16 +6,12 @@
 
 #include <casadi/casadi.hpp>
 #include <pinocchio/math/casadi.hpp>
+// #include <pinocchio/autodiff/casadi.hpp>
 
 #include <pinocchio/multibody/model.hpp>
 #include <pinocchio/parsers/urdf.hpp>
 #include <pinocchio/algorithm/joint-configuration.hpp>
 #include <pinocchio/algorithm/model.hpp>
-
-// #include "pinocchio/algorithm/jacobian.hpp"
-// #include "pinocchio/algorithm/crba.hpp"
-// #include "pinocchio/algorithm/rnea-derivatives.hpp"
-// #include "pinocchio/algorithm/aba-derivatives.hpp"
 
 #include "functions/forward_dynamics.hpp"
 #include "functions/inverse_dynamics.hpp"
@@ -24,9 +20,16 @@
 #include "functions/common.hpp"
 #include "functions/robot_expressions.hpp"
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/optional.hpp>
+#include <iostream>
+#include <sstream>
+#include <cstdlib>
+
 /*
 TODO Check how to include code_generation as a public method in class Serial_Robot: follow the save example https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp
-TODO Add jacobians and derivatives to Serial_Robot
+TODO Add fk jacobians and derivatives to Serial_Robot
 QUESTION Should the Serial_Robot class be renamed as Robot, Rigid_Body_Chain, Robot_Model? (It is not just for serial robots anymore)
 */
 
@@ -73,6 +76,8 @@ namespace mecali
       void                     import_reduced_model(std::string filename, std::vector<std::string> joints_to_lock_by_name, Eigen::VectorXd robot_configuration);
       void                     import_reduced_model(std::string filename, std::vector<std::string> joints_to_lock_by_name, Eigen::VectorXd robot_configuration, Eigen::Vector3d gravity_vector);
 
+      void                     generate_json(std::string filename);
+
 
       // random configuration methods
       Eigen::VectorXd          randomConfiguration();
@@ -81,11 +86,20 @@ namespace mecali
 
       // function methods
       casadi::Function         forward_dynamics();
+
       casadi::Function         inverse_dynamics();
       casadi::Function         generalized_gravity();
       casadi::Function         coriolis_matrix();
       casadi::Function         mass_inverse_matrix();
       casadi::Function         joint_torque_regressor();
+
+      casadi::Function         forward_dynamics_derivatives(std::string type);
+      casadi::Function         forward_dynamics_derivatives();
+
+      casadi::Function         generalized_gravity_derivatives();
+      casadi::Function         inverse_dynamics_derivatives(std::string type);
+      casadi::Function         inverse_dynamics_derivatives();
+
       casadi::Function         forward_kinematics(std::string content, std::vector<std::string> frame_names);
       casadi::Function         forward_kinematics(std::string content, std::vector<int> frame_indices);
       casadi::Function         forward_kinematics(std::string content, std::string frame_name);

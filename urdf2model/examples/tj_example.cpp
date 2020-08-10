@@ -18,7 +18,10 @@ int main()
       mecali::Serial_Robot robot_model_2dof;
       mecali::Serial_Robot robot_model_2dof_wobase;
     // Define (optinal) gravity vector to be used
-      Eigen::Vector3d gravity_vector(0,0,0);
+
+      Eigen::Vector3d gravity_vector(0,0,-9.81);
+      // Eigen::Vector3d gravity_vector(0,0,0);
+
     // Create models based on a URDF files
       robot_model_7dof.import_model(urdf_filename_1, gravity_vector);
 
@@ -40,18 +43,22 @@ int main()
     casadi::Function fk_pos_1   = reduced_robot_model.forward_kinematics("transformation", "EndEffector_Link");
     casadi::Function fk_pos_2   = robot_model_2dof.forward_kinematics("transformation", "EndEffector_Link");
     casadi::Function fk_pos_3   = robot_model_2dof_wobase.forward_kinematics("transformation", "EndEffector_Link");
+    casadi::Function fk_pos_4   = robot_model_7dof.forward_kinematics("transformation", "EndEffector_Link");
 
     casadi::Function fd_1   = reduced_robot_model.forward_dynamics();
     casadi::Function fd_2   = robot_model_2dof.forward_dynamics();
     casadi::Function fd_3   = robot_model_2dof_wobase.forward_dynamics();
+    casadi::Function fd_4   = robot_model_7dof.forward_dynamics();
 
     casadi::Function id_1   = reduced_robot_model.inverse_dynamics();
     casadi::Function id_2   = robot_model_2dof.inverse_dynamics();
     casadi::Function id_3   = robot_model_2dof_wobase.inverse_dynamics();
+    casadi::Function id_4   = robot_model_7dof.inverse_dynamics();
 
     casadi::Function coriolis_1 = reduced_robot_model.coriolis_matrix();
     casadi::Function coriolis_2 = robot_model_2dof.coriolis_matrix();
     casadi::Function coriolis_3 = robot_model_2dof_wobase.coriolis_matrix();
+    casadi::Function coriolis_4 = robot_model_7dof.coriolis_matrix();
 
     casadi::Function mass_inverse_1 = reduced_robot_model.mass_inverse_matrix();
     casadi::Function mass_inverse_2 = robot_model_2dof.mass_inverse_matrix();
@@ -61,6 +68,12 @@ int main()
     casadi::Function regressor_1 = reduced_robot_model.joint_torque_regressor();
     casadi::Function regressor_2 = robot_model_2dof.joint_torque_regressor();
     casadi::Function regressor_3 = robot_model_2dof_wobase.joint_torque_regressor();
+    casadi::Function regressor_4 = robot_model_7dof.joint_torque_regressor();
+
+    casadi::Function gravity_1 = reduced_robot_model.generalized_gravity();
+    casadi::Function gravity_2 = robot_model_2dof.generalized_gravity();
+    casadi::Function gravity_3 = robot_model_2dof_wobase.generalized_gravity();
+    casadi::Function gravity_4 = robot_model_7dof.generalized_gravity();
 
     std::vector<double> q_vec_random((size_t)reduced_robot_model.n_q);
     Eigen::Map<mecali::ConfigVector>( q_vec_random.data(), q_vec_random.size(), 1 ) = reduced_robot_model.randomConfiguration();
@@ -121,6 +134,9 @@ int main()
     casadi::DM mass_inverse_res_4 = mass_inverse_4(casadi::DMVector {q_vec_random_2})[0];
     std::cout << "mass_inverse_4 result with random input        : " << mass_inverse_res_4 << std::endl;
 
+    casadi::DM gravity_res_4 = gravity_4(casadi::DMVector {q_vec_random_2})[0];
+    std::cout << "gravity_4 result with random input        : " << gravity_res_4 << std::endl;
+
 
     // ---------------------------------------------------------------------
     // Generate (or save) a function
@@ -132,12 +148,21 @@ int main()
       mecali::Dictionary codegen_options;
       codegen_options["c"]=false;
       codegen_options["save"]=true;
-      mecali::generate_code(fk_pos_1, "fk_T", codegen_options);
-      mecali::generate_code(fd_1, "fd", codegen_options);
-      mecali::generate_code(id_1, "id", codegen_options);
-      mecali::generate_code(regressor_1, "regressor", codegen_options);
-      mecali::generate_code(coriolis_1, "coriolis", codegen_options);
-      mecali::generate_code(mass_inverse_1, "massinv", codegen_options);
+      mecali::generate_code(fk_pos_1, "fk_T_2dof", codegen_options);
+      mecali::generate_code(fd_1, "fd_2dof", codegen_options);
+      mecali::generate_code(id_1, "id_2dof", codegen_options);
+      mecali::generate_code(regressor_1, "regressor_2dof", codegen_options);
+      mecali::generate_code(coriolis_1, "coriolis_2dof", codegen_options);
+      mecali::generate_code(mass_inverse_1, "massinv_2dof", codegen_options);
+      mecali::generate_code(gravity_1, "gravity_2dof", codegen_options);
+
+      mecali::generate_code(fk_pos_4, "fk_T_7dof", codegen_options);
+      mecali::generate_code(fd_4, "fd_7dof", codegen_options);
+      mecali::generate_code(id_4, "id_7dof", codegen_options);
+      mecali::generate_code(regressor_4, "regressor_7dof", codegen_options);
+      mecali::generate_code(coriolis_4, "coriolis_7dof", codegen_options);
+      mecali::generate_code(mass_inverse_4, "massinv_7dof", codegen_options);
+      mecali::generate_code(gravity_4, "gravity_7dof", codegen_options);
 
       // std::cout << fk_pos_1 << std::endl;
       // std::cout << fd_1 << std::endl;

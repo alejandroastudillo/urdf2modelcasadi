@@ -212,6 +212,40 @@ namespace mecali
       this->import_reduced_model(filename, joints_to_lock_by_intid, pinocchio::neutral(model), pinocchio::Model::gravity981);
   }
 
+  void              Serial_Robot::generate_json(std::string filename)
+  {
+    // Eigen::VectorXd          barycentric_params;
+
+    boost::property_tree::ptree pt;
+    pt.put("name", this->name);
+    pt.put("n_dof", this->n_dof);
+    pt.put("n_joints", this->n_joints);
+    pt.put("n_q", this->n_q);
+    pt.put("n_frames", this->n_frames);
+    pt.put("gravity.x", this->gravity[0]);
+    pt.put("gravity.y", this->gravity[1]);
+    pt.put("gravity.z", this->gravity[2]);
+    // for (int i = 0; i < 10*(this->n_dof); i++)
+    // {
+    //   pt.put("barycentric_params.b"+i, this->barycentric_params[i]);
+    // }
+    for (int i = 1; i < this->n_joints; i++)
+    {
+      pt.put("joints."+this->joint_names[i]+".joint_types", this->joint_types[i-1]);
+      pt.put("joints."+this->joint_names[i]+".joint_pos_ub", this->joint_pos_ub[i-1]);
+      pt.put("joints."+this->joint_names[i]+".joint_pos_lb", this->joint_pos_lb[i-1]);
+      pt.put("joints."+this->joint_names[i]+".joint_torque_limit", this->joint_torque_limit[i-1]);
+      pt.put("joints."+this->joint_names[i]+".joint_vel_limit", this->joint_vel_limit[i-1]);
+    }
+
+    std::stringstream ss;
+    boost::property_tree::json_parser::write_json(ss, pt);
+    // std::cout << ss.str() << std::endl;
+    std::ofstream outFile;
+    outFile.open(filename);
+    outFile << ss.rdbuf();
+  }
+
 
   Eigen::VectorXd   Serial_Robot::randomConfiguration()
   {
@@ -371,6 +405,33 @@ namespace mecali
       return get_joint_torque_regressor( this->_casadi_model, casadi_data );
   }
 
+  casadi::Function  Serial_Robot::forward_dynamics_derivatives(std::string type)
+  {
+      CasadiData casadi_data( this->_casadi_model );
+
+      return get_forward_dynamics_derivatives( this->_casadi_model, casadi_data, type );
+  }
+  casadi::Function  Serial_Robot::forward_dynamics_derivatives()
+  {
+      return this->forward_dynamics_derivatives("all");
+  }
+  casadi::Function  Serial_Robot::generalized_gravity_derivatives()
+  {
+      CasadiData casadi_data( this->_casadi_model );
+
+      return get_generalized_gravity_derivatives( this->_casadi_model, casadi_data );
+  }
+  casadi::Function  Serial_Robot::inverse_dynamics_derivatives(std::string type)
+  {
+      CasadiData casadi_data( this->_casadi_model );
+
+      return get_inverse_dynamics_derivatives( this->_casadi_model, casadi_data, type );
+  }
+  casadi::Function  Serial_Robot::inverse_dynamics_derivatives()
+  {
+      return this->inverse_dynamics_derivatives("all");
+  }
+
   casadi::Function  Serial_Robot::forward_kinematics(std::string content, std::vector<std::string> frame_names)
   {
       CasadiData casadi_data( this->_casadi_model );
@@ -412,7 +473,6 @@ namespace mecali
 
   casadi::Function  Serial_Robot::robot_expressions(std::vector<std::string> frame_names, bool AUGMENT_ODE)
   {
-    // ode_aug (fd), fk_eeT (pos, rot)
     CasadiData casadi_data( this->_casadi_model );
 
     return get_robot_expressions( this->_casadi_model, casadi_data, frame_names, AUGMENT_ODE );

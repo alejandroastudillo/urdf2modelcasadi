@@ -28,7 +28,14 @@ int main()
     // // Set function for forward kinematics
       std::vector<std::string> required_Frames = {"shoulder_link", "upper_arm_link", "forearm_link", "wrist_1_link", "wrist_2_link", "wrist_3_link", "ee_link" };
 
-      casadi::Function fk_pos = robot_model.forward_kinematics("transformation", required_Frames);
+      casadi::Function fkpos_ee = robot_model.forward_kinematics("position", "ee_link");
+      casadi::Function fkrot_ee = robot_model.forward_kinematics("rotation", "ee_link");
+      casadi::Function fk_ee    = robot_model.forward_kinematics("transformation", "ee_link");
+      casadi::Function fk       = robot_model.forward_kinematics("transformation", required_Frames);
+      casadi::Function fd       = robot_model.forward_dynamics();
+      casadi::Function id       = robot_model.inverse_dynamics();
+
+      robot_model.generate_json("ur10.json");
 
 
 
@@ -40,8 +47,11 @@ int main()
       mecali::Dictionary codegen_options;
       codegen_options["c"]=false;
       codegen_options["save"]=true;
-      mecali::generate_code(fk_pos, "ur10_fk", codegen_options);
-
-
+      mecali::generate_code(fkpos_ee, "ur10_fkpos_ee", codegen_options);
+      mecali::generate_code(fkrot_ee, "ur10_fkrot_ee", codegen_options);
+      mecali::generate_code(fk_ee, "ur10_fk_ee", codegen_options);
+      mecali::generate_code(fk, "ur10_fk", codegen_options);
+      mecali::generate_code(fd, "ur10_fd", codegen_options);
+      mecali::generate_code(id, "ur10_id", codegen_options);
 
 }

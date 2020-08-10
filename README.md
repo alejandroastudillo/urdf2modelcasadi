@@ -1,4 +1,4 @@
-# Rigid body dynamics from URDF into CasADi
+# INTERFACE - Rigid body dynamics from URDF into CasADi
 
 ### Build from Source
 * Clone this repository.

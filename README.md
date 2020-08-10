@@ -21,6 +21,7 @@ sudo apt-get install libboost-all-dev
 ```
 sudo apt-get install liburdfdom-dev
 ```
+
 * CASADI >= 3.4.5 (with pkg-config support)
 
 * Pinocchio (with Casadi interface - needs pkg-config support) from branch 'devel' - commit 0a8094da7feb9a5822a120acc4b6817c06722da7
@@ -49,6 +50,7 @@ export CMAKE_PREFIX_PATH=/home/alejandro/phd_software/casadi_source/build:$CMAKE
 cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/openrobots -DBUILD_PYTHON_INTERFACE=OFF -DBUILD_WITH_CASADI_SUPPORT=ON
 sudo make -j4
 sudo make install
+
 ```
 * C++11 (for randomConfiguration)
 

@@ -26,7 +26,7 @@ namespace mecali
     pinocchio::casadi::copy( cas_data.tau, tau_sx );
 
     // Create the RNEA function
-    casadi::Function    rnea("rnea", casadi::SXVector {q_sx, v_sx, a_sx}, casadi::SXVector {tau_sx});
+    casadi::Function    rnea("rnea", casadi::SXVector {q_sx, v_sx, a_sx}, casadi::SXVector {tau_sx}, std::vector<std::string>{"q","dq","ddq"}, std::vector<std::string>{"tau"});
 
     return rnea;
   }
@@ -111,7 +111,7 @@ namespace mecali
     pinocchio::casadi::copy( cas_data.jointTorqueRegressor, JTR_sx );
 
     // Create the RNEA function
-    casadi::Function    joint_torque_regressor("joint_torque_reg", casadi::SXVector {q_sx, v_sx, a_sx}, casadi::SXVector {JTR_sx});
+    casadi::Function    joint_torque_regressor("joint_torque_reg", casadi::SXVector {q_sx, v_sx, a_sx}, casadi::SXVector {JTR_sx}, std::vector<std::string>{"q","dq","ddq"}, std::vector<std::string>{"joint_torque_regressor"});
 
     return joint_torque_regressor;
   }

@@ -134,8 +134,10 @@ int main()
     casadi::DM mass_inverse_res_4 = mass_inverse_4(casadi::DMVector {q_vec_random_2})[0];
     std::cout << "mass_inverse_4 result with random input        : " << mass_inverse_res_4 << std::endl;
 
-    casadi::DM gravity_res_4 = gravity_4(casadi::DMVector {q_vec_random_2})[0];
-    std::cout << "gravity_4 result with random input        : " << gravity_res_4 << std::endl;
+    // casadi::DM gravity_res_4 = gravity_4(casadi::DMVector {q_vec_random_2})[0];
+    // std::cout << "gravity_4 result with random input        : " << gravity_res_4 << std::endl;
+
+    std::cout << mass_inverse_4.n_instructions() << std::endl;
 
 
     // ---------------------------------------------------------------------
@@ -172,7 +174,7 @@ int main()
       // std::cout << mass_inverse_1 << std::endl;
 
       // reduced_robot_model.print_model_data();
-      robot_model_2dof.print_model_data();
+      // robot_model_2dof.print_model_data();
       // robot_model_2dof_wobase.print_model_data();
 
 }

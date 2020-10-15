@@ -84,6 +84,55 @@ namespace mecali
   {
     this->import_model(filename, pinocchio::Model::gravity981, false); // verbose can be omitted from the buildModel execution: <pinocchio::urdf::buildModel(filename,model)>
   }
+  void              Serial_Robot::import_model(std::string filename, Eigen::Vector3d gravity_vector, bool joint_model_free_flyer, bool verbose)
+  {
+    // Pinocchio model
+      Model         model;
+    // Build the model using the URDF parser
+      if (joint_model_free_flyer) {
+        pinocchio::urdf::buildModel(filename, pinocchio::JointModelFreeFlyer(), model);
+      }
+      else {
+        pinocchio::urdf::buildModel(filename,model,verbose);    // https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio_1_1urdf.html
+      }
+    // Set the gravity applied to the model
+      model.gravity.linear(gravity_vector);
+      // model.gravity.linear(pinocchio::Model::gravity981);
+      // model.gravity.setZero();
+    // Initialize the data structure for the model
+      Data          data = pinocchio::Data(model);
+
+    // populate the data structure with some basic information about the robot
+      this->name                  = model.name;
+      this->n_joints              = model.njoints;  // data.oMi.size()
+      this->n_frames              = model.nframes;
+      this->n_q                   = model.nq;
+      this->n_dof                 = model.nv;
+      this->gravity               = model.gravity.linear_impl();
+      this->joint_torque_limit    = model.effortLimit;
+      this->joint_pos_ub          = model.upperPositionLimit;
+      this->joint_pos_lb          = model.lowerPositionLimit;
+      this->joint_vel_limit       = model.velocityLimit;
+      this->joint_names           = model.names;
+      this->neutral_configuration = pinocchio::neutral(model);
+
+      this->_n_bodies             = model.nbodies;
+      this->_model                = model;
+
+      std::vector<std::string> joint_types(this->n_dof);
+      for (int i = 1; i < this->n_joints; i++){ joint_types[i-1] = model.joints[i].shortname(); }
+      this->joint_types           = joint_types;
+
+      Eigen::VectorXd params(10*(this->n_dof));
+      for(pinocchio::Model::JointIndex i=1; i<(pinocchio::Model::JointIndex)model.njoints; ++i){ params.segment<10>((int)((i-1)*10)) = model.inertias[i].toDynamicParameters(); }
+      this->barycentric_params    = params;
+
+    // Casadi model
+      CasadiModel casadi_model = model.cast<CasadiScalar>();
+      CasadiData casadi_data( casadi_model );
+
+      this->_casadi_model         = casadi_model;
+  }
 
   void              Serial_Robot::import_reduced_model(std::string filename, std::vector<mecali::Index> joints_to_lock_by_index, Eigen::VectorXd robot_configuration, Eigen::Vector3d gravity_vector)
   {

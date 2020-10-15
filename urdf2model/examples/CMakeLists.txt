@@ -20,7 +20,7 @@ target_link_libraries( basic_example
                        ${CASADI_LIB}
                        pinocchio::pinocchio
                      )
-# # Complete example
+# Complete example
 add_executable( complete_example
                complete_example.cpp
              )
@@ -115,3 +115,36 @@ target_link_libraries( iiwa_example
                       ${CASADI_LIB}
                       pinocchio::pinocchio
                     )
+
+## scara example
+add_executable( scara_example
+               scara_example.cpp
+             )
+target_link_libraries( scara_example
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                      pinocchio::pinocchio
+                    )
+
+## KUKA KR60 example
+add_executable( kuka_kr60_example
+               kuka_kr60_example.cpp
+             )
+target_link_libraries( kuka_kr60_example
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                      pinocchio::pinocchio
+                                        )
+
+## KUKA KR5 example
+add_executable( kuka_kr5_example
+               kuka_kr5_example.cpp
+             )
+target_link_libraries( kuka_kr5_example
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                      pinocchio::pinocchio
+                                        )

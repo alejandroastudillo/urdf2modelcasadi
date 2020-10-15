@@ -54,7 +54,7 @@ target_link_libraries (RNEA_tests
                       )
 target_compile_definitions(RNEA_tests PRIVATE MODELS_DIR=${CMAKE_SOURCE_DIR}/models) # can also be set like: add_definitions (-DMODELS_DIR=${CMAKE_SOURCE_DIR}/models) for all executables at once
 
-# ------------------------------------------------------------------------------
+# # ------------------------------------------------------------------------------
 
 add_executable (ABA_tests fwddynamics_test.cpp)
 target_link_libraries (ABA_tests
@@ -71,7 +71,7 @@ target_link_libraries (ABA_tests
                       )
 target_compile_definitions(ABA_tests PRIVATE MODELS_DIR=${CMAKE_SOURCE_DIR}/models) # can also be set like: add_definitions (-DMODELS_DIR=${CMAKE_SOURCE_DIR}/models) for all executables at once
 
-# ------------------------------------------------------------------------------
+# # ------------------------------------------------------------------------------
 
 add_executable (FWD_KINEMATICS_tests fwdkinematics_test.cpp)
 target_link_libraries (FWD_KINEMATICS_tests
@@ -90,7 +90,6 @@ target_compile_definitions(FWD_KINEMATICS_tests PRIVATE MODELS_DIR=${CMAKE_SOURC
 
 # ------------------------------------------------------------------------------
 
-# -------------------------------------------------------------------------------------------------------------------
 add_executable (Old_interface_tests old_interface.cpp)
 target_link_libraries (Old_interface_tests
 

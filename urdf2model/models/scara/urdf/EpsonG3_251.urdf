@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+
+<robot name="scara">
+
+  <link name="base_link">
+    <inertial>
+      <origin
+        xyz="0.025147 0.035567 0.058671"
+        rpy="0 0 0" />
+      <mass
+        value="0.14842" />
+      <inertia
+        ixx="9.2077E-05"
+        ixy="3.2384E-21"
+        ixz="-2.4686E-21"
+        iyy="6.375E-05"
+        iyz="9.4273E-22"
+        izz="9.2077E-05" />
+    </inertial>
+  </link>
+
+  <link name="link_1">
+    <inertial>
+      <origin
+        xyz="0.045 0.01 3.4694E-18"
+        rpy="0 0 0" />
+      <mass
+        value="0.1313" />
+      <inertia
+        ixx="2.9641E-05"
+        ixy="3.5343E-07"
+        ixz="-2.7952E-20"
+        iyy="0.00023851"
+        iyz="-7.2792E-22"
+        izz="0.00021763" />
+    </inertial>
+  </link>
+
+  <link name="link_2">
+    <inertial>
+      <origin
+        xyz="0.044789 0.018892 1.1883E-16"
+        rpy="0 0 0" />
+      <mass
+        value="0.2798" />
+      <inertia
+        ixx="0.00011045"
+        ixy="5.9539E-07"
+        ixz="2.9717E-11"
+        iyy="0.00044489"
+        iyz="2.1891E-20"
+        izz="0.00040107" />
+    </inertial>
+  </link>
+
+  <link name="link_3">
+    <inertial>
+      <origin
+        xyz="0.044789 0.018892 1.1883E-16"
+        rpy="0 0 0" />
+      <mass
+        value="0.2798" />
+      <inertia
+        ixx="0.00011045"
+        ixy="5.9539E-07"
+        ixz="2.9717E-11"
+        iyy="0.00044489"
+        iyz="2.1891E-20"
+        izz="0.00040107" />
+    </inertial>
+  </link>
+
+  <joint name="link1_to_base" type="revolute">
+    <parent link="base_link"/>
+    <child link="link_1"/>
+    <origin xyz="0 0 0.129"/>
+    <axis xyz="0 0 1" />
+    <limit effort="300" velocity="0.1" lower="-3.14" upper="3.14"/>
+  </joint>
+
+  <joint name="link2_to_link1" type="revolute">
+    <parent link="link_1"/>
+    <child link="link_2"/>
+    <origin xyz="0.120 0 0"/>
+    <axis xyz="0 0 1" />
+    <limit effort="300" velocity="0.1" lower="-3.14" upper="3.14"/>
+  </joint>
+
+  <joint name="link3_to_link2" type="prismatic">
+    <parent link="link_2"/>
+    <child link="link_3"/>
+    <origin xyz="0.130 0 0"/>
+    <axis xyz="0 0 1" />
+    <limit effort="300" velocity="0.1" lower="-0.150" upper="0"/>
+  </joint>
+
+
+</robot>

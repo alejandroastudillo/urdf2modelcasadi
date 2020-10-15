@@ -12,8 +12,8 @@
 
 # options
   option(DEBUG_MODE "Activate debug mode" OFF)
-  option(BUILD_UNIT_TESTS "Build the unit tests" OFF)
-  option(BUILD_EXAMPLES "Build the examples" OFF)
+  option(BUILD_UNIT_TESTS "Build the unit tests" ON)
+  option(BUILD_EXAMPLES "Build the examples" ON)
   # option(BUILD_BENCHMARKS "Build the benchmarks" OFF)
 
 
@@ -35,6 +35,7 @@
 
 # for linking directories (as the -L flag in gcc)
   find_library(CASADI_LIB casadi HINTS ${CASADI_DIR}/lib)
+  # find_library(CASADI_LIB casadi HINTS ${CASADI_DIR})
   # set(casadi_DIR /home/alejandro/phd_software/casadi_source/build)
   # find_package(casadi REQUIRED)
 

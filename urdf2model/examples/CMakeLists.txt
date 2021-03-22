@@ -148,3 +148,37 @@ target_link_libraries( kuka_kr5_example
                       ${CASADI_LIB}
                       pinocchio::pinocchio
                                         )
+
+## Atlas example
+add_executable( atlas_example
+               atlas_example.cpp
+             )
+target_link_libraries( atlas_example
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                      pinocchio::pinocchio
+                                        )
+
+
+## Rubion example
+add_executable( rubion_example
+               rubion_example.cpp
+             )
+target_link_libraries( rubion_example
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                      pinocchio::pinocchio
+                                        )
+
+## Gen3 float example
+add_executable( gen3_float_example
+               gen3_float_example.cpp
+             )
+target_link_libraries( gen3_float_example
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                      pinocchio::pinocchio
+                                        )

@@ -1,0 +1,172 @@
+<robot name="pi_robot">
+
+	<!-- * * * Link Definitions * * * -->
+
+ 	<link name="base_link">
+		<visual>
+		    <origin xyz="0 0 0.25" rpy="0 0 0"/>
+			<geometry>
+				<box size="1 0.75 .5"/>
+			</geometry>
+			<material name="green">
+	       		<color rgba="0 1 0 1"/>
+	     	</material>
+		</visual>	
+	</link>
+	
+    <link name="prismatic_base">
+      <visual>
+        <origin xyz="0 0 0.02" />
+        <geometry>
+          <box size="0.92 .08 .04" />
+        </geometry>
+        <material name="gray">
+	       		<color rgba="0 0 0 1"/>
+	    </material>
+      </visual>
+    </link>
+ 
+    <joint name="worldJoint"  type="fixed">
+        <origin xyz="0 0 0.5" rpy="0 0 0" />
+        <parent link="base_link"/>
+        <child link="prismatic_base"/>
+    </joint>
+
+	<link name="link1">
+        <visual>
+        	<origin xyz="0 0 0.025" />
+              <geometry>
+              	<box size="0.20 .08 .05" />
+              </geometry>
+            <material name="white">
+	       		<color rgba="1 1 1 1"/>
+	    	</material>
+        </visual>
+    </link>
+
+    <joint name="joint1" type="prismatic">
+        <origin xyz="0 0 0.04" />
+        <axis xyz="1 0 0" />
+        <parent link="prismatic_base"/>
+        <child link="link1"/>
+        <limit lower="-0.6" upper="0.8" velocity="0.5" effort="10"/>
+    </joint>
+
+	<link name="link2">
+      	<visual>
+        	<origin xyz="0.0 0 0.1" />
+        	<geometry>
+          	<box size="0.3 0.15 0.2"/>
+        	</geometry>
+        	<material name="white">
+	       		<color rgba="1 1 1 1"/>
+	    	</material>
+      	</visual>
+    </link>
+
+    <joint name="joint2" type="continuous">
+        <origin xyz="0 0 0.05" />
+        <axis xyz="0 0 1" />
+        <parent link="link1"/>
+        <child link="link2"/>
+    </joint>
+
+    <link name="link3">
+        <visual>
+        	<origin xyz="0 0 0.225" />
+          	<geometry>
+          		<box size="0.05 0.05 0.45"/>
+          	</geometry>
+          	<material name="white">
+	       		<color rgba="1 1 1 1"/>
+	    	</material>
+        </visual>
+    </link>
+
+    <joint name="joint3" type="revolute">
+        <origin xyz="0.15 0 0.16" rpy="0.0 1.04719755 0.0"/>
+        <limit upper="0.8" lower="-1.04719755" effort="10" velocity="10"/>
+        <axis xyz="0 1 0" />
+        <parent link="link2"/>
+        <child link="link3"/>
+    </joint>
+
+	<link name="linkMimic">
+      	<visual>
+        	<origin xyz="0.0 0 0.0" rpy="1.570796327 0.0 0.0"/>
+        	<geometry>
+          		<cylinder radius="0.04" length="0.06"/>
+        	</geometry>
+        	<material name="white">
+	       		<color rgba="1 1 1 1"/>
+	    	</material>
+      	</visual>
+    </link>
+
+    <joint name="jointMimic3" type="revolute">
+        <origin xyz="0 0 0.45"  rpy="0.0 0.0 0.0"/>
+        <axis xyz="0 1 0" />
+        <parent link="link3"/>
+        <child link="linkMimic"/>
+        <limit upper="0.5235987759" lower="-1.04719755" effort="10" velocity="10"/>
+        <mimic joint= "joint3" multiplier="-1" offset="0"/>
+    </joint>
+
+    <link name="link4">
+      	<visual>
+        	<origin xyz="0.0 0.0 0.05" />
+        	<geometry>
+          		<box size="0.03 0.03 0.1"/>
+        	</geometry>
+        	<material name="white">
+	       		<color rgba="1 1 1 1"/>
+	    	</material>
+      	</visual>
+    </link>
+
+    <joint name="joint4" type="continuous">
+        <origin xyz="0 0 0.0" rpy="0.0 0.5235987759 0.0"/>
+        <axis xyz="0 0 1" />
+        <parent link="linkMimic"/>
+        <child link="link4"/>
+    </joint>
+
+    <link name="link5">
+        <visual>
+        	<origin xyz="0.0 0.0 0.1" />
+          	<geometry>
+            	<box size="0.04 0.04 0.2"/>
+          	</geometry>
+          	<material name="white">
+	       		<color rgba="1 1 1 1"/>
+	    	</material>
+        </visual>
+    </link>
+
+    <joint name="joint5" type="continuous">
+        <origin xyz="0 0 0.1" rpy="0.0 1.570796 0.0"/>
+        <axis xyz="0 0 1" />
+        <parent link="link4"/>
+        <child link="link5"/>
+    </joint>
+
+    <link name="link6">
+        <visual>
+          	<origin xyz="0.0 0.0 0.0" />
+          	<geometry>
+            	<sphere radius="0.035"/>
+          	</geometry>
+          	<material name="red">
+	       		<color rgba="0.5 0 0 1"/>
+	    	</material>
+        </visual>
+    </link>
+
+    <joint name="joint6" type="revolute">
+        <origin xyz="0 0 0.2" rpy="0.0 0.0 0.0"/>
+        <limit upper="1.570796" lower="-1.570796" effort="10" velocity="10" />
+        <axis xyz="0 1 0" />
+        <parent link="link5"/>
+        <child link="link6"/>
+    </joint>
+</robot>

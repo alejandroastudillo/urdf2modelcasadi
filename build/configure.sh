@@ -5,8 +5,8 @@
   }
 
 # Set variables used by CMake
-  export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/build/install_matlab"
-  # export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/casadi_351"
+  # export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/build/install_matlab"
+  export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/casadi_351"
   # export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/casadi" # 352
   # export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/build-python/install_python"
   # export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/casadi_353"

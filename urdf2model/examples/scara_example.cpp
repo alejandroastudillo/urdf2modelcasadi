@@ -13,8 +13,18 @@ int main()
       mecali::Serial_Robot robot_model;
     // Define (optinal) gravity vector to be used
       Eigen::Vector3d gravity_vector(0,0,-9.81);
+
+
     // Create the model based on a URDF file
-      robot_model.import_model(urdf_filename, gravity_vector);
+      // robot_model.import_model(urdf_filename, gravity_vector);
+    // For reduced model
+      // Define list of joints to be locked (by name)
+      std::vector<std::string> list_of_joints_to_lock_by_name = {"link3_to_link2"};
+      // Define (optinal) robot configuration where joints should be locked
+      std::vector<double> q_init_vec = {0,0,0};
+      Eigen::VectorXd q_init = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(q_init_vec.data(), q_init_vec.size());
+      // Create the model based on a URDF file
+      robot_model.import_reduced_model(urdf_filename, list_of_joints_to_lock_by_name, q_init, gravity_vector);
 
     // Print some information related to the imported model (boundaries, frames, DoF, barycentric parameters, etc)
       robot_model.print_model_data();
@@ -43,19 +53,19 @@ int main()
     // ---------------------------------------------------------------------
     // Code-generate or save a function
       // If you use options, you can set if you want to C-code-generate the function, or just save it as "second_function.casadi" (which can be loaded afterwards using casadi::Function::load("second_function.casadi"))
-      // mecali::Dictionary codegen_options;
-      // codegen_options["c"]=false;
-      // codegen_options["save"]=true;
-      // mecali::generate_code(fwd_dynamics, "scara_fd", codegen_options);
-      // mecali::generate_code(inv_dynamics, "scara_id", codegen_options);
-      //
-      // mecali::generate_code(fk_T, "scara_fk", codegen_options);
-      //
-      // mecali::generate_code(regressor, "scara_regressor", codegen_options);
-      //
-      // mecali::generate_code(mass_inverse, "scara_mass_inverse", codegen_options);
-      // mecali::generate_code(coriolis, "scara_coriolis", codegen_options);
-      // mecali::generate_code(gravity, "scara_gravity", codegen_options);
+      mecali::Dictionary codegen_options;
+      codegen_options["c"]=false;
+      codegen_options["save"]=true;
+      mecali::generate_code(fwd_dynamics, "reduced_scara_fd", codegen_options);
+      mecali::generate_code(inv_dynamics, "reduced_scara_id", codegen_options);
+
+      mecali::generate_code(fk_T, "reduced_scara_fk", codegen_options);
+
+      mecali::generate_code(regressor, "reduced_scara_regressor", codegen_options);
+
+      mecali::generate_code(mass_inverse, "reduced_scara_mass_inverse", codegen_options);
+      mecali::generate_code(coriolis, "reduced_scara_coriolis", codegen_options);
+      mecali::generate_code(gravity, "reduced_scara_gravity", codegen_options);
 
     // ---------------------------------------------------------------------
     // Print functions
@@ -66,10 +76,10 @@ int main()
       std::cout << "Function scada_fk: " << fk_T << std::endl;
       std::cout << "Function scada_mass_inverse: " << mass_inverse << std::endl;
 
-      std::vector<double> q_vec = {0.86, 0.5, -0.1};
-      std::vector<double> v_vec = {0.3, 0.02, 0.05};
-      std::vector<double> tau_vec = {2.5, 5.6, 1.0};
-      std::vector<double> ddq_vec = {-1230.59, 2497.78, -6.23602};
+      std::vector<double> q_vec = {0.86, 0.5};
+      std::vector<double> v_vec = {0.3, 0.02};
+      std::vector<double> tau_vec = {2.5, 5.6};
+      std::vector<double> ddq_vec = {-1230.59, 2497.78};
 
 
       casadi::DM fd_res = fwd_dynamics(casadi::DMVector {q_vec, v_vec, tau_vec})[0];

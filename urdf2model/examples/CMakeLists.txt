@@ -182,3 +182,14 @@ target_link_libraries( gen3_float_example
                       ${CASADI_LIB}
                       pinocchio::pinocchio
                                         )
+
+## MMO-500 example
+add_executable( mmo500_example
+              mmo500_example.cpp
+              )
+target_link_libraries( mmo500_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )

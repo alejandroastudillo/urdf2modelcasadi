@@ -16,7 +16,7 @@ int main()
   Eigen::Vector3d gravity_vector(0, 0, 0);
   // Create the model based on a URDF file
   // robot_model.import_model(urdf_filename, gravity_vector);
-  robot_model.import_model(urdf_filename, gravity_vector, true, true);
+  robot_model.import_floating_base_model(urdf_filename, gravity_vector, true, true);
 
   // Print some information related to the imported model (boundaries, frames, DoF, etc)
   robot_model.print_model_data();

@@ -16,7 +16,8 @@ int main()
   // Eigen::Vector3d gravity_vector(0, 0, 0);
   // Create the model based on a URDF file
   // robot_model.import_model(urdf_filename, gravity_vector);
-  robot_model.import_model(urdf_filename, gravity_vector, true, true);
+  // robot_model.import_floating_base_model(urdf_filename, gravity_vector, true, true);
+  robot_model.import_planar_base_model(urdf_filename, gravity_vector, true, true);
   // For a floating base robot:
   // q = [global_base_position, global_base_quaternion, joint_positions]
   // v = [local_base_velocity_linear, local_base_velocity_angular, joint_velocities]
@@ -44,17 +45,34 @@ int main()
   casadi::Function fk_ee_pos = robot_model.forward_kinematics("position", end_effector_name);
 
   // ---------------------------------------------------------------------
-  // Test the function
+  // Test the function - Floating base model
   // ---------------------------------------------------------------------
-  std::vector<double> global_base_position = {0.5, 1, 1.5};
-  std::vector<double> global_base_quaternion = {0, 0, 0, 1}; // Identity quaternion
+  // std::vector<double> global_base_position = {0.5, 1, 1.5};
+  // std::vector<double> global_base_quaternion = {0, 0, 0, 1}; // Identity quaternion
+  // std::vector<double> joint_positions = {0.86602540378, 0.5, 0, 1, 0, -0.45, 1, 0, 0};
+
+  // std::vector<double> q_vec;
+  // q_vec.insert(q_vec.end(), global_base_position.begin(), global_base_position.end());
+  // q_vec.insert(q_vec.end(), global_base_quaternion.begin(), global_base_quaternion.end());
+  // q_vec.insert(q_vec.end(), joint_positions.begin(), joint_positions.end());
+  // // q = [global_base_position, global_base_quaternion, joint_positions]
+
+  // // Evaluate the function with a casadi::DMVector containing q_vec as input
+  // casadi::DM T_res = fk_ee(casadi::DMVector{q_vec})[0];
+  // std::cout << "Function result with q_vec input        : " << T_res << std::endl;
+
+  // ---------------------------------------------------------------------
+  // Test the function - Planar base model
+  // ---------------------------------------------------------------------
+  std::vector<double> global_base_position = {0, 0};
+  std::vector<double> heading_angle_cos_sin = {1, 0};
   std::vector<double> joint_positions = {0.86602540378, 0.5, 0, 1, 0, -0.45, 1, 0, 0};
 
   std::vector<double> q_vec;
   q_vec.insert(q_vec.end(), global_base_position.begin(), global_base_position.end());
-  q_vec.insert(q_vec.end(), global_base_quaternion.begin(), global_base_quaternion.end());
+  q_vec.insert(q_vec.end(), heading_angle_cos_sin.begin(), heading_angle_cos_sin.end());
   q_vec.insert(q_vec.end(), joint_positions.begin(), joint_positions.end());
-  // q = [global_base_position, global_base_quaternion, joint_positions]
+  // q = [global_base_position, heading_angle_cos_sin, joint_positions]
 
   // Evaluate the function with a casadi::DMVector containing q_vec as input
   casadi::DM T_res = fk_ee(casadi::DMVector{q_vec})[0];
@@ -77,5 +95,5 @@ int main()
 
   robot_model.generate_json("mmo_500.json");
 
-  std::cout << fk << std::endl;
+  // std::cout << fd << std::endl;
 }

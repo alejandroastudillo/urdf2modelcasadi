@@ -78,7 +78,7 @@ int main()
 
   // Evaluate the function with a casadi::DMVector containing q_vec as input
   casadi::DM T_res = fk_ee(casadi::DMVector{q_vec})[0];
-  std::cout << "Function result with q_vec input        : " << T_res << std::endl;
+  std::cout << "Function result with q_vec input : " << T_res << std::endl;
 
   // ---------------------------------------------------------------------
   // Generate (or save) a function

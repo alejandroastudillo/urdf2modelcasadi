@@ -36,6 +36,9 @@ int main()
   casadi::Function fd = robot_model.forward_dynamics();
   casadi::Function id = robot_model.inverse_dynamics();
 
+  casadi::Function J_fd = robot_model.forward_dynamics_derivatives("jacobian");
+  casadi::Function J_id = robot_model.inverse_dynamics_derivatives("jacobian");
+
   robot_model.generate_json("atlas.json");
 
   // ---------------------------------------------------------------------
@@ -52,4 +55,7 @@ int main()
   mecali::generate_code(fk, "atlas_fk", codegen_options);
   mecali::generate_code(fd, "atlas_fd", codegen_options);
   mecali::generate_code(id, "atlas_id", codegen_options);
+
+  mecali::generate_code(J_fd, "atlas_J_fd", codegen_options);
+  mecali::generate_code(J_id, "atlas_J_id", codegen_options);
 }

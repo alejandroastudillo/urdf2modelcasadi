@@ -354,10 +354,19 @@ namespace mecali
     pt.put("gravity.x", this->gravity[0]);
     pt.put("gravity.y", this->gravity[1]);
     pt.put("gravity.z", this->gravity[2]);
+
+    pt.put("forward_kinematics_path", this->name + "_fk.casadi");
+    pt.put("forward_dynamics_path", this->name + "_fd.casadi");
+    pt.put("inverse_dynamics_path", this->name + "_id.casadi");
+
+    pt.put("Jacobian_forward_dynamics_path", this->name + "_J_fd.casadi");
+    pt.put("Jacobian_inverse_dynamics_path", this->name + "_J_id.casadi");
+
     // for (int i = 0; i < 10*(this->n_dof); i++)
     // {
     //   pt.put("barycentric_params.b"+i, this->barycentric_params[i]);
     // }
+
     for (int i = 1; i < this->n_joints; i++)
     {
       pt.put("joints." + this->joint_names[i] + ".joint_types", this->joint_types[i - 1]);

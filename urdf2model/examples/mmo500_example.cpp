@@ -31,8 +31,10 @@ int main()
   // ---------------------------------------------------------------------
   // Set function for forward dynamics
   casadi::Function fd = robot_model.forward_dynamics();
+  casadi::Function J_fd = robot_model.forward_dynamics_derivatives("jacobian");
   // // Set function for inverse dynamics
   casadi::Function id = robot_model.inverse_dynamics();
+  casadi::Function J_id = robot_model.inverse_dynamics_derivatives("jacobian");
   // // Set function for forward kinematics
   // std::vector<std::string> required_Frames = {"Actuator1", "Actuator2", "Actuator3", "Actuator4", "Actuator5", "Actuator6", "Actuator7", "EndEffector" };
   // casadi::Function fkpos_ee = robot_model.forward_kinematics("position", "EndEffector");
@@ -76,7 +78,7 @@ int main()
 
   // Evaluate the function with a casadi::DMVector containing q_vec as input
   casadi::DM T_res = fk_ee(casadi::DMVector{q_vec})[0];
-  std::cout << "Function result with q_vec input        : " << T_res << std::endl;
+  std::cout << "Function result with q_vec input : " << T_res << std::endl;
 
   // ---------------------------------------------------------------------
   // Generate (or save) a function
@@ -87,7 +89,9 @@ int main()
   codegen_options["c"] = false;
   codegen_options["save"] = true;
   mecali::generate_code(fd, "mmo500_fd", codegen_options);
+  mecali::generate_code(J_fd, "mmo500_J_fd", codegen_options);
   mecali::generate_code(id, "mmo500_id", codegen_options);
+  mecali::generate_code(J_id, "mmo500_J_id", codegen_options);
   mecali::generate_code(fk_ee_pos, "mmo500_fk_ee_pos", codegen_options);
   // mecali::generate_code(fkrot_ee, "mmo500_fkrot_ee", codegen_options);
   mecali::generate_code(fk_ee, "mmo500_fk_ee", codegen_options);

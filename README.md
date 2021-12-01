@@ -30,8 +30,10 @@ sudo apt-get install liburdfdom-dev
 git clone -b devel https://github.com/stack-of-tasks/pinocchio.git
 # Checkout the commit I have been using
 cd pinocchio
+# Fetch pinocchio submodules
+git submodule update --init --recursive
 # Build from source
-cd /pinocchio/build
+cd build
 export CMAKE_PREFIX_PATH=/home/alejandro/phd_software/casadi_source/build:$CMAKE_PREFIX_PATH
 cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/openrobots -DBUILD_PYTHON_INTERFACE=OFF -DBUILD_WITH_CASADI_SUPPORT=ON
 sudo make -j4

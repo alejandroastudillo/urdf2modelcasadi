@@ -37,19 +37,19 @@ int main()
   casadi::Function J_fd = robot_model.forward_dynamics_derivatives("jacobian");
   casadi::Function J_id = robot_model.inverse_dynamics_derivatives("jacobian");
 
-  robot_model.generate_json("yumi.json");
+  // robot_model.generate_json("yumi.json");
 
   // ---------------------------------------------------------------------
   // Generate (or save) a function
   // ---------------------------------------------------------------------
   // Code-generate or save a function
   // If you use options, you can set if you want to C-code-generate the function, or just save it as "second_function.casadi" (which can be loaded afterwards using casadi::Function::load("second_function.casadi"))
-  mecali::Dictionary codegen_options;
-  codegen_options["c"] = false;
-  codegen_options["save"] = true;
-  mecali::generate_code(fk_pos, "yumi_fk", codegen_options);
-  mecali::generate_code(fd, "yumi_fd", codegen_options);
-  mecali::generate_code(id, "yumi_id", codegen_options);
-  mecali::generate_code(J_fd, "yumi_J_fd", codegen_options);
-  mecali::generate_code(J_id, "yumi_J_id", codegen_options);
+  // mecali::Dictionary codegen_options;
+  // codegen_options["c"] = false;
+  // codegen_options["save"] = true;
+  // mecali::generate_code(fk_pos, "yumi_fk", codegen_options);
+  // mecali::generate_code(fd, "yumi_fd", codegen_options);
+  // mecali::generate_code(id, "yumi_id", codegen_options);
+  // mecali::generate_code(J_fd, "yumi_J_fd", codegen_options);
+  // mecali::generate_code(J_id, "yumi_J_id", codegen_options);
 }

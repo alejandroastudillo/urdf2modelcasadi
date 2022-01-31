@@ -11,7 +11,9 @@
   # export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/build-python/install_python"
   # export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/casadi_353"
 
+  export PINOCCHIO_DIRECTORY="/opt/openrobots"
   export PINOCCHIO_INCLUDE="/opt/openrobots/include/"
+  # export PINOCCHIO_INCLUDE="/home/alejandro/miniconda3/envs/tasho/include/"
   export EIGEN_INCLUDE="/usr/include/eigen3"
   export INSTALL_FOLDER="install_folder"
 
@@ -29,7 +31,7 @@
   print_title "########## Executing CMake ##########"
   # cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE
   # cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE -DBUILD_UNIT_TESTS=ON -DDEBUG_MODE=ON
-  cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE -DCMAKE_INSTALL_PREFIX=$INSTALL_FOLDER -DCMAKE_BUILD_TYPE=Release
+  cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_DIR=$PINOCCHIO_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE -DCMAKE_INSTALL_PREFIX=$INSTALL_FOLDER -DCMAKE_BUILD_TYPE=Release
   # cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE -DCMAKE_INSTALL_PREFIX=$INSTALL_FOLDER
 # Execute the make command
   print_title "########## Executing make ##########"

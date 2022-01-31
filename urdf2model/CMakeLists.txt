@@ -39,8 +39,9 @@
   # set(casadi_DIR /home/alejandro/phd_software/casadi_source/build)
   # find_package(casadi REQUIRED)
 
-  find_package(pinocchio REQUIRED)
+  # find_package(pinocchio REQUIRED)
   # link_directories( ${PINOCCHIO_LIBRARY_DIRS} )
+  find_library(PINOCCHIO_LIB pinocchio HINTS ${PINOCCHIO_DIR}/lib)
 
 # Include root folder to the project's include path
   # include_directories(${CMAKE_SOURCE_DIR})
@@ -90,10 +91,10 @@
     add_subdirectory (examples)
   endif(BUILD_EXAMPLES)
 
-  if(BUILD_UNIT_TESTS)
-    enable_testing ()
-    add_subdirectory (tests)
-  endif(BUILD_UNIT_TESTS)
+  # if(BUILD_UNIT_TESTS)
+  #   enable_testing ()
+  #   add_subdirectory (tests)
+  # endif(BUILD_UNIT_TESTS)
 
   # if(BUILD_BENCHMARKS)
   #   add_subdirectory (benchmarks)

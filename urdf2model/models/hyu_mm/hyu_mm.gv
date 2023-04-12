@@ -1,0 +1,65 @@
+digraph G {
+node [shape=box];
+"world" [label="world"];
+"lin_x_link" [label="lin_x_link"];
+"lin_y_link" [label="lin_y_link"];
+"base_link" [label="base_link"];
+"Mobile_base" [label="Mobile_base"];
+"Battery" [label="Battery"];
+"Base_profile" [label="Base_profile"];
+"FT_sensor1" [label="FT_sensor1"];
+"FT_sensor2" [label="FT_sensor2"];
+"SPA_Base_Link" [label="SPA_Base_Link"];
+"SPA_Link_01" [label="SPA_Link_01"];
+"SPA_Link_02" [label="SPA_Link_02"];
+"SPA_Link_03" [label="SPA_Link_03"];
+"SPA_Link_04" [label="SPA_Link_04"];
+"SPA_Link_05" [label="SPA_Link_05"];
+"SPA_Link_06" [label="SPA_Link_06"];
+"tool0" [label="tool0"];
+"left_back_wheel" [label="left_back_wheel"];
+"left_front_wheel" [label="left_front_wheel"];
+"right_back_wheel" [label="right_back_wheel"];
+"right_front_wheel" [label="right_front_wheel"];
+node [shape=ellipse, color=blue, fontcolor=blue];
+"world" -> "lin_x_joint" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"lin_x_joint" -> "lin_x_link"
+"lin_x_link" -> "lin_y_joint" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"lin_y_joint" -> "lin_y_link"
+"lin_y_link" -> "rot_z_joint" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"rot_z_joint" -> "base_link"
+"base_link" -> "world_to_base_joint" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"world_to_base_joint" -> "Mobile_base"
+"Mobile_base" -> "Base_battery_joint" [label="xyz: 0 0 0.191 \nrpy: 0 -0 0"]
+"Base_battery_joint" -> "Battery"
+"Mobile_base" -> "Mobile_to_profile" [label="xyz: 0.1595 0 0.191 \nrpy: 0 -0 1.57"]
+"Mobile_to_profile" -> "Base_profile"
+"Base_profile" -> "Base_profile_joint" [label="xyz: 0 0 0.25 \nrpy: 0 -0 0"]
+"Base_profile_joint" -> "FT_sensor1"
+"FT_sensor1" -> "FT_sensor_joint1" [label="xyz: 0 0 0.0435 \nrpy: 0 -0 0"]
+"FT_sensor_joint1" -> "FT_sensor2"
+"FT_sensor2" -> "FT_sensor_joint2" [label="xyz: 0 0 0.011 \nrpy: 0 -0 0"]
+"FT_sensor_joint2" -> "SPA_Base_Link"
+"SPA_Base_Link" -> "Arm_Joint_1" [label="xyz: 0 0 0.1007 \nrpy: 0 -0 0"]
+"Arm_Joint_1" -> "SPA_Link_01"
+"SPA_Link_01" -> "Arm_Joint_2" [label="xyz: 0 0 0.054 \nrpy: 0 -0 0"]
+"Arm_Joint_2" -> "SPA_Link_02"
+"SPA_Link_02" -> "Arm_Joint_3" [label="xyz: 0 0 0.1458 \nrpy: 0 -0 0"]
+"Arm_Joint_3" -> "SPA_Link_03"
+"SPA_Link_03" -> "Arm_Joint_4" [label="xyz: 0 0 0.1542 \nrpy: 0 -0 0"]
+"Arm_Joint_4" -> "SPA_Link_04"
+"SPA_Link_04" -> "Arm_Joint_5" [label="xyz: 0 0 0.1458 \nrpy: 0 -0 0"]
+"Arm_Joint_5" -> "SPA_Link_05"
+"SPA_Link_05" -> "Arm_Joint_6" [label="xyz: 0 0 0.1542 \nrpy: 0 -0 0"]
+"Arm_Joint_6" -> "SPA_Link_06"
+"SPA_Link_06" -> "endeffector" [label="xyz: 0 0 0.15 \nrpy: 1.5709 -5.55112e-17 -1.5709"]
+"endeffector" -> "tool0"
+"Mobile_base" -> "left_back_wheel_joint" [label="xyz: 0.201 0.2932 0.0755 \nrpy: 0 -0 0"]
+"left_back_wheel_joint" -> "left_back_wheel"
+"Mobile_base" -> "left_front_wheel_joint" [label="xyz: -0.201 0.2932 0.0755 \nrpy: 0 -0 0"]
+"left_front_wheel_joint" -> "left_front_wheel"
+"Mobile_base" -> "right_back_wheel_joint" [label="xyz: 0.201 -0.2932 0.0755 \nrpy: 0 -0 0"]
+"right_back_wheel_joint" -> "right_back_wheel"
+"Mobile_base" -> "right_front_wheel_joint" [label="xyz: -0.201 -0.2932 0.0755 \nrpy: 0 -0 0"]
+"right_front_wheel_joint" -> "right_front_wheel"
+}

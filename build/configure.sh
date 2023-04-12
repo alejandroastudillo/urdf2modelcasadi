@@ -6,7 +6,7 @@
 
 # Set variables used by CMake
   # export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/build/install_matlab"
-  export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/casadi_351"
+  export CASADI_DIRECTORY="/home/mtplnr/mpc_ws/casadi_source/build"
   # export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/casadi" # 352
   # export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/build-python/install_python"
   # export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/casadi_353"
@@ -18,8 +18,8 @@
 # If the CMakeCache.txt file exists, delete it.
   if test -f "CMakeCache.txt"; then
       print_title "########## Removing CMakeCache.txt ##########"
-      rm CMakeCache.txt
-      # ls | grep -v configure.sh | xargs rm -r # deletes everything, except configure.sh
+      # rm CMakeCache.txt
+      ls | grep -v configure.sh | xargs rm -r # deletes everything, except configure.sh
       #rm -rf CMakeFiles
       #rm *.so Makefile urdf2model_casadi *.cmake
       printf "   CMakeCache.txt removed\n"
@@ -33,8 +33,8 @@
   # cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE -DCMAKE_INSTALL_PREFIX=$INSTALL_FOLDER
 # Execute the make command
   print_title "########## Executing make ##########"
-  #make -j3
-  make
+  make -j$(nproc)
+  # make
 
 # Execute unit tests
   print_title "########## Executing unit tests ##########"

@@ -87,6 +87,27 @@ namespace mecali
 
     return coriolis;
   }
+  casadi::Function get_mass_matrix(CasadiModel &cas_model, CasadiData &cas_data)
+  {
+    // Set variables
+    CasadiScalar        q_sx = casadi::SX::sym("q", cas_model.nq);
+    ConfigVectorCasadi  q_casadi(cas_model.nq);
+    pinocchio::casadi::copy( q_sx, q_casadi );
+
+    // Call the Composite Rigid Body Algorithm
+    pinocchio::crba( cas_model, cas_data, q_casadi);
+    cas_data.M.triangularView<Eigen::StrictlyLower>() = cas_data.M.transpose().triangularView<Eigen::StrictlyLower>();
+
+    // Get the result from ABA into an SX
+    casadi::SX          M_sx( cas_model.nv, cas_model.nv);
+    pinocchio::casadi::copy( cas_data.M, M_sx );
+
+    // Create the RNEA function
+    casadi::Function    mass_matrix("M", casadi::SXVector {q_sx}, casadi::SXVector {M_sx});
+
+    return mass_matrix;
+  }
+  
   casadi::Function get_joint_torque_regressor(CasadiModel &cas_model, CasadiData &cas_data)
   {
     // Set variables

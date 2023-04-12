@@ -14,7 +14,7 @@ LIST(APPEND ${PROJECT_NAME}_SOURCES
 # include directories (as the -I flag in gcc)
 include_directories(${PINOCCHIO_INC})
 include_directories(${EIGEN_INC})
-include_directories(${CASADI_DIR}/include)
+include_directories(${CASADI_DIR}/install_folder/include)
 
 # link external libraries (as the -l flag in gcc)
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${HEADERS} ${${PROJECT_NAME}_SOURCES})

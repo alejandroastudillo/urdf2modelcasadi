@@ -5,7 +5,7 @@
 # include directories (as the -I flag in gcc)
 include_directories(${PINOCCHIO_INC})
 include_directories(${EIGEN_INC})
-include_directories(${CASADI_DIR}/include)
+include_directories(${CASADI_DIR}/install_folder/include)
 
 include_directories(${SRC_DIR})
 
@@ -193,3 +193,15 @@ target_link_libraries( mmo500_example
        ${CASADI_LIB}
        pinocchio::pinocchio
                          )
+                         
+## xarm6 example
+add_executable( xarm6_example
+              xarm6_example.cpp
+              )
+target_link_libraries( xarm6_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )                         
+                         

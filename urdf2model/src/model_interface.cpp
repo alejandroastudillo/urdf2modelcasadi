@@ -545,6 +545,12 @@ namespace mecali
 
     return get_coriolis(this->_casadi_model, casadi_data);
   }
+  casadi::Function Serial_Robot::mass_matrix()
+  {
+    CasadiData casadi_data(this->_casadi_model);
+
+    return get_mass_matrix(this->_casadi_model, casadi_data);
+  }
   casadi::Function Serial_Robot::mass_inverse_matrix()
   {
     CasadiData casadi_data(this->_casadi_model);
@@ -622,6 +628,12 @@ namespace mecali
   casadi::Function Serial_Robot::forward_kinematics()
   {
     return this->forward_kinematics("transformation");
+  }
+
+  casadi::Function Serial_Robot::kinematic_jacobian(std::string frame, std::string frame_name)
+  {
+    CasadiData casadi_data(this->_casadi_model);
+    return get_kinematic_jacobian(this->_casadi_model, casadi_data, frame, frame_name);
   }
 
   casadi::Function Serial_Robot::robot_expressions(std::vector<std::string> frame_names, bool AUGMENT_ODE)

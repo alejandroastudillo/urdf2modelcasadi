@@ -18,8 +18,8 @@
 # If the CMakeCache.txt file exists, delete it.
   if test -f "CMakeCache.txt"; then
       print_title "########## Removing CMakeCache.txt ##########"
-      # rm CMakeCache.txt
-      ls | grep -v configure.sh | xargs rm -r # deletes everything, except configure.sh
+      rm CMakeCache.txt
+      # ls | grep -v configure.sh | xargs rm -r # deletes everything, except configure.sh
       #rm -rf CMakeFiles
       #rm *.so Makefile urdf2model_casadi *.cmake
       printf "   CMakeCache.txt removed\n"

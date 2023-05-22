@@ -3,13 +3,13 @@
 using namespace std;
 int main()
 {
-    string ws_path = "/home/mtplnr/mpc_ws/urdf2modelcasadi";
+    string ws_path = "/home/mtplnr/mpc_ws/urdf2moedlcasadi";
   // Example with MMO-500 URDF.
 
   // ---------------------------------------------------------------------
   // Create a model based on a URDF file
   // ---------------------------------------------------------------------
-  std::string urdf_filename = ws_path+"/urdf2model/models/xarm6/xarm6.urdf";
+  std::string urdf_filename = ws_path+"/urdf2model/models/xarm6/xarm6_ros.urdf";
   // Instantiate a Serial_Robot object called robot_model
   mecali::Serial_Robot robot_model;
   // Define (optinal) gravity vector to be used

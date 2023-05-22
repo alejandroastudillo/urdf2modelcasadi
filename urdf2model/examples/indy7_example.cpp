@@ -9,7 +9,7 @@ int main()
   // ---------------------------------------------------------------------
   // Create a model based on a URDF file
   // ---------------------------------------------------------------------
-  std::string urdf_filename = ws_path+"/urdf2model/models/xarm6/xarm6.urdf";
+  std::string urdf_filename = ws_path+"/urdf2model/models/indy7/indy7.urdf";
   // Instantiate a Serial_Robot object called robot_model
   mecali::Serial_Robot robot_model;
   // Define (optinal) gravity vector to be used
@@ -39,9 +39,9 @@ int main()
   casadi::Function C = robot_model.coriolis_matrix();
   casadi::Function G = robot_model.generalized_gravity();
   // // Set function for forward kinematics
-  std::vector<std::string> required_Frames = {"joint1", "joint2", "joint3", "joint4", "joint5","joint6", "xarm6_tcp"};
+  std::vector<std::string> required_Frames = {"joint0", "joint1", "joint2", "joint3", "joint4", "joint5", "indy7_tcp"};
 
-  std::string end_effector_name = "xarm6_tcp";
+  std::string end_effector_name = "indy7_tcp";
 
   casadi::Function fkpos_ee = robot_model.forward_kinematics("position", end_effector_name);
   casadi::Function fkrot_ee = robot_model.forward_kinematics("rotation", end_effector_name);
@@ -99,24 +99,24 @@ int main()
   // If you use options, you can set if you want to C-code-generate the function, or just save it as "second_function.casadi" (which can be loaded afterwards using casadi::Function::load("second_function.casadi"))
   
   mecali::Dictionary codegen_options;
-  codegen_options["c"] = false;
+  codegen_options["c"] = true;
   codegen_options["save"] = true;
-  mecali::generate_code(fd, "xarm6_fd", codegen_options);
-  mecali::generate_code(id, "xarm6_id", codegen_options);
-  mecali::generate_code(M, "xarm6_M", codegen_options);
-  mecali::generate_code(Minv, "xarm6_Minv", codegen_options);
-  mecali::generate_code(C, "xarm6_C", codegen_options);
-  mecali::generate_code(G, "xarm6_G", codegen_options);
+  mecali::generate_code(fd, "indy7_fd", codegen_options);
+  mecali::generate_code(id, "indy7_id", codegen_options);
+  mecali::generate_code(M, "indy7_M", codegen_options);
+  mecali::generate_code(Minv, "indy7_Minv", codegen_options);
+  mecali::generate_code(C, "indy7_C", codegen_options);
+  mecali::generate_code(G, "indy7_G", codegen_options);
   //mecali::generate_code(fk_ee_pos, "mmo500_ppr_fk_ee_pos", codegen_options);
-   mecali::generate_code(fkrot_ee, "xarm6_fkrot_ee", codegen_options);
-  mecali::generate_code(fk_ee, "xarm6_fk_ee", codegen_options);
-  mecali::generate_code(fk, "xarm6_fk", codegen_options);
-  mecali::generate_code(J_fd, "xarm6_J_fd", codegen_options);
-  mecali::generate_code(J_id, "xarm6_J_id", codegen_options);
-  mecali::generate_code(J_s, "xarm6_J_s", codegen_options);
-  mecali::generate_code(J_b, "xarm6_J_b", codegen_options);
+   mecali::generate_code(fkrot_ee, "indy7_fkrot_ee", codegen_options);
+  mecali::generate_code(fk_ee, "indy7_fk_ee", codegen_options);
+  mecali::generate_code(fk, "indy7_fk", codegen_options);
+  mecali::generate_code(J_fd, "indy7_J_fd", codegen_options);
+  mecali::generate_code(J_id, "indy7_J_id", codegen_options);
+  mecali::generate_code(J_s, "indy7_J_s", codegen_options);
+  mecali::generate_code(J_b, "indy7_J_b", codegen_options);
 
-  robot_model.generate_json("xarm6.json");
+  robot_model.generate_json("indy7.json");
 
   // std::cout << fd << std::endl;
 }

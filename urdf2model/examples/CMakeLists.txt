@@ -378,3 +378,37 @@ target_link_libraries( xarm6_example
        ${CASADI_LIB}
        pinocchio::pinocchio
                          )
+
+## xArm6_ros
+add_executable( xarm6_ros_example
+              xarm6_ros_example.cpp
+              )
+target_link_libraries( xarm6_ros_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+                         
+## indy7
+add_executable( indy7_example
+              indy7_example.cpp
+              )
+target_link_libraries( indy7_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+
+## indyrp2
+add_executable( indyrp2_example
+              indyrp2_example.cpp
+              )
+target_link_libraries( indyrp2_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+

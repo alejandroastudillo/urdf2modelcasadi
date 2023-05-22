@@ -9,7 +9,7 @@ int main()
   // ---------------------------------------------------------------------
   // Create a model based on a URDF file
   // ---------------------------------------------------------------------
-  std::string urdf_filename = ws_path+"/urdf2model/models/xarm6/xarm6.urdf";
+  std::string urdf_filename = ws_path+"/urdf2model/models/indyrp2/indyrp2.urdf";
   // Instantiate a Serial_Robot object called robot_model
   mecali::Serial_Robot robot_model;
   // Define (optinal) gravity vector to be used
@@ -39,9 +39,9 @@ int main()
   casadi::Function C = robot_model.coriolis_matrix();
   casadi::Function G = robot_model.generalized_gravity();
   // // Set function for forward kinematics
-  std::vector<std::string> required_Frames = {"joint1", "joint2", "joint3", "joint4", "joint5","joint6", "xarm6_tcp"};
+  std::vector<std::string> required_Frames = {"joint0","joint1", "joint2", "joint3", "joint4", "joint5","joint6", "indyrp2_tcp"};
 
-  std::string end_effector_name = "xarm6_tcp";
+  std::string end_effector_name = "indyrp2_tcp";
 
   casadi::Function fkpos_ee = robot_model.forward_kinematics("position", end_effector_name);
   casadi::Function fkrot_ee = robot_model.forward_kinematics("rotation", end_effector_name);
@@ -101,22 +101,22 @@ int main()
   mecali::Dictionary codegen_options;
   codegen_options["c"] = false;
   codegen_options["save"] = true;
-  mecali::generate_code(fd, "xarm6_fd", codegen_options);
-  mecali::generate_code(id, "xarm6_id", codegen_options);
-  mecali::generate_code(M, "xarm6_M", codegen_options);
-  mecali::generate_code(Minv, "xarm6_Minv", codegen_options);
-  mecali::generate_code(C, "xarm6_C", codegen_options);
-  mecali::generate_code(G, "xarm6_G", codegen_options);
+  mecali::generate_code(fd, "indyrp2_fd", codegen_options);
+  mecali::generate_code(id, "indyrp2_id", codegen_options);
+  mecali::generate_code(M, "indyrp2_M", codegen_options);
+  mecali::generate_code(Minv, "indyrp2_Minv", codegen_options);
+  mecali::generate_code(C, "indyrp2_C", codegen_options);
+  mecali::generate_code(G, "indyrp2_G", codegen_options);
   //mecali::generate_code(fk_ee_pos, "mmo500_ppr_fk_ee_pos", codegen_options);
-   mecali::generate_code(fkrot_ee, "xarm6_fkrot_ee", codegen_options);
-  mecali::generate_code(fk_ee, "xarm6_fk_ee", codegen_options);
-  mecali::generate_code(fk, "xarm6_fk", codegen_options);
-  mecali::generate_code(J_fd, "xarm6_J_fd", codegen_options);
-  mecali::generate_code(J_id, "xarm6_J_id", codegen_options);
-  mecali::generate_code(J_s, "xarm6_J_s", codegen_options);
-  mecali::generate_code(J_b, "xarm6_J_b", codegen_options);
+   mecali::generate_code(fkrot_ee, "indyrp2_fkrot_ee", codegen_options);
+  mecali::generate_code(fk_ee, "indyrp2_fk_ee", codegen_options);
+  mecali::generate_code(fk, "indyrp2_fk", codegen_options);
+  mecali::generate_code(J_fd, "indyrp2_J_fd", codegen_options);
+  mecali::generate_code(J_id, "indyrp2_J_id", codegen_options);
+  mecali::generate_code(J_s, "indyrp2_J_s", codegen_options);
+  mecali::generate_code(J_b, "indyrp2_J_b", codegen_options);
 
-  robot_model.generate_json("xarm6.json");
+  robot_model.generate_json("indyrp2.json");
 
   // std::cout << fd << std::endl;
 }

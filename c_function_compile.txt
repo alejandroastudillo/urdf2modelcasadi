@@ -1,0 +1,2 @@
+gcc -fPIC -shared -O3 {$MODEL_NAME}_G.c -o {$MODEL_NAME}_G.so -lm
+

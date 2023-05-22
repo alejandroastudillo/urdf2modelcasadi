@@ -81,8 +81,8 @@
         <material name="dr_white" />
       </visual>
       <inertial>
-        <origin xyz="-0.002 0.02692 -0.01332" rpy="0 0 0"/>
-        <mass value="2.382"/>
+        <origin xyz="0.00015 0.02724 -0.01357" rpy="0 0 0"/>
+        <mass value="2.177"/>
         <inertia
           ixx="0.00539427"
           ixy="1.095E-05"
@@ -116,10 +116,10 @@
       </visual>
       <inertial>
       <origin
-        xyz="0.03531 0.03386 0.21398"
+        xyz="0.0367 0.03356 0.2209"
         rpy="0 0 0" />
       <mass
-        value="2.267" />
+        value="2.011" />
       <inertia
         ixx="0.0248674"
         ixy="-0.00067797"
@@ -153,10 +153,10 @@
       </visual>
       <inertial>
       <origin
-        xyz="0.06781 0.01457 -0.10749"
+        xyz="0.06977 0.0116 -0.1135"
         rpy="0 0 0" />
       <mass
-        value="1.875" />
+        value="1.725" />
       <inertia
         ixx="0.0053694"
         ixy="-0.00092094"
@@ -189,8 +189,8 @@
         <material name="dr_white" />
       </visual>
       <inertial>
-        <origin xyz="-0.00021 0.02578 -0.02538" rpy="0 0 0"/>
-        <mass value="1.319"/>
+        <origin xyz="-0.0002 -0.02 0.026" rpy="0 0 0"/>
+        <mass value="1.211"/>
         <inertia
           ixx="4.39263e-03"
           ixy="-5.02800e-05"
@@ -224,10 +224,10 @@
       </visual>
       <inertial>
       <origin
-        xyz="0.05428 0.00543 -0.01781"
+        xyz="0.06387 0.0035 -0.0293"
         rpy="0 0 0" />
       <mass
-        value="1.34" />
+        value="1.206" />
       <inertia
         ixx="0.001202758"
         ixy="-0.00039147"
@@ -261,7 +261,7 @@
       </visual>
       <inertial>
       <origin
-        xyz="0 -0.00064 0.00952"
+        xyz="0 0.00677 0.01098"
         rpy="0 0 0" />
       <mass
         value="0.21" />

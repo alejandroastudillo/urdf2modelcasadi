@@ -34,7 +34,7 @@
 
 
 # for linking directories (as the -L flag in gcc)
-  find_library(CASADI_LIB casadi HINTS ${CASADI_DIR}/lib)
+  find_library(CASADI_LIB casadi HINTS ${SRC_DIR}/lib)
   # find_library(CASADI_LIB casadi HINTS ${CASADI_DIR})
   # set(casadi_DIR /home/alejandro/phd_software/casadi_source/build)
   # find_package(casadi REQUIRED)

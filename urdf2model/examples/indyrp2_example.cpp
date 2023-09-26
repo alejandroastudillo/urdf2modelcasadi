@@ -3,7 +3,7 @@
 using namespace std;
 int main()
 {
-    string ws_path = "/home/mtplnr/mpc_ws/urdf2modelcasadi";
+    string ws_path = "/home/xeno/mpc_ws/urdf2modelcasadi";
   // Example with MMO-500 URDF.
 
   // ---------------------------------------------------------------------
@@ -99,7 +99,7 @@ int main()
   // If you use options, you can set if you want to C-code-generate the function, or just save it as "second_function.casadi" (which can be loaded afterwards using casadi::Function::load("second_function.casadi"))
   
   mecali::Dictionary codegen_options;
-  codegen_options["c"] = false;
+  codegen_options["c"] = true;
   codegen_options["save"] = true;
   mecali::generate_code(fd, "indyrp2_fd", codegen_options);
   mecali::generate_code(id, "indyrp2_id", codegen_options);

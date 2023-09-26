@@ -6,7 +6,7 @@
 
 # Set variables used by CMake
   # export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/build/install_matlab"
-  export CASADI_DIRECTORY="/home/xeno/mpc_ws/casadi_source/casadi/build"
+  # export CASADI_DIRECTORY="/home/xeno/mpc_ws/casadi_source/casadi/build"
   # export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/casadi" # 352
   # export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/build-python/install_python"
   # export CASADI_DIRECTORY="/home/alejandro/phd_software/casadi_source/casadi_353"
@@ -29,7 +29,7 @@
   print_title "########## Executing CMake ##########"
   # cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE
   # cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE -DBUILD_UNIT_TESTS=ON -DDEBUG_MODE=ON
-  cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE -DCMAKE_INSTALL_PREFIX=$INSTALL_FOLDER -DCMAKE_BUILD_TYPE=Release
+  cmake ../urdf2model -DCASADI_DIR=$ENV{CASADI_DIRECTORY} -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE -DCMAKE_INSTALL_PREFIX=$INSTALL_FOLDER -DCMAKE_BUILD_TYPE=Release
   # cmake ../urdf2model -DCASADI_DIR=$CASADI_DIRECTORY -DPINOCCHIO_INC=$PINOCCHIO_INCLUDE -DEIGEN_INC=$EIGEN_INCLUDE -DCMAKE_INSTALL_PREFIX=$INSTALL_FOLDER
 # Execute the make command
   print_title "########## Executing make ##########"

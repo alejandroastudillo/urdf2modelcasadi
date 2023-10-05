@@ -185,3 +185,21 @@ int main()
       mecali::generate_code(fk_T_multiframes_by_name, "second_function", codegen_options);
 }
 ```
+
+## Citing
+
+If you use this library, we would be grateful if you could cite the following paper: 
+
+[Mixed Use of Analytical Derivatives and Algorithmic Differentiation for NMPC of Robot Manipulators](https://doi.org/10.1016%2Fj.ifacol.2021.11.156)
+```
+@inproceedings{Astudillo2021,
+    doi = {10.1016/j.ifacol.2021.11.156},
+    url = {https://doi.org/10.1016%2Fj.ifacol.2021.11.156},
+    year = 2021,
+    month = oct,
+    publisher = {Elsevier {BV}},
+    author = {Alejandro Astudillo and Justin Carpentier and Joris Gillis and Goele Pipeleers and Jan Swevers},
+    title = {Mixed Use of Analytical Derivatives and Algorithmic Differentiation for {NMPC} of Robot Manipulators},
+    booktitle = {Modeling, Estimation and Control Conference {MECC} 2021}  
+}
+```

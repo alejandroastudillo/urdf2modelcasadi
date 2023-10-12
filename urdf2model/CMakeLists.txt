@@ -34,11 +34,9 @@
 
 
 # for linking directories (as the -L flag in gcc)
-  find_library(CASADI_LIB casadi HINTS ${CASADI_DIR}/lib)
-  # find_library(CASADI_LIB casadi HINTS ${CASADI_DIR})
-  # set(casadi_DIR /home/alejandro/phd_software/casadi_source/build)
-  # find_package(casadi REQUIRED)
-
+  find_library(CASADI_LIB casadi HINTS $ENV{CASADI_INSTALL_LIB})
+  include_directories($ENV{CASADI_INSTALL_INCLUDE})
+  
   find_package(pinocchio REQUIRED)
   # link_directories( ${PINOCCHIO_LIBRARY_DIRS} )
 

@@ -104,6 +104,49 @@ namespace mecali
         throw std::invalid_argument("There is no option \'" + content + "\' for type of forward kinematics");
     }
   }
+  casadi::Function get_kinematic_jacobian(CasadiModel &cas_model, CasadiData &cas_data, std::string frame, std::string frame_name)
+  {
+    std::vector<CasadiScalar> func_outputs;
+    std::vector<std::string>  output_names;
+
+    // create the input vector (for pinocchio and for the returned function)
+    CasadiScalar        q_sx = casadi::SX::sym("q", cas_model.nq);
+    ConfigVectorCasadi  q_casadi(cas_model.nq);
+    pinocchio::casadi::copy( q_sx, q_casadi );
+
+    // call the forward kinematics function
+    pinocchio::computeJointJacobians(cas_model,   cas_data,    q_casadi);
+    pinocchio::updateFramePlacements(cas_model,   cas_data);
+
+    CasadiData::Matrix6x Jrh(6,cas_model.nv); Jrh.fill(0);
+    int frame_idx=cas_model.getFrameId(frame_name);
+    pinocchio::computeFrameJacobian(cas_model, cas_data, q_casadi, frame_idx, Jrh);
+    
+    if (frame.compare("space") == 0)
+    {
+        CasadiScalar J_s(6,cas_model.nq);
+        pinocchio::getFrameJacobian(cas_model, cas_data, frame_idx, pinocchio::WORLD, Jrh);
+        pinocchio::casadi::copy( Jrh, J_s);
+
+        func_outputs.insert(func_outputs.end(), J_s);
+
+        return casadi::Function("J_s", casadi::SXVector {q_sx}, func_outputs, std::vector<std::string>{"q"}, std::vector<std::string>{"J_s"});
+    }
+    else if (frame.compare("body") == 0)
+    {
+        CasadiScalar J_b(6,cas_model.nq);
+        pinocchio::getFrameJacobian(cas_model, cas_data, frame_idx, pinocchio::LOCAL, Jrh);
+        pinocchio::casadi::copy( Jrh, J_b);
+
+        func_outputs.insert(func_outputs.end(), J_b);
+
+        return casadi::Function("J_b", casadi::SXVector {q_sx}, func_outputs, std::vector<std::string>{"q"}, std::vector<std::string>{"J_b"});
+    }
+    else
+    {
+        throw std::invalid_argument("There is no option \'" + frame + "\' for type of kinematic jacobian");
+    }
+  }
 }
 
 // casadi::Function get_forward_kinematics_position(CasadiModel &cas_model, CasadiData &cas_data, std::string frame_name)

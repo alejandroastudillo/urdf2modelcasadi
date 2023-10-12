@@ -362,6 +362,14 @@ namespace mecali
     pt.put("Jacobian_forward_dynamics_path", this->name + "_J_fd.casadi");
     pt.put("Jacobian_inverse_dynamics_path", this->name + "_J_id.casadi");
 
+    pt.put("Jacobian_space_path", this->name + "_J_s.casadi");
+    pt.put("Jacobian_body_path", this->name + "_J_b.casadi");
+
+    pt.put("mass_matrix_path", this->name + "_M.casadi");
+    pt.put("mass_inverse_matrix_path", this->name + "_Minv.casadi");
+    pt.put("coriolis_path", this->name + "_C.casadi");
+    pt.put("gravity_path", this->name + "_G.casadi");
+
     // for (int i = 0; i < 10*(this->n_dof); i++)
     // {
     //   pt.put("barycentric_params.b"+i, this->barycentric_params[i]);
@@ -545,6 +553,12 @@ namespace mecali
 
     return get_coriolis(this->_casadi_model, casadi_data);
   }
+  casadi::Function Serial_Robot::mass_matrix()
+  {
+    CasadiData casadi_data(this->_casadi_model);
+
+    return get_mass_matrix(this->_casadi_model, casadi_data);
+  }
   casadi::Function Serial_Robot::mass_inverse_matrix()
   {
     CasadiData casadi_data(this->_casadi_model);
@@ -622,6 +636,12 @@ namespace mecali
   casadi::Function Serial_Robot::forward_kinematics()
   {
     return this->forward_kinematics("transformation");
+  }
+
+  casadi::Function Serial_Robot::kinematic_jacobian(std::string frame, std::string frame_name)
+  {
+    CasadiData casadi_data(this->_casadi_model);
+    return get_kinematic_jacobian(this->_casadi_model, casadi_data, frame, frame_name);
   }
 
   casadi::Function Serial_Robot::robot_expressions(std::vector<std::string> frame_names, bool AUGMENT_ODE)

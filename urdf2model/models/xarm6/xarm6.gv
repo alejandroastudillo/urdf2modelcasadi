@@ -1,0 +1,29 @@
+digraph G {
+node [shape=box];
+"base" [label="base"];
+"link_base" [label="link_base"];
+"link1" [label="link1"];
+"link2" [label="link2"];
+"link3" [label="link3"];
+"link4" [label="link4"];
+"link5" [label="link5"];
+"link6" [label="link6"];
+"xarm6_tool0" [label="xarm6_tool0"];
+node [shape=ellipse, color=blue, fontcolor=blue];
+"base" -> "fixed" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"fixed" -> "link_base"
+"link_base" -> "joint1" [label="xyz: 0 0 0.267 \nrpy: 0 -0 0"]
+"joint1" -> "link1"
+"link1" -> "joint2" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"joint2" -> "link2"
+"link2" -> "joint3" [label="xyz: 0.0535 0 0.2845 \nrpy: 0 -0 0"]
+"joint3" -> "link3"
+"link3" -> "joint4" [label="xyz: 0.0775 0 -0.3425 \nrpy: 0 -0 0"]
+"joint4" -> "link4"
+"link4" -> "joint5" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"joint5" -> "link5"
+"link5" -> "joint6" [label="xyz: 0.076 0 -0.097 \nrpy: 0 -0 0"]
+"joint6" -> "link6"
+"link6" -> "xarm6_flange_tool0" [label="xyz: 0 0 -0.0045 \nrpy: 0 -0 0"]
+"xarm6_flange_tool0" -> "xarm6_tool0"
+}

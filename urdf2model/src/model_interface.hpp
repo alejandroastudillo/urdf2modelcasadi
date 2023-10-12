@@ -6,7 +6,7 @@
 
 #include <casadi/casadi.hpp>
 #include <pinocchio/math/casadi.hpp>
-// #include <pinocchio/autodiff/casadi.hpp>
+#include <pinocchio/autodiff/casadi.hpp>
 
 #include <pinocchio/multibody/model.hpp>
 #include <pinocchio/parsers/urdf.hpp>
@@ -93,6 +93,7 @@ namespace mecali
     casadi::Function inverse_dynamics();
     casadi::Function generalized_gravity();
     casadi::Function coriolis_matrix();
+    casadi::Function mass_matrix();
     casadi::Function mass_inverse_matrix();
     casadi::Function joint_torque_regressor();
 
@@ -109,6 +110,8 @@ namespace mecali
     casadi::Function forward_kinematics(std::string content, int frame_index);
     casadi::Function forward_kinematics(std::string content);
     casadi::Function forward_kinematics();
+
+    casadi::Function kinematic_jacobian(std::string frame, std::string frame_name);
 
     casadi::Function robot_expressions(std::vector<std::string> frame_names, bool AUGMENT_ODE);
 

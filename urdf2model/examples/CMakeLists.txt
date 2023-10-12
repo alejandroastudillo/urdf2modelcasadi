@@ -5,7 +5,7 @@
 # include directories (as the -I flag in gcc)
 include_directories(${PINOCCHIO_INC})
 include_directories(${EIGEN_INC})
-include_directories(${CASADI_DIR}/include)
+include_directories(${CASADI_DIR}/install_folder/include)
 
 include_directories(${SRC_DIR})
 
@@ -52,6 +52,28 @@ target_link_libraries( kinova_2dof_example
                       pinocchio::pinocchio
                     )
 
+## Caesar example
+add_executable( caesar_example
+              caesar_example.cpp
+              )
+target_link_libraries( caesar_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+
+add_executable( caesar_noload_example
+              caesar_noload_example.cpp
+              )
+target_link_libraries( caesar_noload_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+
+
 # # UR10 example
 add_executable( ur10_example
                ur10_example.cpp
@@ -88,6 +110,17 @@ add_executable( gen3_example
                gen3_example.cpp
              )
 target_link_libraries( gen3_example
+
+                      ${PROJECT_NAME}
+                      ${CASADI_LIB}
+                      pinocchio::pinocchio
+                    )
+                    
+# # # Gen3 lite example
+add_executable( gen3_lite_example
+               gen3_lite_example.cpp
+             )
+target_link_libraries( gen3_lite_example
 
                       ${PROJECT_NAME}
                       ${CASADI_LIB}
@@ -193,3 +226,189 @@ target_link_libraries( mmo500_example
        ${CASADI_LIB}
        pinocchio::pinocchio
                          )
+
+add_executable( mmo500_ppr_example
+              mmo500_ppr_example.cpp
+              )
+target_link_libraries( mmo500_ppr_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+
+add_executable( mmo500_arm_example
+              mmo500_arm_example.cpp
+              )
+target_link_libraries( mmo500_arm_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+
+## HYU Mobile Manipulator
+add_executable( hyu_mm_example
+              hyu_mm_example.cpp
+              )
+target_link_libraries( hyu_mm_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+                         
+## Soft Morphing
+add_executable( sftmp_example
+              sftmp_example.cpp
+              )
+target_link_libraries( sftmp_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+                         
+## Soft Link
+add_executable( sftlink_example
+              sftlink_example.cpp
+              )
+target_link_libraries( sftlink_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+                         
+## Soft arm
+add_executable( softarm_example
+              softarm_example.cpp
+              )
+target_link_libraries( softarm_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+                         
+## Soft arm prismatic
+add_executable( softarm_prismatic_example
+              softarm_prismatic_example.cpp
+              )
+target_link_libraries( softarm_prismatic_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )                        
+
+## Soft arm prismatic
+add_executable( softarm_prismatic_slack_example
+              softarm_prismatic_slack_example.cpp
+              )
+target_link_libraries( softarm_prismatic_slack_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )   
+                                                  
+## tetra_mm
+add_executable( tetra_mm_example
+              tetra_mm_example.cpp
+              )
+target_link_libraries( tetra_mm_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+                         
+## mir_m0609
+add_executable( mir_m0609_ppr_example
+              mir_m0609_ppr_example.cpp
+              )
+target_link_libraries( mir_m0609_ppr_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+                         
+## mir250_m0609
+add_executable( mir250_m0609_ppr_example
+              mir250_m0609_ppr_example.cpp
+              )
+target_link_libraries( mir250_m0609_ppr_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+                         
+## mir250
+add_executable( mir250_ppr_example
+              mir250_ppr_example.cpp
+              )
+target_link_libraries( mir250_ppr_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+                         
+## mir_m0609
+add_executable( m0609_example
+              m0609_example.cpp
+              )
+target_link_libraries( m0609_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+                         
+## xArm6
+add_executable( xarm6_example
+              xarm6_example.cpp
+              )
+target_link_libraries( xarm6_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+
+## xArm6_ros
+add_executable( xarm6_ros_example
+              xarm6_ros_example.cpp
+              )
+target_link_libraries( xarm6_ros_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+                         
+## indy7
+add_executable( indy7_example
+              indy7_example.cpp
+              )
+target_link_libraries( indy7_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+
+## indyrp2
+add_executable( indyrp2_example
+              indyrp2_example.cpp
+              )
+target_link_libraries( indyrp2_example
+
+       ${PROJECT_NAME}
+       ${CASADI_LIB}
+       pinocchio::pinocchio
+                         )
+

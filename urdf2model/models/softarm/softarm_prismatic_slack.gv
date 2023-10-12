@@ -1,0 +1,44 @@
+digraph G {
+node [shape=box];
+"world" [label="world"];
+"Link1" [label="Link1"];
+"Link2" [label="Link2"];
+"Link3" [label="Link3"];
+"Link4" [label="Link4"];
+"Link5" [label="Link5"];
+"Link6" [label="Link6"];
+"Link6_R1" [label="Link6_R1"];
+"Link6_R2" [label="Link6_R2"];
+"Link7_R1" [label="Link7_R1"];
+"Link7_R2" [label="Link7_R2"];
+"Link7" [label="Link7"];
+"Link8" [label="Link8"];
+"tcp" [label="tcp"];
+node [shape=ellipse, color=blue, fontcolor=blue];
+"world" -> "world_fixed" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"world_fixed" -> "Link1"
+"Link1" -> "Joint1" [label="xyz: 0 0 -0.0947 \nrpy: 0 -0 0"]
+"Joint1" -> "Link2"
+"Link2" -> "Joint2" [label="xyz: 0 0 -0.0645 \nrpy: 0 -0 0"]
+"Joint2" -> "Link3"
+"Link3" -> "Joint3" [label="xyz: 0 0 -0.1603 \nrpy: 0 -0 0"]
+"Joint3" -> "Link4"
+"Link4" -> "Joint4" [label="xyz: 0 0 -0.054 \nrpy: 0 -0 0"]
+"Joint4" -> "Link5"
+"Link5" -> "Joint5" [label="xyz: 0.0853 0 -0.16858 \nrpy: 0 -0 0"]
+"Joint5" -> "Link6"
+"Link6" -> "Joint6_R1" [label="xyz: -0.0853 0 0.0135 \nrpy: 0 -0 0"]
+"Joint6_R1" -> "Link6_R1"
+"Link6_R1" -> "Joint6_R2" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"Joint6_R2" -> "Link6_R2"
+"Link6_R2" -> "Joint6" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"Joint6" -> "Link7_R1"
+"Link7_R1" -> "Joint7_R1" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"Joint7_R1" -> "Link7_R2"
+"Link7_R2" -> "Joint7_R2" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"Joint7_R2" -> "Link7"
+"Link7" -> "Joint7" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"Joint7" -> "Link8"
+"Link8" -> "tcp" [label="xyz: 0 0 -0.1858 \nrpy: 0 -0 0"]
+"tcp" -> "tcp"
+}
